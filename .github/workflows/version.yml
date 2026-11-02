@@ -1,7 +1,5 @@
 name: version-auto
-on:
-  push:
-    branches: [principal]
+on: push
 permissions:
   contents: write
 jobs:
