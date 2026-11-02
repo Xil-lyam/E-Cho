@@ -1,0 +1,846 @@
+<!doctype html>
+<html lang="fr" translate="no">
+<head>
+<meta name="google" content="notranslate">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#060914">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="U&amp;I">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="data:image/png;base64,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">
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
+<title>U&amp;I</title>
+<meta name="description" content="U&amp;I : écris à qui tu veux, quand tu veux. Une messagerie privée, simple et rapide.">
+<script src="js/config.js?v=106"></script>
+<!-- Vitesse : on démarre tout de suite le téléchargement du moteur Firebase et du script principal -->
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js">
+<link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js">
+<link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js">
+<link rel="preload" as="script" href="js/script.js?v=106">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,600;1,9..144,800&family=Roboto:ital,wght@0,400;0,500;0,700;0,900;1,700;1,900&display=swap">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,600;1,9..144,800&family=Roboto:ital,wght@0,400;0,500;0,700;0,900;1,700;1,900&display=swap"></noscript>
+
+<!-- ============================================================
+     CONFIGURATION : remplace les valeurs « COLLE_ICI » (voir LISEZMOI.md)
+     ============================================================ -->
+<script>
+/* U&I — js/boot/theme-init.js
+   Applique tout de suite le thème sauvegardé (évite le flash blanc) */
+(function(){try{var m=localStorage.getItem('uandi-mode')||'dark',k=localStorage.getItem('uandi-skin'),f={nuit:'dark',foret:'dark',clair:'light',rose:'light',neant:'dark'}[k];document.documentElement.dataset.eff=f||(m==='auto'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):m);if(f)document.documentElement.dataset.skin=k;}catch(e){}})();
+
+</script>
+
+<!-- Styles : l’ordre des fichiers = l’ordre de la cascade (ne pas changer) -->
+<link rel="stylesheet" href="css/style.css?v=106">
+<link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap"></noscript>
+
+</head>
+<body>
+<div id="splash" aria-live="polite"><div>U<b>&amp;</b>I</div><div class="sp" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div><small id="splashMsg">Chargement…</small></div>
+<!-- Connexion / inscription -->
+<section class="screen login" id="login" hidden>
+  <h1>U<span class="amp">&amp;</span>I</h1>
+  <p class="sub">Écris à qui tu veux, quand tu veux.</p>
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" id="tabLogin" aria-selected="true">Se connecter</button>
+    <button type="button" role="tab" id="tabSignup" aria-selected="false">Créer un compte</button>
+  </div>
+  <form id="authForm">
+    <label for="u">Nom d’utilisateur</label>
+    <input class="field" id="u" name="username" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required>
+    <p class="hint" id="uHint" hidden>3 à 20 caractères : lettres, chiffres, point, tiret ou souligné.</p>
+    <label for="p">Mot de passe</label>
+    <input class="field" id="p" name="password" type="password" autocomplete="current-password" required>
+    <label for="p2" id="p2Label" hidden>Répète le mot de passe</label>
+    <input class="field" id="p2" name="password2" type="password" autocomplete="new-password" hidden>
+    <button class="primary" id="authBtn" type="submit">Entrer</button>
+    <p class="err" id="authErr" hidden></p>
+  </form>
+  <form id="forgotMail" hidden autocomplete="off">
+    <label for="fmU">Nom d’utilisateur</label>
+    <input class="field" id="fmU" autocapitalize="none" autocorrect="off" spellcheck="false">
+    <button class="primary" id="fmSend" type="button">Recevoir un code par e-mail</button>
+    <div id="fmStep2" hidden>
+      <p class="hint" id="fmInfo" style="margin-top:10px"></p>
+      <label for="fmC">Code reçu par e-mail</label>
+      <input class="field" id="fmC" inputmode="numeric" maxlength="6" placeholder="123456" autocomplete="one-time-code" style="letter-spacing:.3em;text-align:center">
+      <label for="fmP">Nouveau mot de passe</label>
+      <input class="field" id="fmP" type="password" autocomplete="new-password">
+      <label for="fmP2">Répète le mot de passe</label>
+      <input class="field" id="fmP2" type="password" autocomplete="new-password">
+      <button class="primary" id="fmGo" type="submit">Changer mon mot de passe</button>
+      <button class="ghost" id="fmResend" type="button" style="margin-top:8px">Renvoyer le code</button>
+    </div>
+    <p class="err" id="fmErr" hidden></p>
+    <p class="hint" id="fmNone" hidden>Rien reçu ? Regarde dans les courriers indésirables. Sans e-mail de récupération sur ce compte, utilise ton code de récupération ou contacte le créateur de U&amp;I.</p>
+    <button class="ghost" id="fmSwap" type="button" style="margin-top:8px">J’ai un code de récupération</button>
+  </form>
+  <form id="forgotForm" hidden autocomplete="off">
+    <label for="fu">Nom d’utilisateur</label>
+    <input class="field" id="fu" autocapitalize="none" autocorrect="off" spellcheck="false">
+    <label for="fc">Code de récupération</label>
+    <input class="field" id="fc" placeholder="XXXXX-XXXXX-XXXXX-XXXXX" autocapitalize="characters" autocorrect="off" spellcheck="false">
+    <label for="fp">Nouveau mot de passe (facultatif)</label>
+    <input class="field" id="fp" type="password" autocomplete="new-password">
+    <button class="primary" id="forgotBtn" type="submit">Me reconnecter</button>
+    <p class="err" id="forgotErr" hidden></p>
+    <p class="hint">Pas de code de récupération ? Contacte le créateur de U&amp;I.</p>
+    <button class="ghost" id="fcSwap" type="button" style="margin-top:8px">Recevoir un code par e-mail à la place</button>
+  </form>
+  <button class="ghost" id="forgotLink" type="button">Mot de passe oublié ?</button>
+</section>
+
+<!-- Application -->
+<section class="screen login" id="apWait" hidden>
+  <h1>U<span class="amp">&amp;</span>I</h1>
+  <p class="sub" id="apMsg">Approbation par le créateur. Attends un instant…</p>
+  <button class="primary" id="apRetry" type="button" hidden>Réessayer</button>
+  <button class="primary" id="apOut" type="button">Se déconnecter</button>
+</section>
+
+<div id="app" hidden style="display:contents">
+  <!-- Liste des discussions -->
+  <section class="screen" id="viewList" hidden>
+    <header>
+      <div class="titlebox">
+        <h1>U<span class="amp">&amp;</span>I</h1>
+        <span class="me" id="meName"></span>
+      </div>
+      <div class="hbtns"><button class="notebtn" id="myNote" type="button" aria-label="Ma note" title="Ajouter une note"><span class="avatar" id="myNoteAv"></span><span class="plus" aria-hidden="true">+</span></button><button class="ghost" id="openMusic" type="button" aria-label="Musique" title="Musique">♪</button><button class="ghost" id="openGame" type="button">Jeux</button><button class="ghost" id="openSet" type="button">Réglages</button><button class="ghost" id="logout" type="button">Sortir</button></div>
+    </header>
+    <div class="annbar" id="annBar" hidden><span id="annTxt"></span><button id="annX" type="button" aria-label="Fermer l’annonce">✕</button></div>
+    <div class="annbar" id="bdayBar" hidden><span id="bdayTxt"></span><button id="bdayX" type="button" aria-label="Fermer">✕</button></div>
+    <div class="tbar">
+      <button class="tbtn" id="menuBtn" type="button" aria-label="Menu" aria-haspopup="true" aria-expanded="false"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg><i class="tdot" id="menuDot" hidden></i></button>
+      <button class="tbtn mid" id="unreadBtn" type="button" aria-pressed="false">Non lus <span class="frn" id="unreadN" hidden></span></button>
+      <button class="tbtn" id="searchBtn" type="button" aria-label="Chercher une personne"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+      <div class="kmenu" id="kmenu" hidden>
+        <button class="kitem" id="openFriends" type="button">Amis</button>
+        <button class="kitem" id="openReqs" type="button">Demandes <span class="frn" id="frN" hidden></span></button>
+        <button class="kitem" id="newGroup" type="button">Nouveau groupe</button>
+        <button class="kitem" id="openDSearch" type="button">Rechercher une discussion</button>
+      </div>
+    </div>
+    <form class="newchat" id="newChat" autocomplete="off" hidden>
+      <input id="who" placeholder="Nom d’utilisateur…" autocapitalize="none" autocorrect="off" spellcheck="false" aria-label="Nom d’utilisateur de la personne">
+      <button type="submit" aria-label="Chercher"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+    </form>
+    <p class="err" id="newErr" hidden></p>
+    <input class="field search" id="search" type="search" placeholder="Rechercher une discussion…" autocomplete="off" aria-label="Rechercher une discussion" hidden>
+    <ul id="chats"></ul>
+  </section>
+
+  <!-- Une discussion -->
+  <section class="screen" id="viewChat" hidden>
+    <header class="chathead">
+      <button class="back" id="back" type="button" aria-label="Retour aux discussions">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <span class="avatar sm" id="chatAvatar"></span>
+      <div class="titlebox">
+        <div class="nmrow"><span class="nmh" id="chatName"></span><span class="ubadge" id="chatBadge" hidden></span></div>
+        <div class="status" id="status"><span class="dot"></span><span id="statusText"></span></div>
+      </div>
+      <button class="ghost dots" id="callBtn" type="button" aria-label="Appel vocal"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.57a1 1 0 01-.25 1z"/></svg></button>
+      <button class="ghost dots" id="moreBtn" type="button" aria-label="Plus d'options" aria-expanded="false" aria-controls="chatMenu"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="5" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="12" r="2" fill="currentColor"/><circle cx="19" cy="12" r="2" fill="currentColor"/></svg></button>
+    </header>
+    <div class="chatmenu" id="chatMenu" hidden>
+      <button class="ghost" id="giBtn" type="button" hidden>Infos du groupe</button>
+      <button class="ghost" id="nickBtn" type="button">Surnom</button>
+      <button class="ghost" id="themeBtn" type="button">Thème</button>
+      <button class="ghost" id="liveBtn" type="button">Écouter ensemble</button>
+      <button class="ghost" id="pinChat" type="button">Épingler</button>
+      <button class="ghost delchat" id="delChat" type="button">Supprimer</button>
+    </div>
+    <form class="nickform" id="nickForm" hidden autocomplete="off">
+      <input class="field" id="nickIn" maxlength="24" placeholder="Surnom" aria-label="Surnom">
+      <button class="ghost" id="nickSave" type="submit">OK</button>
+    </form>
+    <p class="err" id="nickErr" hidden></p>
+    <div class="livebanner" id="liveBanner" hidden></div>
+    <div class="themes" id="themes" hidden role="group" aria-label="Thème du chat">
+      <button class="sw" type="button" data-ct="" style="--c:#5CE1FF" aria-label="Par défaut"></button><button class="sw" type="button" data-ct="rose" style="--c:#E8457C" aria-label="Rose"></button>
+      <button class="sw" type="button" data-ct="ocean" style="--c:#0B6FA4" aria-label="Océan"></button>
+      <button class="sw" type="button" data-ct="forest" style="--c:#4F8A70" aria-label="Vert sauge"></button>
+      <button class="sw" type="button" data-ct="amber" style="--c:#B45309" aria-label="Ambre"></button>
+      <button class="sw" type="button" data-ct="violet" style="--c:#6D4BD1" aria-label="Violet"></button>
+      <button class="sw" type="button" data-ct="graphite" style="--c:#344054" aria-label="Graphite"></button>
+      <span class="thsep" aria-hidden="true"></span>
+      <button class="bgsw" type="button" data-bg="" style="--c:#0E1430" aria-label="Fond par défaut"></button>
+      <button class="bgsw" type="button" data-bg="rose" style="--c:#FFD6E6" aria-label="Fond rose"></button>
+      <button class="bgsw" type="button" data-bg="citron" style="--c:#F4F6E4" aria-label="Fond vert citron"></button>
+    </div>
+    <div class="logwrap">
+      <div id="log" role="log"></div>
+      <button class="jump" id="jump" type="button" hidden>Nouveau message ↓</button>
+    </div>
+    <p class="typing" id="typingLine" hidden></p>
+    <p class="err" id="err" hidden></p>
+    <p class="count" id="count" hidden></p>
+    <div class="recbar" id="recbar" hidden>
+      <span class="recdot"></span><span class="rectime" id="rectime">0:00</span>
+      <div class="recmeter" id="recmeter" aria-hidden="true"></div>
+      <button class="ghost" id="recCancel" type="button">Annuler</button>
+    </div>
+    <div class="replybar" id="replybar" hidden><div class="rbody"><b id="replyWho"></b><span id="replyTxt"></span></div><button id="replyCancel" type="button" aria-label="Annuler la réponse">✕</button></div>
+    <div class="editbar" id="editbar" hidden><span>Modification du message</span><button class="ghost" id="editCancel" type="button">Annuler</button></div>
+    <form class="composer" id="composer" autocomplete="off">
+      <textarea id="msg" rows="1" maxlength="2000" placeholder="Écris un message…" aria-label="Message"></textarea>
+      <button class="send mic" id="pic" type="button" aria-label="Envoyer une photo">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 8a2 2 0 0 1 2-2h1.5l1.2-1.6A1 1 0 0 1 9.5 4h5a1 1 0 0 1 .8.4L16.5 6H18a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zM12 16.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/></svg>
+      </button>
+      <input type="file" id="picFile" accept="image/*" hidden>
+      <button class="send mic" id="docBtn" type="button" aria-label="Envoyer un fichier">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M21 12.5l-8.6 8.6a5 5 0 0 1-7.1-7.1l9-9a3.3 3.3 0 0 1 4.7 4.7l-9 9a1.7 1.7 0 0 1-2.4-2.4l8.3-8.3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <input type="file" id="docFile" hidden>
+      <button class="send mic" id="musBtn" type="button" aria-label="Envoyer une musique">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M9 18V6l10-2v12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.5" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="16.5" cy="16" r="2.5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+      </button>
+      <input type="file" id="musFile" accept="audio/*" hidden>
+      <button class="send mic" id="mic" type="button" aria-label="Message vocal">
+        <svg class="i-mic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zM6 11.5a6 6 0 0 0 12 0M12 17.5V21" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg class="i-up" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="send" id="send" type="submit" aria-label="Envoyer">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </form>
+  </section>
+
+  <!-- Musique -->
+  <section class="screen" id="viewMusic" hidden>
+    <header class="chathead">
+      <button class="back" id="musicBack" type="button" aria-label="Retour aux discussions">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="titlebox">
+        <span class="nmh">Musique</span>
+        <span class="me">Les musiques de ton appareil</span>
+      </div>
+    </header>
+    <div class="musicwrap">
+      <div class="nowplaying">
+        <div class="disc" id="mDisc" aria-hidden="true">♪</div>
+        <p class="mtitle" id="mTitle">Aucune musique sélectionnée</p>
+        <input type="range" id="mSeek" min="0" max="1000" value="0" aria-label="Position dans la musique">
+        <div class="mtimes"><span id="mCur">0:00</span><span id="mDur">0:00</span></div>
+        <div class="mctrls">
+          <button class="mbtn" id="mShuffle" type="button" aria-label="Lecture aléatoire" aria-pressed="false"><svg class="ln" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h3.5c2 0 3.2 1 4.2 2.6l2.6 4.8c1 1.6 2.2 2.6 4.2 2.6H21M18 14l3 3-3 3M3 17h3.5c1.3 0 2.3-.4 3.1-1.2M13.4 8.2C14.2 7.4 15.2 7 16.5 7H21M18 4l3 3-3 3"/></svg></button>
+          <button class="mbtn" id="mPrev" type="button" aria-label="Précédent"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 5h2v14H6zM20 5.5v13a1 1 0 0 1-1.5.86L9 13.4a1 1 0 0 1 0-1.72l9.5-5.96A1 1 0 0 1 20 5.5z"/></svg></button>
+          <button class="mbtn big" id="mPlay" type="button" aria-label="Lecture"><svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg><svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 4.5h3.5v15H7zM13.5 4.5H17v15h-3.5z"/></svg></button>
+          <button class="mbtn" id="mNext" type="button" aria-label="Suivant"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16 5h2v14h-2zM4 5.5v13a1 1 0 0 0 1.5.86L15 13.4a1 1 0 0 0 0-1.72L5.5 5.72A1 1 0 0 0 4 5.5z"/></svg></button>
+          <button class="mbtn" id="mRepeat" type="button" aria-label="Répéter" aria-pressed="false"><svg class="ln" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 2l4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4M21 13v2a3 3 0 0 1-3 3H3"/></svg></button>
+        </div>
+      </div>
+      <div class="mactions">
+        <button class="ghost" id="mAdd" type="button">Ajouter des musiques</button>
+        <button class="ghost danger" id="mClear" type="button" hidden>Tout retirer</button>
+        <input type="file" id="mFiles" accept="audio/*" multiple hidden>
+      </div>
+      <p class="mmsg" id="mMsg" role="status" aria-live="polite"></p>
+      <ul id="mList"></ul>
+      <div id="mShared" hidden>
+        <p class="mmsg" id="mShTitle" style="margin:18px 0 6px;font-weight:600">☁ Musiques partagées</p>
+        <p class="mmsg" id="mShMsg" role="status" aria-live="polite"></p>
+        <ul id="mShList"></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Jeux -->
+  <button id="openNews" type="button" hidden aria-hidden="true"></button>
+  <section class="screen" id="viewNews" hidden>
+    <header class="chathead">
+      <button class="back" id="nwBack" type="button" aria-label="Retour aux discussions">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="titlebox">
+        <span class="nmh">Actualités</span>
+        <span class="me">Lettres anonymes : personne ne sait qui écrit</span>
+      </div>
+    </header>
+    <div class="nwtabs"><button class="nwtab" type="button" data-p="feed" aria-pressed="true">Lettres</button><button class="nwtab" type="button" data-p="threads" aria-pressed="false">Discussions anonymes<i class="nwdot" id="atDot" hidden></i></button></div>
+    <div class="nwpane" id="nwPaneFeed">
+    <section class="td-card" id="tdEntry">
+      <div class="td-entry-copy"><b>🎲 Action ou vérité</b><span>Crée une partie, invite les autres et jouez ensemble en direct.</span></div>
+      <button class="nwpost" id="tdOpen" type="button">Jouer</button>
+    </section>
+    <section class="td-panel" id="tdPanel" hidden aria-label="Action ou vérité">
+      <div class="td-top"><button class="vact" id="tdClose" type="button">← Actualités</button><div><b>🎲 Action ou vérité</b><small>Une partie en direct avec les autres joueurs</small></div></div>
+      <div class="td-create">
+        <label for="tdNameMode">Comment apparaître dans la partie ?</label>
+        <select id="tdNameMode"><option value="profile">Mon profil</option><option value="pseudo">Un pseudo</option><option value="anon">Anonyme</option></select>
+        <input id="tdPseudo" maxlength="24" placeholder="Ton pseudo (si choisi)" hidden>
+        <label for="tdStart">Heure de début (facultatif)</label>
+        <input id="tdStart" type="datetime-local">
+        <label class="td-cert" id="tdCertWrap" for="tdCertOnly" hidden><input id="tdCertOnly" type="checkbox"> Réservée aux certifiés</label>
+        <button class="nwpost" id="tdCreate" type="button">＋ Créer une partie</button>
+      </div>
+      <p class="td-status" id="tdStatus" role="status" aria-live="polite">Chargement des parties…</p>
+      <div id="tdRooms" class="td-rooms"></div>
+      <div id="tdRoom" class="td-room" hidden>
+        <div class="td-room-head"><div><small>Partie</small><b id="tdRoomTitle">Action ou vérité</b></div><span id="tdRoomState" class="td-pill">En attente</span></div>
+        <p id="tdRoomInfo" class="td-muted"></p>
+        <div id="tdSpinBadge" class="td-spin-badge" aria-live="polite"></div>
+        <div id="tdWheel" class="td-wheel"><div id="tdPlayers" class="td-players"></div><div class="td-bottle" id="tdBottle" role="img" aria-label="Bouteille du jeu"><svg viewBox="0 0 60 160" width="100%" height="100%" aria-hidden="true"><defs><linearGradient id="tdGl" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".30"/><stop offset=".5" stop-color="#fff" stop-opacity=".06"/><stop offset="1" stop-color="#fff" stop-opacity=".24"/></linearGradient><linearGradient id="tdLq" x1="0" x2="0" y1="0" y2="1"><stop offset="0" style="stop-color:var(--accent,#ff3d5a)"/><stop offset="1" stop-color="#7a0f2c"/></linearGradient><linearGradient id="tdLs" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#000" stop-opacity=".28"/><stop offset=".4" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".30"/></linearGradient><linearGradient id="tdGd" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#b88a1c"/><stop offset=".45" stop-color="#ffe08a"/><stop offset="1" stop-color="#a4781a"/></linearGradient><clipPath id="tdBc"><path d="M26 16h8v26C34 54 43 58 43 74V144Q43 154 33 154H27Q17 154 17 144V74C17 58 26 54 26 42Z"/></clipPath></defs><polygon points="30,1 24.5,9.5 35.5,9.5" fill="var(--accent,#ff3d5a)" stroke="#fff" stroke-opacity=".75" stroke-width=".8" stroke-linejoin="round"/><path d="M26 16h8v26C34 54 43 58 43 74V144Q43 154 33 154H27Q17 154 17 144V74C17 58 26 54 26 42Z" fill="rgba(255,255,255,.10)"/><g clip-path="url(#tdBc)"><path d="M10 82Q20 77.5 30 82T50 82V160H10Z" fill="url(#tdLq)"/><path d="M10 82Q20 77.5 30 82T50 82" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="1"/><rect x="10" y="60" width="40" height="100" fill="url(#tdLs)"/><circle cx="24" cy="140" r="1.6" fill="#fff" opacity=".35"/><circle cx="36" cy="132" r="1.1" fill="#fff" opacity=".3"/><circle cx="27" cy="124" r=".9" fill="#fff" opacity=".3"/><circle cx="35" cy="146" r="1.3" fill="#fff" opacity=".25"/></g><path d="M26 16h8v26C34 54 43 58 43 74V144Q43 154 33 154H27Q17 154 17 144V74C17 58 26 54 26 42Z" fill="url(#tdGl)" stroke="#7a1636" stroke-opacity=".55" stroke-width="1" stroke-linejoin="round"/><rect x="19.5" y="98" width="21" height="30" rx="4" fill="#fff4ea" stroke="#e7cfae" stroke-width=".6"/><path d="M30 121.5C24.5 117.4 22 114.6 22 111.3A4 4 0 0 1 30 109.8A4 4 0 0 1 38 111.3C38 114.6 35.5 117.4 30 121.5Z" fill="var(--accent,#ff3d5a)"/><rect x="23.5" y="102" width="13" height="2" rx="1" fill="#c9a95a"/><rect x="26" y="124" width="8" height="1.6" rx=".8" fill="#c9a95a"/><rect x="24" y="9.5" width="12" height="8.5" rx="2.2" fill="url(#tdGd)" stroke="#7a5a10" stroke-opacity=".5" stroke-width=".6"/><path d="M26.5 11.2v5.2M30 11.2v5.2M33.5 11.2v5.2" stroke="#7a5a10" stroke-opacity=".35" stroke-width=".6" stroke-linecap="round"/><path d="M21 80V140" stroke="#fff" stroke-opacity=".5" stroke-width="2.4" stroke-linecap="round"/><path d="M27.8 20V40" stroke="#fff" stroke-opacity=".55" stroke-width="1.4" stroke-linecap="round"/><path d="M39.5 82V132" stroke="#fff" stroke-opacity=".22" stroke-width="1.2" stroke-linecap="round"/><ellipse cx="37" cy="64" rx="1.6" ry="3" fill="#fff" opacity=".4" transform="rotate(-25 37 64)"/></svg></div></div>
+        <button class="nwpost" id="tdSpin" type="button">🌀 Faire tourner la bouteille</button>
+        <div id="tdTurn" class="td-turn" hidden>
+          <p id="tdTurnText"></p>
+          <div id="tdVoice" class="td-voice" hidden>
+            <p id="tdVoiceInfo" class="td-muted"></p>
+            <div class="td-voice-btns"><button class="td-mic" id="tdMicBtn" type="button" hidden>🎙️ Parler</button></div>
+          </div>
+          <div id="tdChooseControls" hidden>
+            <p class="td-muted" style="text-align:center">Que choisis-tu ?</p>
+            <div class="td-choice"><button class="vact" id="tdAction" type="button">🔥 Action</button><button class="vact" id="tdTruth" type="button">💬 Vérité</button></div>
+          </div>
+          <div id="tdPickerControls" hidden>
+            <label for="tdPrompt" id="tdPromptLabel">Ta proposition</label><textarea id="tdPrompt" maxlength="240" rows="3" placeholder="Écris l’action ou la question… Si tu laisses vide, une idée sera choisie au hasard."></textarea>
+            <button class="nwpost" id="tdSendPrompt" type="button">Envoyer la proposition</button>
+          </div>
+          <div id="tdPromptBox" hidden><p id="tdPromptText" class="td-prompt"></p><p id="tdAnswerText" class="td-answer" hidden></p></div>
+          <div id="tdTargetControls" hidden>
+            <label for="tdAnswer">Ta réponse</label><textarea id="tdAnswer" maxlength="500" rows="3" placeholder="Écris ta réponse ou raconte ce que tu as fait…"></textarea>
+            <button class="nwpost" id="tdDone" type="button">Envoyer ma réponse</button>
+          </div>
+          <div id="tdVoteBox" hidden>
+            <div id="tdVoteTimer" hidden><div class="td-timer"><i id="tdTimerBar"></i></div><p id="tdTimerTxt" class="td-timer-txt"></p></div>
+            <div id="tdVoteBtns" class="td-vote" hidden><button class="td-ok" id="tdApprove" type="button">✅ Approuver</button><button class="td-no" id="tdReject" type="button">❌ Désapprouver</button></div>
+            <p id="tdVoteInfo" class="td-muted" style="text-align:center"></p>
+          </div>
+        </div>
+        <div id="tdGv" class="td-gv" hidden>
+          <div class="td-gv-head"><b>🎧 Vocal du salon</b><small id="tdGvInfo"></small></div>
+          <div id="tdGvPeople" class="td-gv-people"></div>
+          <div class="td-gv-btns"><button class="td-mic" id="tdGvTalk" type="button">🎙️ Parler</button><button class="vact" id="tdGvSpk" type="button">🔊 Son actif</button><button class="vact" id="tdGvCfg" type="button">⚙️ Réglages</button></div>
+          <div id="tdGvSet" class="td-gv-set" hidden>
+            <div class="td-gv-set-head"><b>Qui m’entend ?</b><span><button class="td-gv-mini" id="tdGvAll" type="button">Tous</button> <button class="td-gv-mini" id="tdGvNone" type="button">Personne</button></span></div>
+            <div id="tdGvRows" class="td-gv-rows"></div>
+          </div>
+          <div id="tdGvAudios" hidden></div>
+        </div>
+        <div id="tdChat" class="td-chat" hidden>
+          <div class="td-chat-head"><b>🤫 Chat des non-désignés</b><small id="tdChatHint"></small></div>
+          <div id="tdChatList" class="td-chat-list" role="log" aria-live="polite"></div>
+          <div id="tdChatForm" class="td-chat-form"><input id="tdChatInput" maxlength="140" placeholder="Souffle une idée…" autocomplete="off" enterkeyhint="send"><button class="nwpost" id="tdChatSend" type="button">Envoyer</button></div>
+        </div>
+        <div id="tdHost" class="td-host" hidden>
+          <div class="td-host-head"><b>👑 Gérer le salon</b><small>Retire un joueur de ta partie. Il ne pourra pas revenir.</small></div>
+          <div id="tdHostList" class="td-host-list"></div>
+        </div>
+        <audio id="tdAudio" playsinline></audio>
+        <button class="vact" id="tdLeave" type="button">Quitter la partie</button>
+        <button class="vact" id="tdStop" type="button" hidden>⏹ Arrêter la partie</button>
+      </div>
+    </section>
+    <div class="nwaud" id="nwAud"><span id="nwAudTxt"></span><span id="nwAudSw" hidden><button class="vact" type="button" data-a="C" aria-pressed="true">Certifiés</button><button class="vact" type="button" data-a="N" aria-pressed="false">Non certifiés</button></span></div>
+    <div class="nwbox">
+      <div class="nwid">
+        <span class="nwav" id="nwIdAv"></span>
+        <div><small>Ton profil anonyme</small><b id="nwIdName">…</b></div>
+        <button class="vact" id="nwReroll" type="button" title="Nouvelle identité aléatoire">🎲 Changer</button>
+        <button class="vact nwidtog" id="nwIdToggle" type="button" aria-pressed="false" aria-label="Masquer le nom et le bouton Changer" title="Masquer / afficher">🙈</button>
+      </div>
+      <textarea class="nwin" id="nwText" rows="3" maxlength="600" placeholder="Écris ta lettre anonyme… (pas d’insultes, pas de noms)" aria-label="Ta lettre anonyme"></textarea>
+      <div class="nwprev" id="nwPrev" hidden><img id="nwPrevImg" alt="Aperçu de la photo"><button class="vact" id="nwPrevX" type="button" aria-label="Retirer la photo">✖ Retirer</button></div>
+      <input type="file" id="nwFile" accept="image/*" hidden>
+      <div class="nwrow"><span class="hint" id="nwCount">0 / 600</span><button class="vact" id="nwPhoto" type="button">📷 Photo</button><button class="nwpost" id="nwPost" type="button">Publier</button></div>
+      <p class="err" id="nwErr" hidden></p>
+    </div>
+    <div class="vfeed nwfeed" id="nwFeed"></div>
+    </div>
+    <div class="nwpane" id="nwPaneThreads" hidden>
+      <form class="nwcin" id="atTeaseForm" autocomplete="off" style="padding:10px 12px 0"><input class="nwcinput" id="atTeaseWho" maxlength="30" placeholder="Identifiant de la personne à taquiner…" autocapitalize="none" aria-label="Identifiant de la personne à taquiner"><button class="nwpost" type="submit">🎭 Taquiner</button></form>
+      <p class="err" id="atTErr" hidden style="padding:0 12px"></p>
+      <div style="padding:8px 12px 0"><button class="vact" id="atOptBtn" type="button" aria-pressed="true"></button></div>
+      <div class="atlist" id="atList"></div>
+    </div>
+    <div class="nwpane" id="nwPaneThread" hidden>
+      <div class="athead"><span class="nwav" id="atAv"></span><b id="atName">Anonyme</b></div>
+      <div class="atmsgs" id="atMsgs"></div>
+      <p class="err" id="atErr" hidden></p>
+      <div class="atcomp"><input class="nwcinput" id="atText" maxlength="600" placeholder="Message anonyme…" autocomplete="off" aria-label="Message anonyme"><button class="nwpost" id="atSend" type="button">Envoyer</button></div>
+    </div>
+  </section>
+
+  <section class="screen" id="viewGame" hidden>
+    <header class="chathead">
+      <button class="back" id="gameBack" type="button" aria-label="Retour aux discussions">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="titlebox">
+        <span class="nmh">Jeux</span>
+        <span class="me">Mots mélangés : retrouve le mot caché</span>
+      </div>
+    </header>
+    <div class="gamewrap">
+      <button class="ghost" id="m3Open" type="button">🍪 Cookie Match · Niveaux</button>
+      <button class="ghost" id="brOpen" type="button">🎧 Beat Rush · Rythme &amp; musique</button>
+      <button class="ghost" id="sfxBtn" type="button" data-sfx>🔊 Sons</button>
+      <div class="wstats">
+        <div class="wstat"><b id="wScore">0</b><span>Score</span></div>
+        <div class="wstat"><b id="wStreak">0</b><span>Série</span></div>
+        <div class="wstat"><b id="wBest">0</b><span>Meilleur</span></div>
+      </div>
+      <p class="gameinfo">Touche les lettres dans le bon ordre (ou tape-les au clavier).</p>
+      <div class="wslots" id="wSlots"></div>
+      <p class="wmsg" id="wMsg" role="status" aria-live="polite"></p>
+      <div class="wtiles" id="wTiles"></div>
+      <div class="wbtns">
+        <button class="ghost" id="wShuffle" type="button">Mélanger</button>
+        <button class="ghost" id="wClear" type="button">Effacer</button>
+        <button class="ghost" id="wHint" type="button">Indice</button>
+        <button class="ghost" id="wSkip" type="button">Passer</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<nav class="tabbar" id="tabbar" aria-label="Navigation principale" hidden>
+  <button class="tab" type="button" data-t="chats" aria-label="Discussions"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5h16v11H9.5L5 20v-3.5H4z"/></svg><span>Discussions</span><i class="tabbadge" hidden></i></button>
+  <button class="tab" type="button" data-t="news" aria-label="Actualités"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11v16H7a2 2 0 0 1-2-2z"/><path d="M16 9h3v9a2 2 0 0 1-2 2"/><path d="M8.5 8.5h4M8.5 12h4M8.5 15.5h4"/></svg><span>Actualités</span></button>
+  <button class="tab" type="button" data-t="music" aria-label="Musique"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg><span>Musique</span></button>
+  <button class="tab" type="button" data-t="game" aria-label="Jeux"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8.5h10a4 4 0 0 1 4 4v1.5a3 3 0 0 1-5.2 2l-1.1-1.2H9.3L8.2 16A3 3 0 0 1 3 14v-1.5a4 4 0 0 1 4-4z"/><path d="M8 11v3M6.5 12.5h3"/><circle cx="15.5" cy="12" r=".6"/><circle cx="17.5" cy="13.5" r=".6"/></svg><span>Jeux</span></button>
+  <button class="tab" type="button" data-t="set" aria-label="Réglages"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg><span>Réglages</span></button>
+</nav>
+<div class="livebar" id="livebar" hidden role="status"></div>
+<button class="toast" id="toast" type="button" hidden></button>
+
+<dialog class="sheet" id="emDlg" aria-labelledby="emTitle">
+  <h2 id="emTitle">E-mail de récupération</h2>
+  <div class="sec" id="emStep1">
+    <p class="lbl">Ajoute ton vrai e-mail pour pouvoir retrouver ton compte si tu oublies ton mot de passe.</p>
+    <input class="field" id="emInput" type="email" inputmode="email" autocomplete="email" autocapitalize="none" spellcheck="false" placeholder="ton@email.com" aria-label="Ton e-mail">
+  </div>
+  <div class="sec" id="emStep2" hidden>
+    <p class="lbl" id="emSent"></p>
+    <input class="field" id="emCode" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="123456" aria-label="Code reçu" style="letter-spacing:.3em;text-align:center">
+  </div>
+  <p class="err" id="emErr" hidden></p>
+  <div class="pfrow">
+    <button class="ghost" id="emGo" type="button">Envoyer le code</button>
+    <button class="ghost" id="emLater" type="button">Plus tard</button>
+  </div>
+</dialog>
+
+<dialog class="sheet" id="noteEdit" aria-labelledby="neTitle">
+  <h2 id="neTitle">Ma note</h2>
+  <div class="sec">
+    <p class="lbl">Une courte note, visible 24 h par tes amis.</p>
+    <input class="field" id="noteInput" maxlength="60" placeholder="Ta note…" autocomplete="off" aria-label="Ta note">
+    <p class="hint" id="noteCount" style="text-align:right">0 / 60</p>
+    <p class="err" id="noteErr" hidden></p>
+    <label class="hint" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="noteCloseOnly"> Visible par mes amis proches seulement</label>
+  </div>
+  <div class="pfrow">
+    <button class="ghost" id="noteSave" type="button">Partager</button>
+    <button class="ghost" id="noteDel" type="button">Supprimer</button>
+    <button class="ghost" id="noteCancel" type="button">Annuler</button>
+  </div>
+</dialog>
+
+<dialog class="sheet" id="userCard" aria-label="Profil">
+  <div class="pfrow"><span class="avatar lg" id="ucAv"></span><div><strong id="ucName"></strong><p class="hint" id="ucSub"></p></div></div>
+  <div class="ucbtns">
+    <button class="ghost" id="ucFriend" type="button"></button>
+    <button class="ghost" id="ucOpen" type="button"></button>
+    <button class="ghost" id="ucStar" type="button" hidden>⭐ Ami proche</button>
+    <button class="ghost" id="ucMsg" type="button">✉️ Envoyer une invitation par message</button>
+  </div>
+  <div class="ucmsg" id="ucMsgBox" hidden><input class="field" id="ucMsgIn" maxlength="500" placeholder="Ton message d’invitation…" autocomplete="off" aria-label="Message d’invitation"><button class="ghost" id="ucMsgSend" type="button">Envoyer</button></div>
+  <p class="err" id="ucErr" hidden></p>
+  <div class="pfrow"><button class="ghost" id="ucClose" type="button">Fermer</button></div>
+</dialog>
+
+<dialog class="sheet" id="frDlg" aria-label="Amis et demandes">
+  <div class="frtabs"><button class="ghost" id="frTabReq" type="button">Demandes</button><button class="ghost" id="frTabFr" type="button">Amis</button></div>
+  <div class="frbody" id="frBody"></div>
+  <p class="err" id="frErr" hidden></p>
+  <div class="pfrow"><button class="ghost" id="frClose" type="button">Fermer</button></div>
+</dialog>
+
+<dialog class="sheet" id="noteView" aria-label="Note">
+  <div class="pfrow">
+    <span class="avatar lg" id="nvAv"></span>
+    <div><strong id="nvName"></strong><p class="hint" id="nvTime"></p></div>
+  </div>
+  <p class="nvtext" id="nvText"></p>
+  <div class="likerow">
+    <button class="likebtn" id="nvLike" type="button" aria-pressed="false" aria-label="Liker ce profil"><span class="heart" aria-hidden="true">♡</span><span id="nvLikeN">0</span></button>
+  </div>
+  <p class="err" id="nvLikeErr" hidden></p>
+  <div class="nvreply" id="nvReplyBox" hidden><input class="field" id="nvReplyIn" maxlength="500" placeholder="Répondre à sa note…" autocomplete="off" aria-label="Répondre à sa note"><button class="ghost" id="nvReplySend" type="button">Envoyer</button></div>
+  <p class="err" id="nvReplyErr" hidden></p>
+  <div class="nvreacts" id="nvReacts" hidden></div>
+  <div class="pfrow">
+    <button class="ghost" id="nvWrite" type="button">Écrire</button>
+    <button class="ghost" id="nvClose" type="button">Fermer</button>
+  </div>
+</dialog>
+
+<dialog class="sheet" id="groupNew" aria-label="Nouveau groupe">
+  <p class="lbl">Nouveau groupe</p>
+  <input class="field" id="gnTitle" maxlength="40" placeholder="Nom du groupe" autocomplete="off">
+  <textarea class="field" id="gnNames" rows="3" placeholder="Noms d’utilisateur, séparés par des espaces ou des virgules" autocapitalize="none" autocorrect="off" spellcheck="false"></textarea>
+  <p class="hint">Jusqu’à 29 personnes en plus de toi (30 au total).</p>
+  <p class="err" id="gnErr" hidden></p>
+  <div class="pfrow"><button class="ghost" id="gnGo" type="button">Créer</button><button class="ghost" id="gnCancel" type="button">Annuler</button></div>
+</dialog>
+
+<dialog class="sheet" id="groupInfo" aria-label="Infos du groupe">
+  <div class="pfrow">
+    <span class="avatar lg" id="giAv"></span>
+    <button class="ghost" id="giPick" type="button">Photo</button>
+    <button class="ghost" id="giDel" type="button">Retirer</button>
+    <input type="file" id="giFile" accept="image/*" hidden>
+  </div>
+  <p class="lbl">Nom du groupe</p>
+  <div class="pfrow"><input class="field" id="giTitle" maxlength="40" autocomplete="off"><button class="ghost" id="giSave" type="button">OK</button></div>
+  <p class="lbl" id="giCount">Membres</p>
+  <div class="gimembers" id="giMembers"></div>
+  <div id="giAddSec">
+    <p class="lbl">Ajouter des personnes</p>
+    <textarea class="field" id="gaNames" rows="2" placeholder="Noms d’utilisateur, séparés par des espaces" autocapitalize="none" autocorrect="off" spellcheck="false"></textarea>
+    <button class="ghost" id="gaGo" type="button">Ajouter</button>
+  </div>
+  <p class="hint" id="giHint" hidden>Seul le créateur du groupe peut le modifier.</p>
+  <p class="err" id="giErr" hidden></p>
+  <div class="pfrow"><button class="ghost" id="giClose" type="button">Fermer</button></div>
+</dialog>
+
+<dialog id="lockDlg" aria-label="Verrouillage">
+  <div class="lkbox">
+    <h2 id="lkTitle"></h2>
+    <p class="hint" id="lkSub"></p>
+    <div class="lkdots" id="lkDots"></div>
+    <p class="err" id="lkErr" hidden></p>
+    <div class="lkpad" id="lkPad"></div>
+    <div class="lkfoot"><button class="ghost" id="lkBio" type="button" hidden>Empreinte</button><button class="ghost" id="lkCancel" type="button" hidden>Annuler</button><button class="ghost" id="lkForgot" type="button" hidden>Code oublié ?</button></div>
+  </div>
+</dialog>
+
+<dialog class="sheet" id="crDlg" aria-label="Outils créateur">
+  <h2 id="crTitle"></h2>
+  <div id="crBody" style="max-height:55vh;overflow-y:auto"></div>
+  <p class="err" id="crErr" hidden></p>
+  <div class="pfrow"><button class="ghost" id="crClose" type="button">Fermer</button></div>
+</dialog>
+
+<dialog class="sheet" id="accDlg" aria-label="Tous les comptes">
+  <h2 id="accTitle">Comptes</h2>
+  <input class="field" id="accSearch" type="search" placeholder="Rechercher…" autocomplete="off" autocapitalize="none" aria-label="Rechercher un compte">
+  <p class="err" id="accListErr" hidden></p>
+  <div class="gimembers" id="accRows" style="max-height:50vh"></div>
+  <p class="hint" style="margin-top:10px">Un nom reste affiché alors que le compte est déjà supprimé ? Colle son identifiant (uid) :</p>
+  <input class="field" id="accPurgeUid" type="text" placeholder="uid du compte" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" aria-label="uid du compte à nettoyer">
+  <button class="ghost" id="accPurgeGo" type="button" style="margin-top:8px">Nettoyer cet identifiant</button>
+  <div class="pfrow"><button class="ghost" id="accClose" type="button">Fermer</button></div>
+</dialog>
+
+<dialog class="sheet" id="m3Dlg" aria-label="Cookie Match">
+  <h2 id="m3Title">Niveau 1</h2>
+  <div id="m3Levels" hidden><div class="m3lv" id="m3LvGrid"></div></div>
+  <div id="m3Play">
+    <div class="m3top">
+      <div class="wstat"><b id="m3Moves">0</b><span>Coups</span></div>
+      <div class="wstat"><b id="m3Score">0</b><span id="m3Tgt">Objectif</span></div>
+    </div>
+    <div class="m3bar"><i id="m3Bar"></i></div>
+    <div class="m3grid" id="m3Grid"></div>
+  </div>
+  <div class="m3ov" id="m3Ov" hidden><b id="m3OvT"></b><span id="m3OvS" class="hint"></span><button class="ghost" id="m3OvGo" type="button"></button></div>
+  <div class="pfrow" style="margin-top:14px"><button class="ghost" id="m3LvBtn" type="button">Niveaux</button><button class="ghost" type="button" data-sfx="short" aria-label="Sons">🔊</button><button class="ghost" id="m3Close" type="button">Fermer</button></div>
+</dialog>
+
+<dialog class="sheet" id="brDlg" aria-label="Beat Rush">
+  <h2>Beat Rush 🎧</h2>
+  <div class="wstats">
+    <div class="wstat"><b id="brScore">0</b><span>Score</span></div>
+    <div class="wstat"><b id="brCombo">0</b><span>Combo</span></div>
+  </div>
+  <div class="brhp"><i id="brHp"></i></div>
+  <div class="brwrap">
+    <canvas id="brCv" aria-label="Zone de jeu"></canvas>
+    <div class="brov" id="brOv">
+      <b id="brOvT">Beat Rush</b><span class="brstars" id="brStars"></span><span id="brOvS" class="hint"></span>
+      <div class="seg" id="brSeg"><button type="button" data-d="0" aria-pressed="false">Chill</button><button type="button" data-d="1" aria-pressed="true">Pop</button><button type="button" data-d="2" aria-pressed="false">Turbo</button></div>
+      <span class="hint" id="brBest"></span>
+      <button class="ghost brbig" id="brGo" type="button">Jouer</button>
+      <div class="brsongrow"><button class="ghost" id="brMy" type="button">🎵 Ma musique</button><button class="ghost" id="brNoSong" type="button" hidden>✕ Musique du jeu</button></div>
+      <span class="hint" id="brSong"></span>
+    </div>
+    <div class="brov brpickov" id="brPickOv" hidden>
+      <b>Ma musique</b>
+      <span class="hint">Choisis un morceau : les notes suivent son rythme. Si tu rates, le son se détruit !</span>
+      <button class="ghost brbig" id="brImport" type="button">📁 Importer un fichier…</button>
+      <div class="brlist" id="brList"></div>
+      <span class="hint" id="brPickMsg"></span>
+      <button class="ghost brbig" id="brPickBack" type="button">← Retour</button>
+      <input type="file" id="brFile" accept="audio/*,.mp3,.m4a,.wav,.ogg,.aac,.flac,.opus" hidden>
+    </div>
+  </div>
+  <div class="brpads" id="brPads">
+    <button class="brpad" type="button" data-l="0" style="background:#ff5d8f">D</button><button class="brpad" type="button" data-l="1" style="background:#e0a800">F</button><button class="brpad" type="button" data-l="2" style="background:#06b88a">J</button><button class="brpad" type="button" data-l="3" style="background:#2aa8d6">K</button>
+  </div>
+  <div class="pfrow" style="margin-top:12px"><button class="ghost brctl" type="button" data-sfx="short" aria-label="Sons">🔊</button><button class="ghost brctl" id="brClose" type="button">Fermer</button></div>
+</dialog>
+
+<dialog class="viewer" id="viewer"><img id="viewerImg" alt="Photo"></dialog>
+
+<dialog class="sheet" id="settings" aria-labelledby="setTitle">
+  <h2 id="setTitle">Réglages</h2>
+  <div class="sec" id="installSec" hidden>
+    <p class="lbl">Application</p>
+    <button class="ghost" id="installBtn" type="button">Installer l’appli sur ce téléphone</button>
+  </div>
+  <div class="sec">
+    <p class="lbl">Photo de profil</p>
+    <div class="pfrow">
+      <span class="avatar lg" id="setAvatar"></span>
+      <button class="ghost" id="photoPick" type="button">Changer</button>
+      <button class="ghost" id="photoDel" type="button">Retirer</button>
+      <input type="file" id="photoFile" accept="image/*" hidden>
+    </div>
+    <p class="err" id="photoErr" hidden></p>
+  </div>
+  <div class="sec">
+    <p class="lbl">Mon nom</p>
+    <input class="field" id="myNickIn" type="text" maxlength="24" placeholder="Nouveau nom" autocomplete="off" aria-label="Nouveau nom">
+    <p class="err" id="myNickErr" hidden></p>
+    <div class="pfrow" style="margin-top:8px"><button class="ghost" id="myNickGo" type="button">Changer mon nom</button></div>
+    <p class="hint" id="myNickHint">Tu peux changer ton nom une fois tous les 7 jours.</p>
+  </div>
+  <div class="sec">
+    <p class="lbl">Style</p>
+    <div class="seg" id="skinSeg">
+      <button type="button" data-k="" style="font-size:0.8125rem">Défaut</button><button type="button" data-k="nuit" style="font-size:0.8125rem">Nuit</button><button type="button" data-k="clair" style="font-size:0.8125rem">Clair</button><button type="button" data-k="foret" style="font-size:0.8125rem">Forêt</button><button type="button" data-k="rose" style="font-size:0.8125rem">Rose</button><button type="button" data-k="neant" style="font-size:0.8125rem" aria-label="Rouge néant"><span aria-hidden="true" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#e5484d;margin-right:6px"></span>Néant</button>
+    </div>
+  </div>
+  <div class="sec" id="modeSec">
+    <p class="lbl">Apparence</p>
+    <div class="seg" id="modeSeg">
+      <button type="button" data-m="auto">Auto</button><button type="button" data-m="light">Clair</button><button type="button" data-m="dark">Sombre</button>
+    </div>
+  </div>
+  <div class="sec" id="lockSec">
+    <p class="lbl">Verrouillage de l’appli</p>
+    <p class="hint" id="lockState"></p>
+    <div class="pfrow" style="margin-top:8px"><button class="ghost" id="lockSet" type="button">Définir un code</button><button class="ghost" id="lockBio" type="button" hidden>Ajouter l’empreinte</button><button class="ghost" id="lockOff" type="button" hidden>Désactiver</button></div>
+    <p class="err" id="lockErr" hidden></p>
+  </div>
+  <div class="sec" id="bdaySec">
+    <p class="lbl">Mon anniversaire</p>
+    <div class="pfrow"><select class="field" id="bdD" aria-label="Jour"></select><select class="field" id="bdM" aria-label="Mois"></select></div>
+    <div class="pfrow" style="margin-top:8px"><button class="ghost" id="bdSave" type="button">Enregistrer</button><button class="ghost" id="bdDel" type="button">Retirer</button></div>
+    <p class="hint" style="margin-top:8px">Sans l’année. Tes amis voient ton anniversaire arriver.</p>
+  </div>
+  <div class="sec" id="privSec">
+    <p class="lbl">Confidentialité</p>
+    <button class="ghost" id="hideOnBtn" type="button" aria-pressed="false">Masquer mon statut en ligne</button>
+    <button class="ghost" id="hideSeenBtn" type="button" aria-pressed="false" style="margin-top:8px">Masquer mes « Vu »</button>
+    <p class="hint" style="margin-top:8px">Statut masqué : personne ne voit ton point vert. « Vu » masqué : tu ne montres ni ne vois les accusés de lecture.</p>
+  </div>
+  <div class="sec" id="badgeSec">
+    <p class="lbl">Badge créateur</p>
+    <p class="hint" id="badgeState"></p>
+    <input class="field" id="badgeKey" type="password" placeholder="Clé du badge" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" aria-label="Clé du badge">
+    <p class="err" id="badgeErr" hidden></p>
+    <div class="pfrow" style="margin-top:8px"><button class="ghost" id="badgeGo" type="button">Activer</button><button class="ghost" id="badgeOff" type="button" hidden>Retirer le badge</button></div>
+  </div>
+  <div class="sec" id="featSec">
+    <p class="lbl">Fonctionnalités</p>
+    <div id="featBody"><p class="hint">Chargement…</p></div>
+  </div>
+  <div class="sec" id="creatorSec" hidden>
+    <p class="lbl">Outils créateur</p>
+    <button class="ghost" id="accList" type="button">Voir tous les comptes</button>
+    <button class="ghost" id="apBtn" type="button" style="margin-top:8px">Comptes à approuver</button>
+    <button class="ghost" id="apAuto" type="button" aria-pressed="false" style="margin-top:8px">⚡ Approbation automatique : désactivée</button>
+    <button class="ghost" id="apMig" type="button" style="margin-top:8px">Approuver les comptes existants</button>
+    <button class="ghost" id="apStrict" type="button" aria-pressed="false" style="margin-top:8px">🔒 Mode strict : désactivé</button>
+    <div class="pfrow" style="margin-top:8px"><button class="ghost" id="statsBtn" type="button">Statistiques</button><button class="ghost" id="modBtn" type="button">Signalements</button><button class="ghost" id="annBtn" type="button">Annonce à tous</button></div>
+    <p class="hint" style="margin-top:8px">Ton identifiant : <span id="myUid" style="user-select:all;word-break:break-all"></span></p>
+  </div>
+  <div class="sec" id="emSec">
+    <p class="lbl">E-mail de récupération</p>
+    <p class="hint" id="emStat">Vérification…</p>
+    <div class="pfrow" style="margin-top:8px"><button class="ghost" id="emOpen" type="button">Ajouter un e-mail</button><button class="ghost" id="emDel" type="button" hidden>Retirer</button></div>
+    <p class="hint">Si tu oublies ton mot de passe, un code sera envoyé à cette adresse.</p>
+  </div>
+  <div class="sec" id="pwSec">
+    <p class="lbl">Mot de passe</p>
+    <input class="field" id="pwCur" type="password" placeholder="Mot de passe actuel" autocomplete="current-password" aria-label="Mot de passe actuel">
+    <input class="field" id="pwNew" type="password" placeholder="Nouveau mot de passe" autocomplete="new-password" aria-label="Nouveau mot de passe" style="margin-top:6px">
+    <p class="err" id="pwErr" hidden></p>
+    <p class="hint" id="pwCode" hidden style="user-select:all;word-break:break-all"></p>
+    <div class="pfrow" style="margin-top:8px"><button class="ghost" id="pwChange" type="button">Changer</button><button class="ghost" id="pwRec" type="button">Code de récupération</button></div>
+    <p class="hint">Le code de récupération te permet de te reconnecter si tu oublies ton mot de passe. Après un changement de mot de passe, crées-en un nouveau.</p>
+  </div>
+  <div class="sec" id="notifSec">
+    <p class="lbl">Notifications</p>
+    <div class="nstat" id="nStat" data-s="warn"><span class="nd"></span><div class="nt"><b id="nStatT">Vérification…</b><small id="nStatS"></small></div></div>
+    <button class="ghost nfull" id="nEnable" type="button" hidden>Activer les notifications</button>
+    <div class="nrows">
+      <label class="nrow"><span class="nl">Messages<small>Nouveaux messages et groupes</small></span><input class="nsw" type="checkbox" data-np="msg" aria-label="Messages"></label>
+      <label class="nrow"><span class="nl">Demandes d’amis<small>Quand quelqu’un veut t’ajouter</small></span><input class="nsw" type="checkbox" data-np="friends" aria-label="Demandes d’amis"></label>
+      <label class="nrow"><span class="nl">Actualités<small>Nouvelles lettres anonymes</small></span><input class="nsw" type="checkbox" data-np="news" aria-label="Actualités"></label>
+      <label class="nrow"><span class="nl">Son<small>Petit bip à l’arrivée d’un message</small></span><input class="nsw" type="checkbox" data-np="sound" aria-label="Son"></label>
+      <label class="nrow"><span class="nl">Vibration<small>Vibre quand l’appli est ouverte ou en push</small></span><input class="nsw" type="checkbox" data-np="vib" aria-label="Vibration"></label>
+    </div>
+    <p class="lbl nsub">Voix</p>
+    <div class="seg" id="voiceSeg">
+      <button type="button" data-v="1">Voix activée</button><button type="button" data-v="0">Voix coupée</button>
+    </div>
+    <p class="lbl nsub">Ne pas déranger</p>
+    <label class="nrow"><span class="nl">Heures calmes<small>Les notifications arrivent sans son</small></span><input class="nsw" type="checkbox" data-np="quiet" aria-label="Heures calmes"></label>
+    <div class="ntime" id="npTimes" hidden><span>De</span><input class="field" type="time" id="npFrom" aria-label="Début des heures calmes"><span>à</span><input class="field" type="time" id="npTo" aria-label="Fin des heures calmes"></div>
+    <p class="lbl nsub">Sourdine rapide</p>
+    <div class="seg" id="npMute"><button type="button" data-m="1">1 h</button><button type="button" data-m="8">8 h</button><button type="button" data-m="tom">Demain</button><button type="button" data-m="off">Réactiver</button></div>
+    <p class="hint" id="npMuteInfo"></p>
+    <button class="ghost nfull" id="notifTest" type="button">Tester ici (son et voix)</button>
+    <button class="ghost nfull" id="pushTest" type="button" hidden>Tester appli fermée</button>
+    <p class="hint" id="nMsg" style="margin-top:8px"></p>
+  </div>
+  <div class="sec">
+    <input class="field" id="newsCode" type="text" placeholder="…" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" aria-label="Code" style="opacity:.25;font-size:.75rem;padding:6px 10px">
+  </div>
+  <div class="sec">
+    <p class="lbl">Espace</p>
+    <button class="ghost" id="freeSpace" type="button">Libérer de l’espace</button>
+    <p class="hint" id="freeMsg">Retire les photos intégrées de tes propres messages de plus de 7 jours dans la discussion ouverte (sans lecture Firestore en plus ; les photos envoyées par lien sont gardées). Les photos des autres ne peuvent être nettoyées que par eux : chacun doit le faire pour les siennes.</p>
+  </div>
+  <div class="sec">
+    <p class="lbl">Compte</p>
+    <button class="ghost danger" id="accDel" type="button">Supprimer mon compte</button>
+    <div id="accConfirm" hidden>
+      <p class="hint">Définitif : ton compte, ta photo, ta note et toutes tes discussions (y compris chez tes amis) seront supprimés. Ton nom d’utilisateur pourra ensuite être réutilisé pour un nouveau compte.</p>
+      <input class="field" id="accPass" type="password" placeholder="Ton mot de passe" autocomplete="current-password" aria-label="Mot de passe pour confirmer">
+      <p class="err" id="accErr" hidden></p>
+      <div class="pfrow">
+        <button class="ghost danger" id="accGo" type="button">Supprimer définitivement</button>
+        <button class="ghost" id="accCancel" type="button">Annuler</button>
+      </div>
+    </div>
+  </div>
+  <div class="sec"><button class="ghost danger" id="setLogout" type="button">Se déconnecter</button></div>
+  <button class="ghost" id="setClose" type="button">Fermer</button>
+</dialog>
+
+<script src="js/push.js" async></script>
+
+<!-- ===== MODULE ÉTUDE (bouton flottant + lecteur de leçons) ===== -->
+
+<button id="stFab" type="button" aria-label="Ouvrir le mode étude"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5zM4 5.5V21.5M8 7h8M8 11h6"/></svg>Étudier</button>
+<div id="stToast" role="status"></div>
+<div id="stP" hidden>
+  <div class="st-top">
+    <button class="st-ic" id="stClose" aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <h2 id="stTitle">Étudier</h2>
+    <button class="st-ic" id="stSrch" aria-label="Rechercher"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
+  </div>
+  <div class="st-bar"><i id="stProg"></i></div>
+  <div class="st-search" id="stSBar" hidden>
+    <input id="stQ" type="search" placeholder="Chercher un mot, un titre…" autocomplete="off">
+    <span id="stCnt"></span>
+    <button class="st-ic" id="stPrev" aria-label="Précédent"><svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></button>
+    <button class="st-ic" id="stNext" aria-label="Suivant"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+  </div>
+  <div class="st-chips" id="stChips">
+    <button class="st-chip" data-a="import"><svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg>Importer</button>
+    <button class="st-chip" data-a="paste">Coller du texte</button>
+    <button class="st-chip" data-a="lib">Mes leçons</button>
+    <button class="st-chip" data-a="pages">📄 Pages PDF</button>
+    <button class="st-chip" data-a="toc">Sommaire</button>
+    <button class="st-chip" data-a="titles">Titres seulement</button>
+    <button class="st-chip" data-a="stars">★ Importants</button>
+    <button class="st-chip" data-a="mask">Réviser (masquer)</button>
+    <button class="st-chip" data-a="read">Lire à voix haute</button>
+    <button class="st-chip" data-a="timer">⏱ 25:00</button>
+    <button class="st-chip" data-a="fm">A−</button>
+    <button class="st-chip" data-a="fp">A+</button>
+  </div>
+  <div id="stBody"></div>
+  <div class="st-sheet" id="stSheet" hidden><div id="stSheetIn"></div></div>
+  <input type="file" id="stFile" hidden>
+  <div id="stZoom"><button id="stZClose" aria-label="Fermer">✕</button><img alt=""></div>
+</div>
+<!-- ===== FIN MODULE ÉTUDE ===== -->
+
+<!-- ===== ASSISTANT IA (menu du bouton + , panneau de discussion) ===== -->
+
+<div id="aiP" hidden>
+  <div class="ai-top">
+    <button class="ai-ic" id="aiClose" type="button" aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <h2>X.Uni <small id="aiVer"></small></h2>
+    <button class="ai-ic" id="aiCfg" type="button" aria-label="Réglages de X.Uni"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
+    <button class="ai-ic" id="aiHistB" type="button" aria-label="Historique des conversations"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5M12 8v4l3 2"/></svg></button>
+    <button class="ai-ic" id="aiNew" type="button" aria-label="Nouvelle conversation"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+  </div>
+  <div class="ai-ctx"><label for="aiLes">Leçon</label><select id="aiLes"></select></div>
+  <div class="ai-chips" id="aiChips">
+    <button type="button" data-p="resume">Résumé</button>
+    <button type="button" data-p="quiz">Quiz</button>
+    <button type="button" data-p="devoirs">Devoirs</button>
+    <button type="button" data-p="explique">Explique-moi</button>
+  </div>
+  <div id="aiLog" role="log" aria-live="polite"></div>
+  <form id="aiForm" autocomplete="off">
+    <textarea id="aiIn" rows="1" maxlength="2000" placeholder="Pose ta question…" aria-label="Ta question"></textarea>
+    <button id="aiSend" type="submit" aria-label="Envoyer"><svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>
+  </form>
+  <div class="ai-sheet" id="aiHistSheet" hidden><div>
+    <h3>Mes conversations</h3>
+    <button class="ai-hnew" id="aiHistNew" type="button">+ Nouvelle conversation</button>
+    <button class="ai-hsel" id="aiHistSel" type="button">Choisir des conversations à supprimer</button>
+    <div id="aiHistList"></div>
+    <div class="ai-srow"><button id="aiHistDel" type="button" hidden>Supprimer (0)</button><button id="aiHistClose" type="button">Fermer</button></div>
+  </div></div>
+  <div class="ai-sheet" id="aiSheet" hidden><div>
+    <h3>Réglages de X.Uni</h3>
+    <label for="aiGroq">Clé Groq (gratuite, principale)</label>
+    <input id="aiGroq" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="gsk_…">
+    <div id="aiGroqHelp">
+      <a class="ai-link big" href="https://console.groq.com/keys" target="_blank" rel="noopener">👉 Créer ma clé Groq gratuite</a>
+      <p class="ai-note">Connecte-toi sur Groq, touche « Create API Key », copie-la puis colle-la ci-dessus. Elle reste sur ce téléphone.</p>
+    </div>
+    <p class="ai-note ok" id="aiGroqOk" hidden>✓ Clé Groq enregistrée sur ce téléphone. Pour la retirer, vide le champ puis touche Enregistrer.</p>
+    <label for="aiOr">Clé OpenRouter (secours, facultatif)</label>
+    <input id="aiOr" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="sk-or-…">
+    <p class="ai-note">Utilisée si Groq est indisponible. <a class="ai-link" href="https://openrouter.ai/keys" target="_blank" rel="noopener">Créer ma clé OpenRouter</a></p>
+    <label for="aiHf">Clé Hugging Face (secours, facultatif)</label>
+    <input id="aiHf" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="hf_…">
+    <p class="ai-note">Crée un jeton « Fine-grained » avec la permission « Make calls to Inference Providers ». <a class="ai-link" href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener">Créer mon jeton</a></p>
+    <label for="aiKey">Clé Gemini (secours, facultatif)</label>
+    <input id="aiKey" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="AIza…">
+    <div id="aiKeyHelp">
+      <p class="ai-note">X.Uni répond toujours avec Groq en premier. Si Groq est indisponible, il bascule sur Gemini. La voix de lecture utilise aussi cette clé. <a class="ai-link" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Créer ma clé Gemini</a></p>
+    </div>
+    <p class="ai-note ok" id="aiKeyOk" hidden>✓ Clé Gemini enregistrée sur ce téléphone. Pour la retirer, vide le champ puis touche Enregistrer.</p>
+    <label for="aiModel">Version de secours (Gemini)</label>
+    <select id="aiModel"></select>
+    <p class="ai-note" id="aiModelNote"></p>
+    <label for="aiFacts">Ce que X.Uni retient sur toi</label>
+    <textarea id="aiFacts" rows="6" maxlength="1200" placeholder="Rien pour l’instant. Tu peux aussi écrire ici ce qu’il doit savoir : ton niveau, tes matières…"></textarea>
+    <p class="ai-note" id="aiSync"></p>
+    <div class="ai-srow"><button id="aiSave" type="button">Enregistrer</button><button id="aiWipe" type="button">Tout effacer</button><button id="aiShClose" type="button">Fermer</button></div>
+  </div></div>
+</div>
+<script src="js/script.js?v=106"></script>
+<script src="js/halloween.js?v=106" defer></script>
+<script src="js/reglage.js?v=106" defer></script>
+<script src="js/fonctions.js?v=106" defer></script>
+<script src="js/profil.js?v=107" defer></script>
+<script src="js/profil-edition.js?v=106" defer></script>
+     <script src="js/stories.js?v=107" defer></script>
+<script src="js/maj.js?v=106" defer></script>
+<script src="js/tirer.js?v=106" defer></script>
+</body>
+</html>
