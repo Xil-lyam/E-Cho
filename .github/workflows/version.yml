@@ -1,0 +1,23 @@
+name: version-auto
+on:
+  push:
+    branches: [principal]
+permissions:
+  contents: write
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Changer le numéro de version
+        run: |
+          V=$((100 + ${{ github.run_number }}))
+          sed -i -E "s/\?v=[0-9]+/?v=$V/g" index.html
+          sed -i -E "s/version: '[0-9]+'/version: '$V'/" js/config.js
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "version $V"
+            git push
+          fi
