@@ -1,4 +1,4 @@
-/* U&I — script.js : toute la logique de l'appli (démarrage, appli, jeux, modules, assistant) */
+p/* U&I — script.js : toute la logique de l'appli (démarrage, appli, jeux, modules, assistant) */
 
 
 /* U&I — js/boot/splash.js
