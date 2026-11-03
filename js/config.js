@@ -12,8 +12,8 @@ window.APP_CONFIG = {
   // Supabase : l'URL (sans /rest/v1/) et la clé « publishable » (jamais la clé secret)
   firebase: {
     url: "https://ycpcvogpagnseyzwsvwb.supabase.co",
-    key: "COLLE_TA_CLE_PUBLISHABLE",
-    apiKey: "COLLE_TA_CLE_PUBLISHABLE"
+    key: "sb_publishable_6E2gyuWttwC8DNB8bCmxIQ_1PIioQV3",
+    apiKey: "sb_publishable_6E2gyuWttwC8DNB8bCmxIQ_1PIioQV3"
   },
 
   // Nom d'utilisateur "sophie" => compte interne sophie@u-and-i.app (aucun e-mail n'est envoyé)
