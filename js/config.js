@@ -8,7 +8,7 @@ try{var _v=navigator.vibrate;if(_v)navigator.vibrate=function(){try{return _v.ap
    Configuration : Firebase, domaine des comptes, push (VAPID + Worker) */
 window.APP_CONFIG = {
   // numéro de version : à augmenter à chaque mise à jour (évite le vieux cache de GitHub Pages)
-  version: '283',
+  version: '284',
   firebase: {
     apiKey: "AIzaSyCoHtDPfDbogSjRZmBp4uxZg-7LunSSpuw",
     authDomain: "u-i-love.firebaseapp.com",
