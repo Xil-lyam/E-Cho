@@ -153,7 +153,7 @@
     if (loading) return loading;
     var live = shuffle(sources.filter(function (s) { return !s.done; }));
     live.sort(function (a, b) { return ((prof.aff[b.t + ':' + b.v] || 0) - (prof.aff[a.t + ':' + a.v] || 0)) * (Math.random() < 0.5 ? 1 : 0); });
-    loading = Promise.all(live.slice(0, 3).map(function (s) {
+    loading = Promise.all(live.slice(0, 10).map(function (s) {
       return fetchSource(s).catch(function (e) { lastErr = e; s.fail = (s.fail || 0) + 1; if (s.fail > 2) s.done = true; return []; });
     })).then(function (arrs) {
       arrs.forEach(function (a) { a.forEach(function (v) { if (!poolIds[v.id]) { poolIds[v.id] = 1; pool.push(v); } }); });
