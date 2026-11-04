@@ -35,11 +35,11 @@ window.APP_CONFIG = {
   //  - playlists : identifiants de playlists (PL…) → idem
   //  - queries : mots-clés (coûtent 100 unités par recherche, mis en cache 6 h)
   shorts: {
-    apiKey: "COLLE_TA_CLE_YOUTUBE_ICI",
+    apiKey: "AIzaSyA3FOLp1yfchRnM7UxYxbnU9HnxxEFkaxE",
     // noms d'utilisateur (@…) ou identifiants UC… — un @ introuvable est simplement ignoré
     channels: ["@Squeezie", "@Cyprien", "@NormanFaitDesVideos", "@McFlyetCarlito", "@Michou", "@Inoxtag", "@Amixem", "@MisterV", "@TiboInShape", "@Natoo"],
     playlists: [],
-    queries: ["shorts madagascar", "shorts humour", "shorts musique", "shorts football", "shorts cuisine", "shorts animaux"],
+    queries: [],
     maxSeconds: 60,
     region: "FR",
     lang: "fr"
