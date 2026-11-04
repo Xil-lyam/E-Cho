@@ -37,7 +37,7 @@ window.APP_CONFIG = {
   shorts: {
     apiKey: "AIzaSyA3FOLp1yfchRnM7UxYxbnU9HnxxEFkaxE",
     // noms d'utilisateur (@…) ou identifiants UC… — un @ introuvable est simplement ignoré
-    channels: ["@Squeezie", "@NormanFaitDesVideos", "@Amixem", "@B4CInstitution", "@sciencetrash", "@GauthierDm_Science", "@MisterV", "@TiboInShape", "@Natoo", "@cocktaildefruits", "@theomcx", "@higumanga", "@Jaysko261gasy", "@alvinlecomedien", "@ComedieMADA", "@Levinho", "@etreetudiant", "@histoiresdefruits2026", "@FruitStory_off", "@Rnboi", "@TKS2G", "@NyRabe", "@ricoanimations0", "@Paulygones", "@AnimeSenpaiVf", "@NBA", "@MSHTVOfficial", "@GDsHighlights", "@BestDuSport", "@LeFooteuxxx", "@MFZ6HD", "@xrrftbl", "@jt_editzx1", "@heisty710", "@LétoileNoire-x9f", "@galagade.studio", "@Noctigme"]
+    channels: ["@Squeezie", "@NormanFaitDesVideos", "@Amixem", "@B4CInstitution", "@sciencetrash", "@GauthierDm_Science", "@MisterV", "@TiboInShape", "@Natoo", "@cocktaildefruits", "@theomcx", "@higumanga", "@Jaysko261gasy", "@alvinlecomedien", "@ComedieMADA", "@Levinho", "@etreetudiant", "@histoiresdefruits2026", "@FruitStory_off", "@Rnboi", "@TKS2G", "@NyRabe", "@ricoanimations0", "@Paulygones", "@AnimeSenpaiVf", "@NBA", "@MSHTVOfficial", "@GDsHighlights", "@BestDuSport", "@LeFooteuxxx", "@MFZ6HD", "@xrrftbl", "@jt_editzx1", "@heisty710", "@LétoileNoire-x9f", "@galagade.studio", "@Noctigme"],
     playlists: [],
     queries: [],
     maxSeconds: 120,
