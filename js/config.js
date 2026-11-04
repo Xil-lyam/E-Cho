@@ -37,7 +37,7 @@ window.APP_CONFIG = {
   shorts: {
     apiKey: "AIzaSyA3FOLp1yfchRnM7UxYxbnU9HnxxEFkaxE",
     // noms d'utilisateur (@…) ou identifiants UC… — un @ introuvable est simplement ignoré
-    channels: ["@Squeezie", "@Cyprien", "@NormanFaitDesVideos", "@McFlyetCarlito", "@Michou", "@Inoxtag", "@Amixem", "@MisterV", "@TiboInShape", "@Natoo"],
+    channels: ["@Squeezie", "@Cyprien", "@NormanFaitDesVideos", "@McFlyetCarlito", "@Michou", "@Inoxtag", "@Amixem", "@MisterV", "@TiboInShape", "@Natoo", "@cocktaildefruits", "@theomcx", "@higumanga", "@Jaysko261gasy", "@alvinlecomedien", "@ComedieMADA", "@Levinho", "@etreetudiant"],
     playlists: [],
     queries: [],
     maxSeconds: 60,
