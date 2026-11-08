@@ -143,7 +143,7 @@
   function pick(n) {
     var av = shuffle(avail()), out = [];
     while (out.length < n && av.length) {
-      var explore = Math.random() < 0.2;
+      var explore = Math.random() < 0.5;
       var ws = av.map(function (v) {
         if (explore) return 1;
         var a = (prof.aff[v.ch] || 0) + 0.5 * (prof.aff[v.src] || 0);
@@ -159,7 +159,7 @@
     if (loading) return loading;
     var live = shuffle(sources.filter(function (s) { return !s.done; }));
     live.sort(function (a, b) { return ((prof.aff[b.t + ':' + b.v] || 0) - (prof.aff[a.t + ':' + a.v] || 0)) * (Math.random() < 0.5 ? 1 : 0); });
-    loading = Promise.all(live.slice(0, 3).map(function (s) {
+    loading = Promise.all(live.slice(0, 6).map(function (s) {
       return fetchSource(s).catch(function (e) { lastErr = e; s.fail = (s.fail || 0) + 1; if (s.fail > 2) s.done = true; return []; });
     })).then(function (arrs) {
       arrs.forEach(function (a) { a.forEach(function (v) { if (!poolIds[v.id]) { poolIds[v.id] = 1; pool.push(v); } }); });
