@@ -39,31 +39,35 @@
 
   function swap(dir) {
     if (reduce || !form.animate) return;
-    var r = form.getBoundingClientRect(), h0 = form.offsetHeight;
-    /* copie de l'ancien côté : elle glisse dehors par-dessus */
+    var login = document.getElementById('login'), W = Math.max(window.innerWidth, 360) + 80;
+    var OUT = 420, IN = 480, r = form.getBoundingClientRect(), h0 = form.offsetHeight;
+    if (login) login.style.overflowX = 'hidden';
+    document.documentElement.style.overflowX = 'hidden';
+
+    /* 1) l'ancien côté (copie) part entièrement sur le côté */
     var ghost = form.cloneNode(true);
     [].forEach.call(ghost.querySelectorAll('[id]'), function (n) { n.removeAttribute('id'); });
     [].forEach.call(ghost.querySelectorAll('[name]'), function (n) { n.removeAttribute('name'); });
     ghost.removeAttribute('id'); ghost.setAttribute('aria-hidden', 'true'); ghost.setAttribute('inert', '');
     ghost.style.cssText = 'position:fixed;margin:0;z-index:5;pointer-events:none;left:' + r.left + 'px;top:' + r.top + 'px;width:' + r.width + 'px;height:' + r.height + 'px;overflow:hidden';
     form.parentNode.insertBefore(ghost, form.nextSibling);
-    var out = ghost.animate([{ opacity: 1, transform: 'translateX(0)' }, { opacity: 0, transform: 'translateX(' + (-dir * 60) + 'px)' }],
-      { duration: 260, easing: 'ease-in', fill: 'forwards' });
+    var out = ghost.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(' + (-dir * W) + 'px)' }],
+      { duration: OUT, easing: 'cubic-bezier(.55,0,.8,.4)', fill: 'forwards' });
     out.onfinish = function () { if (ghost.parentNode) ghost.parentNode.removeChild(ghost); };
 
-    /* après le changement fait par l'appli : nouvelle hauteur + arrivée du nouveau côté */
+    /* 2) le nouveau côté attend hors écran, puis arrive de l'autre côté */
     setTimeout(function () {
       var h1 = form.offsetHeight;
-      if (h1 !== h0) {
-        form.style.overflow = 'hidden';
-        var a = form.animate([{ height: h0 + 'px' }, { height: h1 + 'px' }], { duration: 360, easing: EASE });
-        a.onfinish = a.oncancel = function () { form.style.overflow = ''; };
-      }
-      var kids = [].filter.call(form.children, function (c) { return c.offsetParent !== null; });
-      kids.forEach(function (c, i) {
-        c.animate([{ opacity: 0, transform: 'translateX(' + (dir * 46) + 'px)' }, { opacity: 1, transform: 'none' }],
-          { duration: 380, delay: 90 + i * 30, easing: EASE, fill: 'backwards' });
-      });
+      form.style.overflow = 'hidden';
+      var done = function () {
+        form.style.overflow = '';
+        if (login) login.style.overflowX = '';
+        document.documentElement.style.overflowX = '';
+      };
+      if (h1 !== h0) form.animate([{ height: h0 + 'px' }, { height: h1 + 'px' }], { duration: OUT + IN - 120, easing: EASE });
+      var inn = form.animate([{ transform: 'translateX(' + (dir * W) + 'px)' }, { transform: 'translateX(0)' }],
+        { duration: IN, delay: OUT - 140, easing: EASE, fill: 'backwards' });
+      inn.onfinish = inn.oncancel = done;
     }, 0);
   }
 
@@ -73,5 +77,30 @@
     swap(b.id === 'tabSignup' ? 1 : -1);
   }, true);
 
-  init();
+  /* clavier ouvert : le champ touché reste visible */
+  document.addEventListener('focusin', function (e) {
+    var t = e.target, lg = document.getElementById('login');
+    if (!lg || !t || !lg.contains(t) || !/^(INPUT|TEXTAREA)$/.test(t.tagName)) return;
+    setTimeout(function () { try { t.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (x) {} }, 320);
+  });
+
+  /* quand un formulaire ou une étape apparaît (mot de passe oublié, code de récupération…),
+     on fait défiler pour que tous ses boutons soient visibles */
+  function watchReveal() {
+    var lg = document.getElementById('login');
+    if (!lg) { setTimeout(watchReveal, 600); return; }
+    var t = 0;
+    new MutationObserver(function (list) {
+      var shown = list.some(function (m) { return m.attributeName === 'hidden' && !m.target.hidden && m.target !== lg; });
+      if (!shown) return;
+      clearTimeout(t);
+      t = setTimeout(function () {
+        var vis = [].filter.call(lg.querySelectorAll('button'), function (b) { return b.offsetParent !== null; });
+        var last = vis[vis.length - 1];
+        if (last) { try { last.scrollIntoView({ block: 'end', behavior: 'smooth' }); } catch (x) {} }
+      }, 450);
+    }).observe(lg, { attributes: true, subtree: true, attributeFilter: ['hidden'] });
+  }
+
+  init(); watchReveal();
 })();
