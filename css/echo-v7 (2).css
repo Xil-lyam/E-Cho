@@ -1,0 +1,212 @@
+/* E'cho — css/echo-v7.css (v6 : design « Velours »)
+   À charger APRÈS css/style.css. Ne change que l'apparence : aucun script touché.
+   Idée : un rendu chaleureux et soigné, comme une vraie appli du commerce.
+   - surfaces douces avec une vraie profondeur (ombres fines et réalistes)
+   - une couleur d'accent en léger dégradé, utilisée partout de la même façon
+   - coins bien arrondis, espaces généreux, titre en Fraunces italique = la signature E'cho
+   Tout passe par les variables du thème : ça marche avec tous les thèmes (nuit, clair, rose…). */
+
+:root {
+  --dock-h: 56px;
+  --v7-title: "Fraunces", Georgia, serif;
+  --v7-r: 18px;
+  --v7-acc2: color-mix(in srgb, var(--accent) 78%, #000);            /* accent un peu plus profond */
+  --v7-grad: linear-gradient(145deg, var(--accent), var(--v7-acc2));
+  --v7-lift: 0 1px 2px rgba(0,0,0,.16), 0 4px 14px rgba(0,0,0,.12); /* petite ombre réaliste */
+  --v7-hair: color-mix(in srgb, var(--ink) 9%, transparent);         /* ligne très fine */
+  --v7-ease: cubic-bezier(.22, 1, .36, 1);
+}
+
+/* ---------- Ambiance : une lueur très douce en haut de l'écran ---------- */
+html body { background:
+  radial-gradient(120% 40% at 50% -8%, color-mix(in srgb, var(--accent) 11%, transparent), transparent 70%),
+  var(--bg); }
+
+/* ---------- Titres : la signature E'cho ---------- */
+html body .screen > header h1, html body .chathead h1 {
+  font-family: var(--v7-title); font-style: italic; font-weight: 800; letter-spacing: -.02em; text-shadow: none;
+}
+html body .screen > header h1 { font-size: 2.1rem !important; line-height: 1; }
+html body .screen > header h1 .amp { color: var(--accent); }
+html body .screen > header { border-bottom: 1px solid var(--v7-hair); }
+
+/* ---------- Avatars : ronds, avec un fin liseré lumineux ---------- */
+html body .avatar { border: 0 !important; border-radius: 50% !important; box-shadow: 0 0 0 1px var(--v7-hair) !important; }
+html body .ondot { animation: none; border: 2px solid var(--bg); box-shadow: none; }
+
+/* ---------- Boutons ronds de l'en-tête ---------- */
+html body .tico, html body .chathead .dots, html body .chathead .back {
+  border: 0 !important; box-shadow: none !important; border-radius: 50%; min-width: 42px; min-height: 42px;
+  background: color-mix(in srgb, var(--ink) 6%, transparent) !important; transition: background .2s, scale .2s var(--v7-ease);
+}
+html body .tico:active, html body .chathead .dots:active, html body .chathead .back:active { scale: .92; background: var(--soft) !important; }
+
+/* ---------- Barre « Non lus / recherche » ---------- */
+html body #viewList .tbar { gap: 8px; padding: 6px 14px 10px; }
+html body #viewList .tbar .tbtn {
+  border: 0 !important; border-radius: 999px; background: color-mix(in srgb, var(--ink) 7%, transparent) !important;
+  color: var(--ink); box-shadow: none !important; transition: background .2s, color .2s, scale .2s var(--v7-ease);
+}
+html body #viewList .tbar .tbtn:active { scale: .96; }
+html body #viewList .tbar .tbtn[aria-pressed="true"] { background: var(--v7-grad) !important; color: var(--accent-ink); }
+
+/* ---------- Liste des discussions ---------- */
+html body #viewList #chats { padding: 0 8px 12px; }
+html body #viewList #chats > li { margin: 0; list-style: none; }
+html body #viewList .chatrow {
+  width: 100%; gap: 13px; padding: 11px 12px; align-items: center; text-align: left;
+  border: 0 !important; border-radius: var(--v7-r); background: transparent !important; box-shadow: none !important;
+  -webkit-backdrop-filter: none; backdrop-filter: none; transition: background .2s, scale .2s var(--v7-ease);
+}
+html body #viewList .chatrow::before, html body #viewList .chatrow::after { display: none; }
+html body #viewList .chatrow:active { background: color-mix(in srgb, var(--ink) 7%, transparent) !important; scale: .985; }
+html body #viewList .chatrow .avw, html body #viewList .chatrow .avatar { width: 52px; height: 52px; flex: none; }
+html body #viewList .chatrow .avw { margin-right: 4px; }
+html body #viewList .chatrow > .avw ~ * { margin-left: 6px; }
+html body #viewList .chatrow .nm { font-weight: 600; font-size: 1.02rem; letter-spacing: -.005em; }
+html body #viewList .chatrow .pv { font-size: .88rem; opacity: .68; }
+html body #viewList .chatrow .side { font-size: .74rem; opacity: .65; }
+/* non lu : léger fond teinté + pastille */
+html body #viewList .chatrow.unread { background: color-mix(in srgb, var(--accent) 9%, transparent) !important; }
+html body #viewList .chatrow.unread .nm { font-weight: 800; }
+html body #viewList .chatrow.unread .pv { opacity: 1; font-weight: 600; }
+html body #viewList .chatrow .pip {
+  width: 11px; height: 11px; border-radius: 50%; rotate: 0deg; border: 0; animation: none;
+  background: var(--v7-grad); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+/* ---------- Discussion : bulles ---------- */
+html body .bubble { border-radius: 20px; }
+html body .mine .bubble, html body .row.mine .bubble {
+  border: 0 !important; background: var(--v7-grad) !important; color: var(--accent-ink);
+  box-shadow: 0 1px 2px rgba(0,0,0,.2), 0 3px 10px color-mix(in srgb, var(--accent) 22%, transparent) !important;
+}
+html body .theirs .bubble, html body .row.theirs .bubble {
+  border: 1px solid var(--v7-hair) !important; background: var(--surface); color: var(--ink);
+  box-shadow: 0 1px 2px rgba(0,0,0,.12) !important;
+}
+html body .mine.last .bubble { border-bottom-right-radius: 6px; }
+html body .theirs.last .bubble { border-bottom-left-radius: 6px; }
+html body .composer { border-top: 1px solid var(--v7-hair); box-shadow: none; }
+
+/* ---------- Champs de saisie ---------- */
+html body .field, html body input.field, html body textarea.field, html body select.field {
+  border-radius: 14px; border: 1px solid var(--v7-hair); background: color-mix(in srgb, var(--ink) 5%, transparent);
+  transition: border-color .2s, box-shadow .2s;
+}
+html body .field:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
+
+/* ---------- Boutons principaux, cartes, menus ---------- */
+html body button.primary, html body .nwpost {
+  border: 0; border-radius: 14px; background: var(--v7-grad); color: var(--accent-ink); font-weight: 700;
+  box-shadow: 0 1px 2px rgba(0,0,0,.2), 0 6px 16px color-mix(in srgb, var(--accent) 28%, transparent) !important;
+  transition: scale .2s var(--v7-ease), filter .2s;
+}
+html body button.primary:active, html body .nwpost:active { scale: .97; filter: brightness(.95); }
+html body .td-card, html body .homechip, html body .nwtab {
+  border: 1px solid var(--v7-hair); border-radius: var(--v7-r); background: var(--surface); box-shadow: var(--v7-lift);
+}
+html body .nwtab { box-shadow: none; }
+html body .nwtab[aria-pressed="true"] { background: var(--v7-grad); color: var(--accent-ink); border-color: transparent; }
+html body .mksheet { border: 1px solid var(--v7-hair); border-radius: 22px; background: var(--surface); box-shadow: 0 10px 40px rgba(0,0,0,.35); }
+html body .mkic { border: 0; border-radius: 13px; background: color-mix(in srgb, var(--accent) 14%, transparent); }
+html body .chatmenu { border-radius: 16px; border: 1px solid var(--v7-hair); box-shadow: var(--v7-lift); }
+
+/* ---------- Barre du bas (téléphone / tablette) ---------- */
+@media (max-width: 899px) {
+
+  html body #tabbar.tabbar:not([hidden]) {
+    display: flex; flex-wrap: nowrap;
+    left: 0; right: 0; bottom: 0; width: auto; max-width: none;
+    transform: none; translate: 0 0; scale: 1; opacity: 1;
+    gap: 2px; justify-content: space-around; align-items: stretch;
+    padding: 5px 6px calc(5px + env(safe-area-inset-bottom, 0px));
+    border-radius: 0; border: 0; border-top: 1px solid var(--v7-hair);
+    background: color-mix(in srgb, var(--surface) 88%, transparent);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4) !important; backdrop-filter: blur(18px) saturate(1.4) !important;
+    box-shadow: 0 -6px 24px rgba(0,0,0,.14) !important;
+    overflow: visible;
+  }
+  /* Cachée quand le clavier est ouvert et dans une discussion */
+  html body:has(input:focus, textarea:focus) #tabbar.tabbar:not([hidden]),
+  html body:has(#viewChat:not([hidden])) #tabbar.tabbar:not([hidden]) { display: none; }
+
+  html body #tabbar.tabbar .tab {
+    flex: 1 1 0; width: auto !important; height: auto !important; min-height: 0; min-width: 0;
+    padding: 6px 2px 5px !important; margin: 0 !important; gap: 2px;
+    flex-direction: column; justify-content: center; align-items: center;
+    border: 0; border-radius: 14px; background: transparent !important; box-shadow: none !important;
+    color: var(--muted); position: relative; overflow: visible;
+    transition: background .25s, color .25s, scale .2s var(--v7-ease);
+  }
+  html body #tabbar.tabbar .tab:active { scale: .92; }
+  html body #tabbar.tabbar .tab svg { width: 22px; height: 22px; filter: none; translate: 0 0; scale: 1; }
+  html body #tabbar.tabbar .tab span {
+    display: block; max-width: 100% !important; opacity: 1 !important; margin: 0 !important;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .64rem; font-weight: 600;
+  }
+  /* Onglet choisi : SEUL lui est dans un rond rouge, qui glisse d'un onglet à l'autre */
+  html body #tabbar.tabbar .tabind {
+    display: block; position: absolute; left: 0; top: 5px; bottom: calc(5px + env(safe-area-inset-bottom, 0px));
+    border-radius: 999px; background: var(--v7-grad); pointer-events: none; z-index: 0;
+    box-shadow: 0 2px 10px color-mix(in srgb, var(--accent) 45%, transparent);
+  }
+  html body #tabbar.tabbar .tab { z-index: 1; }
+  html body #tabbar.tabbar .tab[aria-current="page"] { color: var(--accent-ink); }
+  html body #tabbar.tabbar .tab[aria-current="page"] svg { filter: none; stroke-width: 2.2; }
+  /* si le rond glissant n'est pas actif, l'onglet choisi porte lui-même le rond rouge */
+  html body #tabbar.tabbar:not(:has(.tabind.on)) .tab[aria-current="page"] { background: var(--v7-grad) !important; border-radius: 999px; }
+  html body #tabbar.tabbar .tab::before, html body #tabbar.tabbar .tab[aria-current="page"]::after { content: none; animation: none; }
+  /* l'icône choisie fait un petit saut */
+  @media (prefers-reduced-motion: no-preference) {
+    html body #tabbar.tabbar .tab[aria-current="page"] svg { animation: v7Pop .5s cubic-bezier(.34,1.56,.64,1); }
+    @keyframes v7Pop { 0% { scale: .75; translate: 0 3px; } 100% { scale: 1; translate: 0 0; } }
+    html body #tabbar.tabbar .tabind { transition: translate .45s cubic-bezier(.34,1.3,.64,1), width .45s cubic-bezier(.34,1.3,.64,1), opacity .25s; }
+  }
+
+  /* Ordre, sur une seule rangée : Messages, Musique, Lettres, Profil, Accueil, puis + */
+  html body #tabbar.tabbar .tab[data-t="chats"]  { order: 1; }
+  html body #tabbar.tabbar .tab[data-t="music"]  { order: 2; }
+  html body #tabbar.tabbar .tab[data-t="anon"]   { order: 3; }
+  html body #tabbar.tabbar .tab[data-t="me"]     { order: 4; }
+  html body #tabbar.tabbar .tab[data-t="news"]   { order: 5; }
+  html body #tabbar.tabbar .tab[data-t="create"] { order: 6; }
+  html body #tabbar.tabbar .tab[data-t="create"][aria-expanded="true"] svg { rotate: 45deg; }
+
+  /* « Lettre anonyme » : même style que les autres, nom raccourci */
+  html body #tabbar.tabbar .tab[data-t="anon"],
+  html body #tabbar.tabbar .tab[data-t="anon"]:not([aria-current="page"]) { background: transparent !important; box-shadow: none !important; border-radius: 14px; }
+  html body #tabbar.tabbar .tab[data-t="anon"] span { font-size: 0; }
+  html body #tabbar.tabbar .tab[data-t="anon"] span::after { content: "Lettres"; font-size: .64rem; font-weight: 600; }
+
+  /* Musique en lecture : rangée toujours égale */
+  html body #tabbar.tabbar .tab-music.is-playing { width: auto !important; padding: 6px 2px 5px !important; }
+  html body #tabbar.tabbar .tab-music .mini-pp, html body #tabbar.tabbar .tab-music .mini-bar { display: none !important; }
+  html body #tabbar.tabbar.tight .tab span, html body #tabbar.tabbar.shrunk .tab span { max-width: 100% !important; opacity: 1 !important; }
+  html body #tabbar.tabbar.shrunk { scale: 1; opacity: 1; }
+  html body #tabbar.tabbar.shrunk .tab, html body #tabbar.tabbar.hasmusic .tab { width: auto !important; height: auto !important; }
+  html body #tabbar.tabbar .tabbadge { top: 2px; left: calc(50% + 6px); right: auto; background: var(--v7-grad); }
+
+  /* Place réservée : le contenu s'arrête juste au-dessus de la barre, rien n'est caché */
+  html body.hasnav, html body.hasnav:has(#viewList:not([hidden]), #viewNews:not([hidden])) {
+    padding-bottom: calc(var(--dock-h) + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  html body.hasnav:has(#viewChat:not([hidden])) { padding-bottom: env(safe-area-inset-bottom, 0px) !important; }
+  html body #viewList #chats, html body #viewNews .nwpane { padding-bottom: 12px; }
+
+  html body .fxfab, html body #stFab { bottom: calc(var(--dock-h) + 14px + env(safe-area-inset-bottom, 0px)); }
+  html body .mksheet:not(.nt) { bottom: calc(var(--dock-h) + 10px + env(safe-area-inset-bottom, 0px)); }
+}
+
+/* ---------- Un peu de vie, sans excès (coupé si l'appareil le demande) ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  html body #app .screen:not([hidden]) { animation: v7In .3s var(--v7-ease) both; }
+  @keyframes v7In { from { opacity: 0; translate: 0 8px; } }
+}
+@media (prefers-reduced-motion: reduce) { html body * { transition: none !important; } }
+
+::selection { background: color-mix(in srgb, var(--accent) 40%, transparent); }
+
+/* boutons ronds de l'en-tête : taille fixe, plus compacts */
+html body .hbtns .tico { width: 38px !important; height: 38px !important; min-width: 38px !important; min-height: 38px !important; }
+html body .hbtns { gap: 6px; }
