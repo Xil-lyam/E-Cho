@@ -1391,7 +1391,7 @@ window.__uandiMods['js/ui/bande-notes.js'] = function () {
   function bust(u) { return u + '?v=' + VER; }
   /* L'appli est une seule fermeture (variables partagées) coupée en parties pour être lisible :
      on charge les parties en parallèle, puis on les assemble dans l'ordre et on les exécute d'un bloc. */
-  async function loadApp() { window.__uandiApp(); }
+  async function loadApp() { if (window.__uandiAppLoad) await window.__uandiAppLoad(); window.__uandiApp(); }
   function loadModules() {
     APP_MODULES.forEach(function (p) {
       try { window.__uandiMods[p](); }

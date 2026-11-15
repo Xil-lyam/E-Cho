@@ -37,6 +37,41 @@
 
 </script>
 
+<!-- Démarrage : style minimal de l’écran d’accueil, dans la page, pour qu’il s’affiche tout de suite
+     (avant le gros fichier css/style.css). Mêmes couleurs que l’écran final : rien ne saute quand le CSS arrive. -->
+<style id="splash-critical">
+#splash{--spa:#C2305F;position:fixed;inset:0;z-index:98;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center;background:#fff;color:#241038;font:700 2.6rem/1 system-ui,sans-serif;letter-spacing:.02em;transition:opacity .3s}
+:root[data-eff="dark"] #splash{--spa:#5CE1FF}
+:root[data-skin="nuit"] #splash{--spa:#6EA8FF}
+:root[data-skin="clair"] #splash{--spa:#0F766E}
+:root[data-skin="foret"] #splash{--spa:#4FD1A1}
+:root[data-skin="rose"] #splash{--spa:#E0457B}
+:root[data-skin="neant"] #splash{--spa:#FF3B4E}
+#splash b{display:inline-block;color:var(--accent,var(--spa));animation:spBeat 1.3s ease-in-out infinite}
+#splash .sptag{margin:-6px 0 0;font:500 .95rem/1.35 system-ui,sans-serif;letter-spacing:0;color:#6b5a7e}
+#splash .sp{display:flex;align-items:center;gap:9px;height:30px}
+#splash .sp i{width:9px;height:9px;border-radius:50%;background:var(--accent,var(--spa));opacity:.35;animation:spWave 1.2s ease-in-out infinite}
+#splash .sp i:nth-child(2){animation-delay:.12s}#splash .sp i:nth-child(3){animation-delay:.24s}#splash .sp i:nth-child(4){animation-delay:.36s}#splash .sp i:nth-child(5){animation-delay:.48s}
+#splash small{font:400 .8rem system-ui,sans-serif;color:#6b5a7e;opacity:.9}
+@keyframes spWave{0%,100%{transform:translateY(0) scale(.8);opacity:.3}50%{transform:translateY(-10px) scale(1.25);opacity:1}}
+@keyframes spBeat{0%,100%{transform:scale(1)}15%{transform:scale(1.25)}30%{transform:scale(1)}45%{transform:scale(1.15)}60%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){#splash b,#splash .sp i{animation:none;opacity:1}}
+/* Réglages X.Uni : section repliable « clés de secours » */
+.ai-adv{margin-top:14px;border:1px solid var(--line,#ddd);border-radius:14px;padding:0 12px;background:var(--bg,transparent)}
+.ai-adv>summary{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:13px 0;font-size:.85rem;font-weight:600;cursor:pointer;list-style:none}
+.ai-adv>summary::-webkit-details-marker{display:none}
+.ai-adv>summary::after{content:"";width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);transition:transform .2s;opacity:.6;flex:none;margin-right:4px}
+.ai-adv[open]>summary::after{transform:rotate(-135deg)}
+.ai-adv[open]>summary{border-bottom:1px solid var(--line,#ddd);margin-bottom:2px}
+.ai-adv>label:first-of-type{margin-top:6px}
+.ai-adv>*:last-child{margin-bottom:12px}
+</style>
+<!-- Démarrage : on lance tout de suite le téléchargement du code de l’appli (script-a + script-b), en parallèle
+     des styles et de Firebase. js/script.js récupère ces téléchargements au lieu de bloquer la page. -->
+<script>
+(function(){try{var V=(window.APP_CONFIG&&window.APP_CONFIG.version)||'3';window.__echoParts=['js/script-a.js','js/script-b.js'].map(function(p){return fetch(p+'?v='+V).then(function(r){if(!r.ok)throw new Error(p+' : HTTP '+r.status);return r.text();});});window.__echoParts.forEach(function(q){q.catch(function(){});});}catch(e){window.__echoParts=null;}})();
+</script>
+
 <!-- Styles : l’ordre des fichiers = l’ordre de la cascade (ne pas changer) -->
 <link rel="stylesheet" href="css/style.css?v=558">
 <link rel="stylesheet" href="css/echo-v7.css?v=558">
@@ -46,7 +81,7 @@
 
 </head>
 <body>
-<div id="splash" aria-live="polite"><div>E<b>&#39;</b>cho</div><div class="sp" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div><small id="splashMsg">Chargement…</small></div>
+<div id="splash" role="status" aria-live="polite"><div>E<b>&#39;</b>cho</div><p class="sptag">Écris à qui tu veux, quand tu veux.</p><div class="sp" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div><small id="splashMsg">Chargement…</small><noscript><small>E&#39;cho a besoin de JavaScript : active-le dans ton navigateur.</small></noscript></div>
 <!-- Connexion / inscription -->
 <section class="screen login" id="login" hidden>
   <h1>E<span class="amp">&#39;</span>cho</h1>
@@ -839,6 +874,8 @@
       <p class="ai-note">Connecte-toi sur Groq, touche « Create API Key », copie-la puis colle-la ci-dessus. Elle reste sur ce téléphone.</p>
     </div>
     <p class="ai-note ok" id="aiGroqOk" hidden>✓ Clé Groq enregistrée sur ce téléphone. Pour la retirer, vide le champ puis touche Enregistrer.</p>
+    <details class="ai-adv" id="aiAdv">
+    <summary>Clés de secours et voix (facultatif)</summary>
     <label for="aiOr">Clé OpenRouter (secours, facultatif)</label>
     <input id="aiOr" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="sk-or-…">
     <p class="ai-note">Utilisée si Groq est indisponible. <a class="ai-link" href="https://openrouter.ai/keys" target="_blank" rel="noopener">Créer ma clé OpenRouter</a></p>
@@ -854,12 +891,17 @@
     <label for="aiModel">Version de secours (Gemini)</label>
     <select id="aiModel"></select>
     <p class="ai-note" id="aiModelNote"></p>
+    </details>
     <label for="aiFacts">Ce que X.Uni retient sur toi</label>
     <textarea id="aiFacts" rows="6" maxlength="1200" placeholder="Rien pour l’instant. Tu peux aussi écrire ici ce qu’il doit savoir : ton niveau, tes matières…"></textarea>
     <p class="ai-note" id="aiSync"></p>
     <div class="ai-srow"><button id="aiSave" type="button">Enregistrer</button><button id="aiWipe" type="button">Tout effacer</button><button id="aiShClose" type="button">Fermer</button></div>
   </div></div>
 </div>
+<script>
+/* E'cho : à l'ouverture des réglages X.Uni, déplie « clés de secours » si une clé y est déjà enregistrée */
+document.addEventListener('click',function(e){try{var b=e.target.closest&&e.target.closest('#aiCfg');if(!b)return;setTimeout(function(){var d=document.getElementById('aiAdv');if(!d)return;var has=['aiOr','aiHf','aiKey','aiOmniUrl'].some(function(id){var n=document.getElementById(id);return n&&n.value.trim();});d.open=has;},80);}catch(x){}});
+</script>
 <script src="js/script.js?v=558"></script>
 <script src="js/script-2.js?v=558"></script>
 <script src="js/shorts.js?v=558" defer></script>
