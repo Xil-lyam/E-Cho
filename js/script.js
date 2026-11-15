@@ -3,7 +3,7 @@
    Ce chargeur les lit dans l'ordre, les recolle et les exécute comme UN SEUL script : le fonctionnement est
    identique à l'ancien script.js. Il reste synchrone, donc l'ordre avec script-2.js ne change pas. */
 (function () {
-  var V = '3';                                        /* à augmenter à chaque mise à jour des parties */
+  var V = (window.APP_CONFIG && window.APP_CONFIG.version) || '3';                                        /* à augmenter à chaque mise à jour des parties */
   var PARTS = ['js/script-a.js', 'js/script-b.js'];
   var code = '';
   for (var i = 0; i < PARTS.length; i++) {
