@@ -1,0 +1,286 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap');
+/* E'cho — lark-music.css (v3)
+   Écran Musique façon Lark Player : fond vert-gris foncé, texte pêche, grande pochette,
+   barre « vagues », liste « File d'attente » avec feuille qui monte du bas.
+   À charger APRÈS css/echo-v7.css. Ne touche que #viewMusic. Fonctionne avec js/lark-music.js. */
+
+
+#viewMusic {
+  --lk-bg: var(--bg);
+  --lk-sheet: color-mix(in srgb, var(--lk-cov, var(--bg)) 22%, color-mix(in srgb, var(--bg) 90%, var(--ink)));
+  --lk-pill: color-mix(in srgb, var(--bg) 80%, var(--ink));
+  --lk-peach: var(--accent);            /* couleur principale du site : rose, rouge, bleu, vert... */
+  --lk-on: var(--accent-ink);           /* texte sur fond de couleur */
+  --lk-mut: var(--muted); --lk-ink: var(--ink);
+  --lk-dim: color-mix(in srgb, var(--muted) 60%, var(--bg));
+  color: var(--lk-ink); font-family: "Lexend", "Outfit", system-ui, sans-serif;
+}
+#viewMusic svg { fill: currentColor; }
+
+/* fond teinté par la couleur de la pochette (change à chaque titre) */
+html body:has(#viewMusic:not([hidden])) { background: color-mix(in srgb, var(--lk-cov, var(--bg)) 34%, var(--bg)) !important; transition: background .8s; }
+
+/* ---------- En-tête réduit : juste la flèche retour ---------- */
+html body #viewMusic .chathead { background: transparent; border: 0; box-shadow: none; padding: 6px 0 0; min-height: 0; }
+html body #viewMusic .chathead .titlebox { display: none; }
+html body #viewMusic .back { color: var(--lk-peach); }
+
+html body #viewMusic .musicwrap { padding: 4px 0 110px; gap: 0; align-items: center; }
+html body #viewMusic .musicwrap > * { width: 100%; max-width: 440px; }
+
+/* ---------- Écran lecteur ---------- */
+html body #viewMusic .nowplaying {
+  display: flex; flex-direction: column; align-items: stretch; gap: 0;
+  padding: 0; background: transparent; border: 0; box-shadow: none; border-radius: 0;
+}
+html body #viewMusic .nowplaying .disc {
+  width: 100%; height: auto; aspect-ratio: 1; margin: 6px 0 20px; border-radius: 28px;
+  font-size: 5rem; color: color-mix(in srgb, var(--accent) 55%, transparent); box-shadow: none; animation: none !important;
+  background-size: cover; background-position: center;
+}
+html body #viewMusic .nowplaying .disc.hascover { color: transparent; }
+html body #viewMusic .nowplaying .mtitle {
+  text-align: left; white-space: normal; font-family: inherit; font-size: 1.35rem; line-height: 1.25; font-weight: 700;
+  color: var(--lk-peach); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+html body #viewMusic .lkartist { margin: 6px 0 0; color: var(--lk-mut); font-size: .9rem; text-align: left; min-height: 1.2em; }
+html body #viewMusic .lkartist:empty { visibility: hidden; }
+
+/* barre « vagues » */
+.lkseek { position: relative; height: 60px; margin-top: 12px; --p: 0%; }
+/* (sélecteurs renforcés : sinon « #viewMusic svg { fill: currentColor } » gagnait et l'onde restait blanche) */
+html body #viewMusic .lkseek svg.w { position: absolute; left: 0; right: 0; bottom: 8px; width: 100%; height: 44px; fill: color-mix(in srgb, var(--accent) 16%, transparent); pointer-events: none; overflow: visible; }
+html body #viewMusic .lkseek svg.w1 { fill: color-mix(in srgb, var(--accent) 55%, transparent); clip-path: inset(0 calc(100% - var(--p)) 0 0); }
+.lkseek .ln { position: absolute; left: 0; right: 0; bottom: 3px; height: 4px; border-radius: 4px; background: color-mix(in srgb, var(--accent) 22%, transparent); pointer-events: none; }
+.lkseek .ln i { display: block; height: 100%; width: var(--p); border-radius: 4px; background: var(--lk-peach); }
+html body #viewMusic .lkseek #mSeek { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+html body #viewMusic .mtimes { margin-top: 2px; color: var(--lk-mut); font-size: .7rem; }
+
+/* boutons : gros symboles pêche, sans fond */
+html body #viewMusic .mctrls { width: 100%; justify-content: center; gap: 34px; margin-top: 18px; padding: 0; }
+html body #viewMusic .mctrls #mShuffle, html body #viewMusic .mctrls #mRepeat { display: none; }
+html body #viewMusic .mbtn, html body #viewMusic .mbtn.big {
+  width: 64px; height: 64px; border-radius: 50%; background: transparent; box-shadow: none; border: 0;
+  color: var(--lk-peach); animation: none; display: grid; place-items: center;
+}
+html body #viewMusic .mbtn svg, html body #viewMusic .mbtn.big svg { width: 38px; height: 38px; }
+html body #viewMusic .mbtn:active, html body #viewMusic #mPlay { background: color-mix(in srgb, var(--accent) 16%, transparent); }
+html body #viewMusic #mPlay .i-pause { display: none; }
+html body #viewMusic #mPlay.playing .i-pause { display: block; }
+html body #viewMusic #mPlay.playing .i-play { display: none; }
+
+/* rangée du bas : ajouter / file d'attente */
+.lkbot { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; padding: 0 4px; }
+.lkbot button, .lkqi button { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; color: var(--lk-mut); background: none; border: 0; cursor: pointer; }
+.lkbot button svg, .lkqi button svg { width: 26px; height: 26px; }
+.lkbot button:active, .lkqi button:active { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.lkbot .lbl { flex: 1; min-width: 0; height: 46px; padding: 0 10px; background: none; border: 0; color: var(--lk-ink); font: inherit; font-size: .82rem; font-weight: 600; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+.lkbot #lkLyBtn.off { opacity: .35; }
+.lkbot button { position: relative; flex: none; }
+.lkbot #lkSleep .bdg { position: absolute; top: 1px; right: -4px; display: none; padding: 1px 5px; border-radius: 8px; font-size: .58rem; font-weight: 700; background: var(--lk-peach); color: var(--lk-on); }
+.lkbot #lkSleep.on { color: var(--lk-peach); }
+.lkbot #lkSleep.on .bdg { display: block; }
+
+/* vitesse de lecture */
+html body #viewMusic .mtimes { align-items: center; }
+.lkspeed { flex: none; padding: 3px 10px; border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); border-radius: 12px; background: none; color: var(--lk-mut); font: inherit; font-size: .72rem; font-weight: 700; cursor: pointer; }
+.lkspeed.on { background: var(--lk-peach); border-color: var(--lk-peach); color: var(--lk-on); }
+
+/* recherche + favoris dans la file d'attente */
+.lkqs { display: flex; align-items: center; gap: 8px; padding: 0 18px 8px; }
+.lkqs input { flex: 1; min-width: 0; height: 40px; padding: 0 14px; border: 0; border-radius: 14px; background: var(--lk-pill); color: var(--lk-ink); font: inherit; font-size: .9rem; outline: none; }
+.lkqs input::placeholder { color: var(--lk-mut); }
+.lkqs button { flex: none; width: 40px; height: 40px; border: 0; border-radius: 14px; display: grid; place-items: center; background: var(--lk-pill); color: var(--lk-mut); cursor: pointer; }
+.lkqs button.on { background: var(--lk-peach); color: var(--lk-on); }
+.lkqs button svg { width: 22px; height: 22px; }
+html body #viewMusic .lkfav svg, html body .lksheet .lkfav svg, html body .lkqs svg { fill: none; stroke: currentColor; stroke-width: 2; }
+html body .lksheet .lkfav.on svg, html body .lkqs button.on svg { fill: currentColor; }
+.lksheet .lkfav { width: 32px; height: 32px; flex: none; display: grid; place-items: center; background: none; border: 0; color: var(--lk-mut); opacity: .7; }
+.lksheet .lkfav svg { width: 20px; height: 20px; }
+.lksheet .lkfav.on { color: var(--lk-peach); opacity: 1; }
+
+.lkqs button.chip { width: auto; padding: 0 12px; font: inherit; font-size: .74rem; font-weight: 700; white-space: nowrap; }
+.lkly-body p { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+
+.lkqs2 { padding-top: 0; justify-content: flex-start; }
+.lkqs2 button.chip { height: 34px; border-radius: 12px; }
+.lkqbody #mList { display: flex; flex-direction: column; }
+.lkcv[data-nq]::after { content: attr(data-nq); position: absolute; top: 3px; left: 3px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 9px; display: grid; place-items: center; background: var(--lk-peach); color: var(--lk-on); font-size: .7rem; font-weight: 700; }
+.lksheet .mname, .lksheet .lkcv { -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; }
+
+/* petite bulle d'info (minuterie, +10 s, reprise) */
+.lktoast { position: fixed; z-index: 70; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 12px);
+  max-width: min(92vw, 420px); display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-radius: 18px;
+  background: var(--lk-pill); color: var(--lk-ink); font-size: .85rem; font-weight: 500; box-shadow: 0 6px 24px rgba(0,0,0,.35);
+  opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; }
+.lktoast.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.lktoast span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lktoast button { flex: none; width: auto; height: auto; border: 0; border-radius: 12px; padding: 6px 12px; background: var(--lk-peach); color: var(--lk-on); font: inherit; font-weight: 700; cursor: pointer; }
+.lkbot .lbl.sw { animation: lkLine .45s cubic-bezier(.2,.8,.2,1); }
+@keyframes lkLine { from { opacity: 0; transform: translateY(8px); } }
+
+/* écran lecteur FIXE : plus de glissement vertical de la page quand on touche l'écran */
+html:has(#viewMusic:not([hidden])), html body:has(#viewMusic:not([hidden])) { overflow: hidden !important; overscroll-behavior: none; }
+html body #viewMusic { overflow: hidden; overscroll-behavior: none; }
+html body #viewMusic .musicwrap, html body #viewMusic .chathead { touch-action: pan-x; }
+
+/* quand la file d'attente est ouverte : on cache le lecteur derrière (plus de pochette qui dépasse ni de flèche en double) */
+html body #viewMusic .musicwrap, html body #viewMusic .chathead { transition: opacity .3s; }
+html body #viewMusic.lkq .musicwrap, html body #viewMusic.lkq .chathead { opacity: 0; pointer-events: none; }
+
+/* ---------- Paroles plein écran ---------- */
+.lkly { position: fixed; z-index: 62; inset: 0; max-width: 44rem; margin: 0 auto; display: flex; flex-direction: column; padding-top: env(safe-area-inset-top, 0px);
+  background: color-mix(in srgb, var(--lk-cov, var(--bg)) 34%, var(--bg)); transform: translateY(105%); visibility: hidden;
+  transition: transform .45s cubic-bezier(.2,.8,.2,1), visibility 0s .45s; }
+.lkly.open { transform: none; visibility: visible; transition: transform .45s cubic-bezier(.2,.8,.2,1); }
+.lkly h2 { margin: 0; padding: 0 24px 8px; font-size: 1.1rem; color: var(--lk-peach); text-align: center; }
+.lkly-body { flex: 1; overflow-y: auto; padding: 24px 24px 40vh; text-align: left; }
+.lkly-body p { margin: 0 0 18px; font-size: 1.55rem; line-height: 1.3; font-weight: 700; color: var(--lk-dim); cursor: pointer; transition: color .3s, transform .3s; transform-origin: left; }
+.lkly-body p.on { color: var(--lk-peach); transform: scale(1.04); }
+.lkly-body p.pl { font-size: 1.1rem; font-weight: 500; color: var(--lk-ink); cursor: default; white-space: pre-line; }
+
+/* éléments natifs qu'on garde mais qu'on cache (boutons pilotés par le JS) */
+html body #viewMusic .mactions { position: absolute; left: -9999px; top: 0; width: 1px; height: 1px; overflow: hidden; }
+html body #viewMusic .mmsg { color: var(--lk-mut); text-align: center; font-size: .8rem; }
+html body #viewMusic .musicwrap > #mList, html body #viewMusic .musicwrap > #mShared { display: none; }
+
+/* ---------- Mini-lecteur du haut (visible quand la file est ouverte) ---------- */
+.lkmini { position: fixed; z-index: 55; left: 0; right: 0; max-width: 44rem; margin: 0 auto; top: calc(env(safe-area-inset-top, 0px) + 12px);
+  padding: 0 18px; display: flex; align-items: center; gap: 14px; opacity: 0; pointer-events: none; transition: opacity .35s; }
+.lkq .lkmini { opacity: 1; pointer-events: auto; }
+.lkmini .lkcv { width: 48px; height: 48px; }
+.lkmini .lkmt { flex: 1; min-width: 0; }
+.lkmini .lkmtt { color: var(--lk-peach); font-weight: 600; font-size: .95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lkmini .lkb { margin-top: 8px; height: 4px; border-radius: 4px; background: color-mix(in srgb, var(--accent) 16%, transparent); }
+.lkmini .lkb i { display: block; height: 100%; width: 0; border-radius: 4px; background: var(--lk-peach); }
+.lkmini button { width: 44px; height: 44px; color: var(--lk-peach); display: grid; place-items: center; background: none; border: 0; }
+.lkmini button svg { width: 30px; height: 30px; }
+.lkmini .i-pause { display: none; } .lkmini.playing .i-pause { display: block; } .lkmini.playing .i-play { display: none; }
+
+/* ---------- Feuille « File d'attente » ---------- */
+.lksheet { position: fixed; z-index: 60; left: 0; right: 0; bottom: 0; max-width: 44rem; margin: 0 auto;
+  top: calc(env(safe-area-inset-top, 0px) + 84px); display: flex; flex-direction: column;
+  background: var(--lk-sheet); border-radius: 30px 30px 0 0; transform: translateY(108%); visibility: hidden;
+  transition: transform .45s cubic-bezier(.2,.8,.2,1), visibility 0s .45s; }
+.lkq .lksheet { transform: none; visibility: visible; transition: transform .45s cubic-bezier(.2,.8,.2,1); }
+.lkhandle { align-self: center; width: 80px; height: 34px; display: grid; place-items: center; color: var(--lk-dim); background: none; border: 0; }
+.lkhandle svg { width: 30px; height: 30px; }
+.lkqh { display: flex; align-items: center; justify-content: space-between; padding: 6px 18px 10px 20px; }
+.lkqh h2 { margin: 0; font-size: 1.3rem; font-weight: 700; color: var(--lk-ink); white-space: nowrap; }
+.lkqi { display: flex; gap: 2px; }
+.lkqi button { width: 40px; height: 40px; }
+.lksheet, .lkly { touch-action: pan-y; }
+.lkqbody { flex: 1; min-height: 0; overflow-y: auto; padding: 4px 18px 140px; overscroll-behavior: contain; }
+.lkqbody #mList, .lkqbody #mShList { list-style: none; margin: 0; padding: 0; }
+.lkqbody #mShared { margin-top: 10px; }
+.lkqbody .mmsg { text-align: center; }
+.lkqbody li.empty { list-style: none; text-align: center; color: var(--lk-mut); padding: 36px 10px; font-size: .9rem; }
+.lkqbody li.empty strong { display: block; color: var(--lk-ink); font-size: 1.05rem; margin-bottom: 6px; }
+.lkpills { position: absolute; left: 0; right: 0; bottom: 0; display: flex; gap: 10px; padding: 22px 18px calc(16px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(180deg, transparent, var(--lk-sheet) 38%); }
+.lkpills button { flex: 1; height: 62px; border-radius: 22px; display: grid; place-items: center; background: var(--lk-pill); color: var(--lk-mut); border: 0; cursor: pointer; transition: flex .3s, background .25s; }
+.lkpills button svg { width: 30px; height: 30px; }
+.lkpills button.on { flex: 1.5; background: var(--lk-peach); color: var(--lk-on); }
+.lkpills button:active { transform: scale(.97); }
+
+/* ---------- Lignes (liste + partagées) ---------- */
+html body #viewMusic .mrow, .lksheet .mrow {
+  position: relative; display: flex; align-items: center; gap: 14px; margin: 0; padding: 8px 0; min-height: 64px;
+  border: 0; border-radius: 0; background: transparent; box-shadow: none; animation: none;
+}
+html body #viewMusic .mrow::before, .lksheet .mrow::before { display: none; }
+.lkcv { position: relative; flex: none; width: 52px; height: 52px; border-radius: 13px; overflow: hidden; display: grid; place-items: center;
+  background-size: cover; background-position: center; color: color-mix(in srgb, var(--ink) 75%, transparent); font-size: 1.3rem; }
+.lkcv.img { color: transparent; }
+.lkeq { position: absolute; inset: 0; display: none; align-items: flex-end; justify-content: center; gap: 4px; padding-bottom: 13px; background: rgba(0,0,0,.42); }
+.lkeq i { width: 5px; border-radius: 3px; background: #fff; animation: lkEq .9s ease-in-out infinite; }
+.lkeq i:nth-child(2) { animation-delay: -.3s; } .lkeq i:nth-child(3) { animation-delay: -.6s; }
+@keyframes lkEq { 0%,100% { height: 6px; } 50% { height: 22px; } }
+body:has(#mPlay.playing) .mrow.on .lkeq { display: flex; }
+.lksheet .mname { flex: 1; min-width: 0; display: block; text-align: left; background: none; border: 0; padding: 4px 0; color: var(--lk-ink);
+  font: inherit; font-size: .98rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lksheet .mname .lkart { display: block; margin-top: 2px; font-size: .8rem; font-weight: 400; color: var(--lk-mut); overflow: hidden; text-overflow: ellipsis; }
+.lksheet .mrow.on .mname { color: var(--lk-peach); }
+.lksheet .mshare, .lksheet .mdel, .lksheet .mren, .lksheet .mcloud { width: 32px; height: 32px; flex: none; display: grid; place-items: center; background: none; border: 0; color: var(--lk-mut); opacity: .7; font-size: .95rem; }
+.lksheet .mcloud.on { color: var(--lk-peach); opacity: 1; }
+.lksheet .mfield { flex: 1; min-width: 0; }
+
+@media (prefers-reduced-motion: reduce) { .lkeq i { animation: none; } .lksheet { transition: none; } }
+
+
+/* ---------- v4 : glisser-déposer, égaliseur, mini-lecteur flottant ---------- */
+.lkqs2 { flex-wrap: wrap; }
+.lkgrip { flex: none; width: 24px; height: 44px; margin: 0 -8px 0 -6px; display: grid; place-items: center; color: var(--lk-dim); touch-action: none; cursor: grab; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.lkgrip svg { width: 18px; height: 18px; }
+.lkqbody.nodrag .lkgrip { display: none; }
+.lkqbody #mList li { position: relative; transition: transform .18s ease; }
+.lkqbody #mList.lkdrag { touch-action: none; }
+.lkqbody #mList li.lkdragging { transition: none; z-index: 6; background: var(--lk-sheet); border-radius: 16px; box-shadow: 0 10px 28px rgba(0,0,0,.45); }
+.lkqbody #mList li.lkdragging .lkgrip { cursor: grabbing; color: var(--lk-peach); }
+
+.lkeqp { position: absolute; z-index: 8; left: 14px; right: 14px; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); display: none; padding: 14px 16px 16px; border-radius: 22px;
+  background: var(--lk-pill); color: var(--lk-ink); box-shadow: 0 10px 34px rgba(0,0,0,.45); }
+.lkeqp.open { display: block; }
+.lkeqh { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.lkeqh b { font-weight: 700; }
+.lkeqh button { width: 34px; height: 34px; border: 0; background: none; color: var(--lk-mut); font-size: 1rem; }
+.lkeqp label { display: grid; grid-template-columns: 56px 1fr 52px; align-items: center; gap: 10px; padding: 6px 0; font-size: .85rem; }
+.lkeqp input[type=range] { width: 100%; accent-color: var(--lk-peach); }
+.lkeqp output { text-align: right; color: var(--lk-mut); font-variant-numeric: tabular-nums; font-size: .8rem; }
+.lkeqp p { margin: 6px 0 10px; font-size: .74rem; color: var(--lk-mut); line-height: 1.35; }
+.lkeqp button.chip { height: 34px; border-radius: 12px; padding: 0 12px; }
+
+.lkfloat { --lk-peach: var(--accent); --lk-on: var(--accent-ink);
+  position: fixed; z-index: 2147483000; top: calc(env(safe-area-inset-top, 0px) + 68px); right: 10px; width: min(236px, 70vw); height: 54px; padding: 0 4px 0 6px; box-sizing: border-box;
+  display: flex; align-items: center; gap: 8px; border-radius: 18px; touch-action: none; -webkit-user-select: none; user-select: none; cursor: grab;
+  background: color-mix(in srgb, var(--bg) 78%, var(--ink)); color: var(--ink); border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+  box-shadow: 0 8px 26px rgba(0,0,0,.4); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); font-family: "Lexend", "Outfit", system-ui, sans-serif; }
+.lkfloat[hidden] { display: none; }
+.lkfloat svg { fill: currentColor; }
+.lkfloat .lkcv { width: 40px; height: 40px; border-radius: 11px; font-size: 1.05rem; }
+.lkfloat .lkmt { flex: 1; min-width: 0; }
+.lkfloat .lkmtt { font-size: .8rem; font-weight: 600; color: var(--lk-peach); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lkfloat .lkb { margin-top: 6px; height: 3px; border-radius: 3px; background: color-mix(in srgb, var(--accent) 18%, transparent); }
+.lkfloat .lkb i { display: block; height: 100%; width: 0; border-radius: 3px; background: var(--lk-peach); }
+.lkfloat button { flex: none; width: 36px; height: 40px; padding: 0; display: grid; place-items: center; background: none; border: 0; color: var(--lk-peach); }
+.lkfloat button svg { width: 24px; height: 24px; }
+.lkfloat .i-pause { display: none; } .lkfloat.playing .i-pause { display: block; } .lkfloat.playing .i-play { display: none; }
+
+
+/* ---------- v5 : fluidité ---------- */
+.lkfloat { -webkit-backdrop-filter: none; backdrop-filter: none; background: color-mix(in srgb, var(--bg) 88%, var(--ink)); will-change: transform; contain: layout paint; }
+.lksheet { will-change: transform; contain: layout paint; }
+.lkqbody #mList li { contain: layout paint style; content-visibility: auto; contain-intrinsic-size: auto 64px; }
+.lkqbody #mList li.lkdragging { content-visibility: visible; }
+.lkqbody { -webkit-overflow-scrolling: touch; }
+html body:has(#viewMusic:not([hidden])) { transition: none !important; }
+.lkeq i { will-change: height; }
+body:not(:has(#mPlay.playing)) .lkeq i { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .lkqbody #mList li { transition: none; } }
+
+
+/* ---------- v6 : rien ne passe sous la barre d'onglets ---------- */
+html body #viewMusic .musicwrap { padding-bottom: calc(var(--lk-tab, 100px) + 10px); }
+html body #viewMusic .nowplaying .disc {
+  /* la pochette rétrécit si l'écran est bas, pour que la rangée du bas (paroles, minuterie) reste visible */
+  width: min(100%, max(120px, calc(100dvh - var(--lk-tab, 100px) - 410px - env(safe-area-inset-top, 0px))));
+  margin: 4px auto 14px;
+}
+
+
+/* ---------- v7 : l'onde vit pendant la lecture ---------- */
+html body #viewMusic .lkseek svg.w { transform-origin: 50% 100%; }
+body:has(#mPlay.playing) #viewMusic .lkseek svg.w1 { animation: lkWave 1.3s ease-in-out infinite; }
+body:has(#mPlay.playing) #viewMusic .lkseek svg.w0 { animation: lkWave 1.9s ease-in-out infinite reverse; }
+@keyframes lkWave { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(.72); } }
+@media (prefers-reduced-motion: reduce) { body:has(#mPlay.playing) #viewMusic .lkseek svg.w { animation: none; } }
+
+
+/* ---------- v8 : zone « X » pour retirer le mini-lecteur ---------- */
+.lkfloatx { position: fixed; z-index: 2147483001; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 28px); width: 64px; height: 64px; margin-left: -32px; border-radius: 50%;
+  display: grid; place-items: center; background: rgba(20,12,14,.88); color: #fff; border: 2px solid rgba(255,255,255,.35); box-shadow: 0 8px 24px rgba(0,0,0,.45);
+  opacity: 0; transform: translateY(90px) scale(.7); pointer-events: none; transition: opacity .2s, transform .25s cubic-bezier(.34,1.56,.64,1), background .15s; }
+.lkfloatx svg { width: 28px; height: 28px; fill: currentColor; }
+.lkfloatx.show { opacity: 1; transform: none; }
+.lkfloatx.hot { background: #e5334b; border-color: #fff; transform: scale(1.25); }
+.lkfloat.over { opacity: .7; transform: scale(.82); transition: transform .15s, opacity .15s; }
