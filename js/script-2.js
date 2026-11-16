@@ -2862,7 +2862,43 @@ idbOpen().then(function(db){DB=db;return kvGet('meta')}).then(function(m){
     box.appendChild(mk('aiOmniUrl', 'http://localhost:20128/v1', 'text'));
     box.appendChild(mk('aiOmniMod', 'Modèle (auto par défaut)', 'text'));
     box.appendChild(mk('aiOmniKey', 'Clé OmniRoute (si besoin)', 'password'));
-    (hf.closest('label') || hf).insertAdjacentElement('afterend', box);
+    /* bouton de test : dit tout de suite si OmniRoute répond, et propose ses modèles */
+    var row = document.createElement('div'); row.style.cssText = 'display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px';
+    var tb = document.createElement('button'); tb.type = 'button'; tb.id = 'aiOmniTest'; tb.textContent = 'Tester la connexion';
+    tb.style.cssText = 'padding:9px 16px;border-radius:999px;border:1px solid currentColor;background:transparent;color:inherit;font:inherit;font-size:.9em;cursor:pointer;opacity:.9';
+    var stt = document.createElement('span'); stt.id = 'aiOmniStat'; stt.setAttribute('role', 'status'); stt.style.cssText = 'font-size:.85em;line-height:1.35;flex:1 1 180px';
+    var dl = document.createElement('datalist'); dl.id = 'aiOmniList';
+    row.appendChild(tb); row.appendChild(stt); box.appendChild(row); box.appendChild(dl);
+    box.querySelector('#aiOmniMod').setAttribute('list', 'aiOmniList');
+    tb.addEventListener('click', omniTest);
+    var first = document.querySelector('label[for="aiOr"]');
+    if (first) first.insertAdjacentElement('beforebegin', box); else (hf.closest('label') || hf).insertAdjacentElement('afterend', box);
+  }
+  /* Teste l'adresse saisie : demande la liste des modèles (GET /models) et explique l'échec s'il y en a un. */
+  async function omniTest() {
+    var st = $('#aiOmniStat'), btn = $('#aiOmniTest'), u = $('#aiOmniUrl');
+    var v = u.value.trim().replace(/\/+$/, '');
+    if (!v) { st.textContent = 'Écris d’abord l’adresse de ton OmniRoute.'; return; }
+    if (!/^https?:\/\//i.test(v)) v = 'http://' + v;
+    if (!/\/v1$/i.test(v)) v += '/v1';
+    var k = $('#aiOmniKey').value.trim();
+    btn.disabled = true; st.textContent = 'Test en cours…';
+    var ctl = new AbortController(), to = setTimeout(function () { ctl.abort(); }, 8000);
+    try {
+      var r = await fetch(v + '/models', { signal: ctl.signal, headers: k ? { 'Authorization': 'Bearer ' + k } : {} });
+      if (r.status === 401 || r.status === 403) st.textContent = '✗ OmniRoute répond, mais refuse la clé (' + r.status + ').';
+      else if (!r.ok) st.textContent = '✗ OmniRoute répond avec une erreur (' + r.status + '). Vérifie l’adresse (elle finit par /v1).';
+      else {
+        var j = null; try { j = await r.json(); } catch (e) {}
+        var ids = ((j && j.data) || []).map(function (x) { return x && x.id; }).filter(Boolean).slice(0, 300);
+        var dl = $('#aiOmniList'); if (dl) { dl.textContent = ''; ids.forEach(function (id) { var o = document.createElement('option'); o.value = id; dl.appendChild(o); }); }
+        st.textContent = '✓ Connecté' + (ids.length ? ' — ' + ids.length + ' modèle(s) proposés dans le champ « Modèle ».' : '.') + ' Touche Enregistrer pour l’utiliser.';
+      }
+    } catch (e) {
+      st.textContent = ctl.signal.aborted
+        ? '✗ Pas de réponse au bout de 8 s. Vérifie que OmniRoute tourne.'
+        : '✗ Impossible de joindre OmniRoute : il ne tourne pas, l’adresse est fausse, ou il n’autorise pas ce site (CORS) ou ce navigateur à l’appeler.';
+    } finally { clearTimeout(to); btn.disabled = false; }
   }
   function omniFill() {
     omniEnsureUi();
