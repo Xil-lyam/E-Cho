@@ -1402,11 +1402,11 @@ window.__uandiMods['js/ui/bande-notes.js'] = function () {
         document.head.appendChild(s);
       });
       if (typeof window.__uandiApp === 'function') break;
-      say('Chargement…');
+      say('Réveil de l’écho…');
       await new Promise(function (ok) { setTimeout(ok, 600 * (k + 1)); });
     }
   }
-  async function loadApp() { await waitApp(); window.__uandiApp(); }
+  async function loadApp() { if (window.__uandiAppLoad) { try { await window.__uandiAppLoad(); } catch (e) {} } await waitApp(); window.__uandiApp(); }
   function loadModules() {
     APP_MODULES.forEach(function (p) {
       try { window.__uandiMods[p](); }
@@ -1452,7 +1452,7 @@ window.__uandiMods['js/ui/bande-notes.js'] = function () {
   }
   async function loadFirebase() {
     if (window.firebase && firebase.auth && firebase.firestore) return true;
-    say('Chargement…');
+    say('Réveil de l’écho…');
     if (!(await lib(F[0], 9000))) return false;
     say('Connexion au serveur…');
     var r = await Promise.all([lib(F[1], 9000), lib(F[2], 9000)]);

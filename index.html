@@ -37,6 +37,49 @@
 
 </script>
 
+<!-- Démarrage : style minimal de l’écran d’accueil, dans la page, pour qu’il s’affiche tout de suite
+     (avant le gros fichier css/style.css). Mêmes couleurs que l’écran final : rien ne saute quand le CSS arrive. -->
+<style id="splash-critical">
+#splash{--spa:#5CE1FF;--sp1:#0E1430;--sp2:#060914;--spi:#EAF0FF;--spm:#8D98C4;position:fixed;inset:0;z-index:98;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:24px;text-align:center;background:radial-gradient(120% 80% at 50% 28%,var(--sp1) 0%,var(--sp2) 72%);color:var(--spi);font:700 2.9rem/1 system-ui,sans-serif;letter-spacing:.02em;transition:opacity .35s}
+:root[data-eff="light"] #splash{--spa:#3D6BFF;--sp1:#FFFFFF;--sp2:#EEF3FF;--spi:#0E1530;--spm:#5C6890}
+:root[data-skin="nuit"] #splash{--spa:#6EA8FF;--sp1:#12151B;--sp2:#0A0C10;--spi:#F2F4F8;--spm:#8B93A3}
+:root[data-skin="clair"] #splash{--spa:#0F766E;--sp1:#FFFFFF;--sp2:#E6F4F2;--spi:#0F172A;--spm:#64748B}
+:root[data-skin="foret"] #splash{--spa:#4FD1A1;--sp1:#131F1B;--sp2:#0C1613;--spi:#E8F1ED;--spm:#86A095}
+:root[data-skin="rose"] #splash{--spa:#E0457B;--sp1:#FFF6FA;--sp2:#FFE9F1;--spi:#5B1035;--spm:#A24E78}
+:root[data-skin="neant"] #splash{--spa:#FF3B4E;--sp1:#130809;--sp2:#070304;--spi:#F7E9EA;--spm:#A5868A}
+#splash .spmark{position:relative;display:flex;align-items:center;justify-content:center;width:100%;height:150px;animation:spIn .7s cubic-bezier(.2,.8,.2,1) both}
+#splash .springs{position:absolute;left:50%;top:50%;width:0;height:0}
+#splash .springs i{position:absolute;left:-60px;top:-60px;width:120px;height:120px;border-radius:50%;border:2px solid var(--accent,var(--spa));opacity:0;animation:spEcho 2.7s cubic-bezier(.2,.6,.3,1) infinite}
+#splash .springs i:nth-child(2){animation-delay:.9s}#splash .springs i:nth-child(3){animation-delay:1.8s}
+#splash .splogo{position:relative;z-index:1;color:var(--spi)}
+#splash b{display:inline-block;color:var(--accent,var(--spa));text-shadow:0 0 20px var(--accent,var(--spa));animation:spBeat 1.8s ease-in-out infinite}
+#splash .sptag{margin:0;font:500 1rem/1.35 system-ui,sans-serif;letter-spacing:.01em;color:var(--spm);animation:spIn .7s .15s cubic-bezier(.2,.8,.2,1) both}
+#splash .spbar{width:132px;height:3px;border-radius:3px;overflow:hidden;background:rgba(128,136,170,.25);animation:spIn .7s .3s ease both}
+#splash .spbar i{display:block;width:45%;height:100%;border-radius:3px;background:linear-gradient(90deg,transparent,var(--accent,var(--spa)),transparent);animation:spSlide 1.3s ease-in-out infinite}
+#splash small{font:400 .82rem system-ui,sans-serif;color:var(--spm)}
+@keyframes spEcho{0%{transform:scale(.45);opacity:.55}55%{opacity:.16}100%{transform:scale(2.3);opacity:0}}
+@keyframes spBeat{0%,100%{transform:scale(1)}12%{transform:scale(1.28)}26%{transform:scale(1)}40%{transform:scale(1.14)}54%{transform:scale(1)}}
+@keyframes spSlide{0%{transform:translateX(-110%)}100%{transform:translateX(250%)}}
+@keyframes spIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){#splash *{animation:none!important}#splash .springs{display:none}#splash .spbar i{width:100%}}
+#splash #splashRetry{margin:6px 0 0;padding:12px 26px!important;border:0;border-radius:999px;background:var(--accent,var(--spa))!important;color:var(--accent-ink,#fff)!important;font:600 1rem system-ui,sans-serif!important;cursor:pointer}
+#splash #splashRetry:focus-visible{outline:3px solid var(--spi);outline-offset:3px}
+/* Réglages X.Uni : section repliable « clés de secours » */
+.ai-adv{margin-top:14px;border:1px solid var(--line,#ddd);border-radius:14px;padding:0 12px;background:var(--bg,transparent)}
+.ai-adv>summary{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:13px 0;font-size:.85rem;font-weight:600;cursor:pointer;list-style:none}
+.ai-adv>summary::-webkit-details-marker{display:none}
+.ai-adv>summary::after{content:"";width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);transition:transform .2s;opacity:.6;flex:none;margin-right:4px}
+.ai-adv[open]>summary::after{transform:rotate(-135deg)}
+.ai-adv[open]>summary{border-bottom:1px solid var(--line,#ddd);margin-bottom:2px}
+.ai-adv>label:first-of-type{margin-top:6px}
+.ai-adv>*:last-child{margin-bottom:12px}
+</style>
+<!-- Démarrage : on lance tout de suite le téléchargement du code de l’appli (script-a + script-b), en parallèle
+     des styles et de Firebase. js/script.js récupère ces téléchargements au lieu de bloquer la page. -->
+<script>
+(function(){try{var V=(window.APP_CONFIG&&window.APP_CONFIG.version)||'3';window.__echoParts=['js/script-a.js','js/script-b.js'].map(function(p){return fetch(p+'?v='+V).then(function(r){if(!r.ok)throw new Error(p+' : HTTP '+r.status);return r.text();});});window.__echoParts.forEach(function(q){q.catch(function(){});});}catch(e){window.__echoParts=null;}})();
+</script>
+
 <!-- Styles : l’ordre des fichiers = l’ordre de la cascade (ne pas changer) -->
 <link rel="stylesheet" href="css/style.css?v=583">
 <link rel="stylesheet" href="css/echo-v7.css?v=583">
@@ -46,7 +89,7 @@
 
 </head>
 <body>
-<div id="splash" aria-live="polite"><section class="sp-box"><h1 class="sp-logo" aria-label="E'cho">E<span class="sp-apos">&#39;<span class="sp-ring"></span><span class="sp-ring"></span><span class="sp-ring"></span></span>cho</h1><p class="sp-tag">Écris à qui tu veux, quand tu veux.</p><p id="splashMsg" class="sp-msg">Chargement…</p></section></div>
+<div id="splash" role="status" aria-live="polite"><div class="spmark"><span class="springs" aria-hidden="true"><i></i><i></i><i></i></span><div class="splogo">E<b>&#39;</b>cho</div></div><p class="sptag">Ici, tes mots résonnent.</p><div class="spbar" aria-hidden="true"><i></i></div><small id="splashMsg">Réveil de l’écho…</small><noscript><small>E&#39;cho a besoin de JavaScript : active-le dans ton navigateur.</small></noscript></div>
 <!-- Connexion / inscription -->
 <section class="screen login" id="login" hidden>
   <h1>E<span class="amp">&#39;</span>cho</h1>
@@ -839,6 +882,8 @@
       <p class="ai-note">Connecte-toi sur Groq, touche « Create API Key », copie-la puis colle-la ci-dessus. Elle reste sur ce téléphone.</p>
     </div>
     <p class="ai-note ok" id="aiGroqOk" hidden>✓ Clé Groq enregistrée sur ce téléphone. Pour la retirer, vide le champ puis touche Enregistrer.</p>
+    <details class="ai-adv" id="aiAdv">
+    <summary>Clés de secours et voix (facultatif)</summary>
     <label for="aiOr">Clé OpenRouter (secours, facultatif)</label>
     <input id="aiOr" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="sk-or-…">
     <p class="ai-note">Utilisée si Groq est indisponible. <a class="ai-link" href="https://openrouter.ai/keys" target="_blank" rel="noopener">Créer ma clé OpenRouter</a></p>
@@ -854,12 +899,17 @@
     <label for="aiModel">Version de secours (Gemini)</label>
     <select id="aiModel"></select>
     <p class="ai-note" id="aiModelNote"></p>
+    </details>
     <label for="aiFacts">Ce que X.Uni retient sur toi</label>
     <textarea id="aiFacts" rows="6" maxlength="1200" placeholder="Rien pour l’instant. Tu peux aussi écrire ici ce qu’il doit savoir : ton niveau, tes matières…"></textarea>
     <p class="ai-note" id="aiSync"></p>
     <div class="ai-srow"><button id="aiSave" type="button">Enregistrer</button><button id="aiWipe" type="button">Tout effacer</button><button id="aiShClose" type="button">Fermer</button></div>
   </div></div>
 </div>
+<script>
+/* E'cho : à l'ouverture des réglages X.Uni, déplie « clés de secours » si une clé y est déjà enregistrée */
+document.addEventListener('click',function(e){try{var b=e.target.closest&&e.target.closest('#aiCfg');if(!b)return;setTimeout(function(){var d=document.getElementById('aiAdv');if(!d)return;var has=['aiOr','aiHf','aiKey','aiOmniUrl'].some(function(id){var n=document.getElementById(id);return n&&n.value.trim();});d.open=has;},80);}catch(x){}});
+</script>
 <script src="js/script.js?v=583"></script>
 <script src="js/script-2.js?v=583"></script>
 <script src="js/shorts.js?v=583" defer></script>

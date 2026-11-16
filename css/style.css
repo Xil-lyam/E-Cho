@@ -1457,19 +1457,8 @@ html body .row.open .meta .del{ color:var(--danger); }
 @keyframes tdot{ 0%,70%,100%{ transform:translateY(0); opacity:.45; } 35%{ transform:translateY(-5px); opacity:1; } }
 .typing .tnm{ font-size:.75rem; color:var(--muted); }
 @media (prefers-reduced-motion:reduce){ .typing .tbub i, html body .row.open .meta{ animation:none; } }
-/* écran d'attente (évite l'écran noir pendant le chargement) */
-#splash{ position:fixed; inset:0; z-index:98; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; background:radial-gradient(120% 80% at 50% 0%, #3a0a14 0%, #0a0305 70%); color:#fff; font:700 2.6rem/1 system-ui,sans-serif; letter-spacing:.02em; transition:opacity .3s; }
-#splash b{ color:#ff5a7a; }
-#splash b{ display:inline-block; animation:spBeat 1.3s ease-in-out infinite; text-shadow:0 0 18px rgba(255,90,122,.55); }
-#splash .sp{ display:flex; align-items:center; gap:9px; height:30px; }
-#splash .sp i{ width:9px; height:9px; border-radius:50%; background:#ff5a7a; opacity:.35; animation:spWave 1.2s ease-in-out infinite; }
-#splash .sp i:nth-child(2){ animation-delay:.12s; } #splash .sp i:nth-child(3){ animation-delay:.24s; } #splash .sp i:nth-child(4){ animation-delay:.36s; } #splash .sp i:nth-child(5){ animation-delay:.48s; }
-@keyframes spWave{ 0%,100%{ transform:translateY(0) scale(.8); opacity:.3; } 50%{ transform:translateY(-10px) scale(1.25); opacity:1; } }
-@keyframes spBeat{ 0%,100%{ transform:scale(1); } 15%{ transform:scale(1.25); } 30%{ transform:scale(1); } 45%{ transform:scale(1.15); } 60%{ transform:scale(1); } }
-@media (prefers-reduced-motion:reduce){ #splash b, #splash .sp i{ animation:none; opacity:1; } }
-#splash small{ font:400 .8rem system-ui,sans-serif; opacity:.6; }
+/* écran d'attente : son style est dans index.html (balise #splash-critical), pour s'afficher avant ce fichier */
 @keyframes spin{ to{ transform:rotate(360deg); } }
-:root[data-eff="light"] #splash{ background:#fff; color:#0F172A; }
 
 /* U&I — css/14-etudier.css
    Module Étudier */
@@ -2194,10 +2183,6 @@ html body #viewList.refreshed header::after{ --pull:1; opacity:0; transition:opa
 @keyframes pullShine{ from{ background-position:200% 0 } to{ background-position:0 0 } }
 @media (prefers-reduced-motion:reduce){ html body #viewList.refreshing header::after{ animation:none !important } }
 
-/* E'cho — écran de chargement : couleurs du thème */
-#splash b{ color:var(--accent,#ff5a7a); text-shadow:0 0 18px color-mix(in srgb,var(--accent,#ff5a7a) 55%,transparent); }
-#splash .sp i{ background:var(--accent,#ff5a7a); }
-#splash{ background:radial-gradient(120% 80% at 50% 0%, color-mix(in srgb,var(--accent,#ff5a7a) 20%,#0a0305) 0%, #0a0305 70%); }
 
 /* E'cho — fond de l'appli propre à chaque style (Nuit, Clair, Forêt, Rose, Néant). « Défaut » garde l'aurore d'origine. */
 :root[data-skin="nuit"] body::before{ background:
@@ -2236,11 +2221,6 @@ html body #viewList.refreshed header::after{ --pull:1; opacity:0; transition:opa
   repeating-linear-gradient(0deg, color-mix(in srgb,var(--accent) 6%,transparent) 0 1px, transparent 1px 7px);
   -webkit-mask-image:radial-gradient(ellipse at 50% 100%,#000 0%,transparent 70%); mask-image:radial-gradient(ellipse at 50% 100%,#000 0%,transparent 70%); }
 
-/* E'cho — écran de démarrage clair, pour se fondre avec l'écran natif d'Android (icône sur fond blanc) */
-html body #splash{ background:#fff; color:#241038; }
-html body #splash > div:first-child{ color:#241038; }
-html body #splash b{ text-shadow:none; }
-html body #splash small{ color:#6b5a7e; opacity:.9; }
 
 /* ==========================================================================
    E'cho — navigation « pilule flottante » (option 2) + Actualités = Accueil
@@ -2522,20 +2502,3 @@ html body #tabbar .tab[data-t="anon"] { color: var(--accent); }
 html body #tabbar .tab[data-t="anon"]:not([aria-current="page"]) { background: color-mix(in srgb, var(--accent) 16%, transparent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent) inset; border-radius: 999px; }
 html body #tabbar .tab[data-t="anon"][aria-current="page"] span { max-width: 9rem; }
 
-/* ==========================================================================
-   E'cho — nouvel écran de chargement (fond blanc, comme l'écran natif Android).
-   Placé à la fin : même spécificité que « html body #splash » plus haut, donc il gagne.
-   ========================================================================== */
-html body #splash{ background:radial-gradient(120% 70% at 50% 42%, color-mix(in srgb,var(--accent,#ff5a7a) 9%,#fff), #fff 62%); color:#241038; }
-html body #splash .sp-box{ width:min(88vw,420px); display:flex; flex-direction:column; align-items:center; gap:16px; text-align:center; margin:0; padding:0; }
-html body #splash .sp-logo{ position:relative; isolation:isolate; margin:0; padding:0; font:800 clamp(56px,18vw,88px)/1 Sora,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; letter-spacing:-.04em; color:#241038; }
-html body #splash .sp-apos{ position:relative; display:inline-block; color:var(--accent,#ff5a7a); text-shadow:none; animation:none; }
-html body #splash .sp-ring{ position:absolute; left:50%; top:.28em; width:.3em; height:.3em; margin:0; transform:translate(-50%,-50%); z-index:-1; border:1.5px solid color-mix(in srgb,var(--accent,#ff5a7a) 65%,transparent); border-radius:50%; opacity:0; animation:spRing 3.2s cubic-bezier(.2,.6,.3,1) infinite; pointer-events:none; }
-html body #splash .sp-ring:nth-child(2){ animation-delay:1.05s; }
-html body #splash .sp-ring:nth-child(3){ animation-delay:2.1s; }
-@keyframes spRing{ 0%{ width:.3em; height:.3em; opacity:.8; } 100%{ width:3.2em; height:3.2em; opacity:0; } }
-html body #splash .sp-tag{ margin:0; padding:0; font:500 1.05rem/1.3 Outfit,system-ui,sans-serif; letter-spacing:0; color:#6b5a7e; }
-html body #splash #splashMsg{ margin:10px 0 0; padding:0; min-height:1.4em; font:400 .95rem/1.4 Outfit,system-ui,sans-serif; letter-spacing:0; color:#6b5a7e; opacity:1; }
-html body #splash #splashRetry{ margin:0; padding:12px 26px !important; border:0; border-radius:999px; background:var(--accent,#ff5a7a) !important; color:#fff; font:600 1rem Outfit,system-ui,sans-serif !important; cursor:pointer; }
-html body #splash #splashRetry:focus-visible{ outline:3px solid #241038; outline-offset:3px; }
-@media (prefers-reduced-motion:reduce){ html body #splash .sp-ring{ animation:none; width:2em; height:2em; opacity:.3; } html body #splash .sp-ring:nth-child(n+2){ display:none; } }
