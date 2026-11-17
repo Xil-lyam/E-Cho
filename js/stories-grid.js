@@ -58,7 +58,7 @@
       var b = document.createElement('button');
       b.type = 'button'; b.className = 'stg-card stg-me';
       b.innerHTML = '<span class="stg-plus">+</span><span class="stg-name">Ajouter une story</span>';
-      b.addEventListener('click', function () { close(); var m = document.getElementById('myNote'); if (m) m.click(); });
+      b.addEventListener('click', function () { close(); if (window.__echoOpenNote) window.__echoOpenNote(); });
       grid.appendChild(b);
     }
     others.forEach(function (o) { grid.appendChild(card(o, false)); });

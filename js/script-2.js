@@ -78,7 +78,7 @@ window.__uandiMods['js/ui/onglets.js'] = function () {
   function mkAction(k) {
     sheetClose();
     if ((k === 'letter' || k === 'chat') && window.EchoShorts) window.EchoShorts.close();
-    if (k === 'note') { $('myNote').click(); return; }
+    if (k === 'note') { if (window.__echoOpenNote) window.__echoOpenNote(); else $('myNote').click(); return; }
     if (k === 'group') { $('newGroup').click(); return; }
     if (k === 'settings') { $('openSet').click(); return; }
     if (k === 'chat') {

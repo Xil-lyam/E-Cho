@@ -3890,7 +3890,7 @@ window.__uandiApp = function () {
   })();
   function noteCount() { $('#noteCount').textContent = $('#noteInput').value.length + ' / 60'; }
   function noteErr(t) { var e = $('#noteErr'); e.textContent = t || ''; e.hidden = !t; }
-  $('#myNote').addEventListener('click', function () {
+  function openNoteEditor() {
     var a = activeNote(state.me);
     $('#noteInput').value = a ? a.text : '';
     $('#noteDel').hidden = !a;
@@ -3899,6 +3899,12 @@ window.__uandiApp = function () {
     noteCount();
     neDlg.showModal();
     $('#noteInput').focus();
+  }
+  window.__echoOpenNote = openNoteEditor;
+  /* l'avatar de l'en-tête ouvre mon profil (la note se crée avec le + de « Ma story ») */
+  $('#myNote').addEventListener('click', function () {
+    try { if (window.UIProfile && UIProfile.open) { UIProfile.open(state.me, state.username); return; } } catch (e) {}
+    openNoteEditor();
   });
   $('#noteInput').addEventListener('input', noteCount);
   $('#chatAvatar').addEventListener('click', function () {

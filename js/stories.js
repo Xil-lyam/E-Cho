@@ -1143,8 +1143,9 @@
     var uid = it.uid, list = it.list || [], n = it.note;
     var b = mk('button', 'stb' + (list.length ? ((isMine || isNew(uid, list)) ? '' : ' seen') : (n && !isMine ? ' nt' : ' none')) + (list.some(function (x) { return Array.isArray(x.to); }) ? ' cf' : '')); b.type = 'button';
     var ring = mk('div', 'ring'), ph = mk('div', 'ph'); paintAv(ph, uid, it.name); ring.appendChild(ph);
-    if (isMine && !list.length) ring.appendChild(mk('i', 'plus', '+'));
-    if (n) ring.appendChild(mk('span', 'nbub', n.text));
+    function openNote(e) { e.stopPropagation(); e.preventDefault(); if (window.__echoOpenNote) window.__echoOpenNote(); }
+    if (isMine) { var pl = mk('i', 'plus', '+'); pl.setAttribute('role', 'button'); pl.setAttribute('aria-label', 'Créer une note'); pl.addEventListener('click', openNote); ring.appendChild(pl); }
+    if (n) { var nb = mk('span', 'nbub', n.text); if (isMine) nb.addEventListener('click', openNote); ring.appendChild(nb); }
     b.appendChild(ring); b.appendChild(mk('span', 'n', isMine ? 'Ma story' : cap(it.name)));
     b.addEventListener('click', function () {
       if (isMine) { if (list.length) openQueue([{ uid: uid, name: it.name, list: list }], 0); else compose(); return; }

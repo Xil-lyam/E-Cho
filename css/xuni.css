@@ -71,3 +71,8 @@ html[data-eff="light"] #aiP .ai-sheet>div{box-shadow:0 -10px 40px rgba(0,0,0,.15
 
 /* ===== Navigation allégée : on cache ce qui répète la barre du bas ou l'en-tête ===== */
 #kmenu #openFriends,#kmenu #openReqs{display:none}
+
+/* l’avatar de l’en-tête = profil : plus de « + » dessus (la note se crée depuis « Ma story ») */
+#viewList .notebtn .plus{display:none!important}
+/* « + » de Ma story : plus facile à toucher */
+#stBar .stb .plus{width:26px!important;height:26px!important;box-shadow:0 0 0 2px var(--bg)}
