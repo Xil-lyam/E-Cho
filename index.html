@@ -84,6 +84,7 @@
 <link rel="stylesheet" href="css/style.css?v=586">
 <link rel="stylesheet" href="css/echo-v7.css?v=586">
 <link rel="stylesheet" href="css/lark-music.css?v=586">
+<link rel="stylesheet" href="css/xuni.css?v=586">
 <link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap"></noscript>
 
@@ -848,13 +849,15 @@
 <div id="aiP" hidden>
   <div class="ai-top">
     <button class="ai-ic" id="aiClose" type="button" aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-    <h2>X.Uni <small id="aiVer"></small></h2>
+    <h2><span class="ai-logo" aria-hidden="true"></span><span class="ai-tt">X.Uni<small id="aiVer"></small></span></h2>
     <button class="ai-ic" id="aiCfg" type="button" aria-label="Réglages de X.Uni"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
     <button class="ai-ic" id="aiHistB" type="button" aria-label="Historique des conversations"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5M12 8v4l3 2"/></svg></button>
     <button class="ai-ic" id="aiNew" type="button" aria-label="Nouvelle conversation"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
   </div>
+  <div class="ai-bar">
   <div class="ai-ctx"><label for="aiLes">Leçon</label><select id="aiLes"></select></div>
   <div class="ai-ctx"><label for="aiProv">IA</label><select id="aiProv" aria-label="Choisir l’IA utilisée"></select></div>
+  </div>
   <div class="ai-chips" id="aiChips">
     <button type="button" data-p="resume">Résumé</button>
     <button type="button" data-p="quiz">Quiz</button>
@@ -874,41 +877,76 @@
     <div class="ai-srow"><button id="aiHistDel" type="button" hidden>Supprimer (0)</button><button id="aiHistClose" type="button">Fermer</button></div>
   </div></div>
   <div class="ai-sheet" id="aiSheet" hidden><div>
-    <h3>Réglages de X.Uni</h3>
-    <label for="aiGroq">Clé Groq (gratuite, principale)</label>
-    <input id="aiGroq" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="gsk_…">
-    <div id="aiGroqHelp">
-      <a class="ai-link big" href="https://console.groq.com/keys" target="_blank" rel="noopener">👉 Créer ma clé Groq gratuite</a>
-      <p class="ai-note">Connecte-toi sur Groq, touche « Create API Key », copie-la puis colle-la ci-dessus. Elle reste sur ce téléphone.</p>
+    <div class="ai-sh-head"><h3>Réglages de X.Uni</h3></div>
+    <div class="ai-tabs" role="tablist">
+      <button type="button" role="tab" class="on" data-tab="keys" aria-selected="true">🔑 Clés API</button>
+      <button type="button" role="tab" data-tab="mem" aria-selected="false">🧠 Mémoire</button>
+      <button type="button" role="tab" data-tab="ia" aria-selected="false">⚙️ Modèle</button>
     </div>
-    <p class="ai-note ok" id="aiGroqOk" hidden>✓ Clé Groq enregistrée sur ce téléphone. Pour la retirer, vide le champ puis touche Enregistrer.</p>
-    <details class="ai-adv" id="aiAdv">
-    <summary>Clés de secours et voix (facultatif)</summary>
-    <label for="aiOr">Clé OpenRouter (secours, facultatif)</label>
-    <input id="aiOr" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="sk-or-…">
-    <p class="ai-note">Utilisée si Groq est indisponible. <a class="ai-link" href="https://openrouter.ai/keys" target="_blank" rel="noopener">Créer ma clé OpenRouter</a></p>
-    <label for="aiHf">Clé Hugging Face (secours, facultatif)</label>
-    <input id="aiHf" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="hf_…">
-    <p class="ai-note">Crée un jeton « Fine-grained » avec la permission « Make calls to Inference Providers ». <a class="ai-link" href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener">Créer mon jeton</a></p>
-    <label for="aiKey">Clé Gemini (secours, facultatif)</label>
-    <input id="aiKey" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="AIza…">
-    <div id="aiKeyHelp">
+    <div class="ai-pane" data-pane="keys">
+      <section class="ai-card">
+        <div class="ai-card-h"><b>Groq</b><span class="ai-badge main">Principale</span><span class="ai-st" data-for="aiGroq"></span></div>
+        <input id="aiGroq" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="gsk_…" aria-label="Clé Groq">
+        <div id="aiGroqHelp">
+          <a class="ai-link big" href="https://console.groq.com/keys" target="_blank" rel="noopener">👉 Créer ma clé Groq gratuite</a>
+          <p class="ai-note">Connecte-toi sur Groq, touche « Create API Key », copie-la puis colle-la ci-dessus. Elle reste sur ce téléphone.</p>
+        </div>
+        <p class="ai-note ok" id="aiGroqOk" hidden>✓ Clé Groq enregistrée sur ce téléphone. Pour la retirer, vide le champ puis touche Enregistrer.</p>
+      </section>
+      <section class="ai-card">
+        <div class="ai-card-h"><b>OpenRouter</b><span class="ai-badge">Secours</span><span class="ai-st" data-for="aiOr"></span></div>
+        <input id="aiOr" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="sk-or-…" aria-label="Clé OpenRouter">
+        <p class="ai-note">Utilisée si Groq est indisponible. <a class="ai-link" href="https://openrouter.ai/keys" target="_blank" rel="noopener">Créer ma clé OpenRouter</a></p>
+      </section>
+      <section class="ai-card">
+        <div class="ai-card-h"><b>Hugging Face</b><span class="ai-badge">Secours</span><span class="ai-st" data-for="aiHf"></span></div>
+        <input id="aiHf" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="hf_…" aria-label="Jeton Hugging Face">
+        <p class="ai-note">Crée un jeton « Fine-grained » avec la permission « Make calls to Inference Providers ». <a class="ai-link" href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener">Créer mon jeton</a></p>
+      </section>
+      <section class="ai-card">
+        <div class="ai-card-h"><b>Gemini</b><span class="ai-badge">Secours + voix</span><span class="ai-st" data-for="aiKey"></span></div>
+        <input id="aiKey" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="AIza…" aria-label="Clé Gemini">
+        <div id="aiKeyHelp">
       <p class="ai-note">X.Uni répond toujours avec Groq en premier. Si Groq est indisponible, il bascule sur Gemini. La voix de lecture utilise aussi cette clé. <a class="ai-link" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Créer ma clé Gemini</a></p>
     </div>
-    <p class="ai-note ok" id="aiKeyOk" hidden>✓ Clé Gemini enregistrée sur ce téléphone. Pour la retirer, vide le champ puis touche Enregistrer.</p>
-    <label for="aiModel">Version de secours (Gemini)</label>
-    <select id="aiModel"></select>
-    <p class="ai-note" id="aiModelNote"></p>
-    </details>
-    <label for="aiFacts">Ce que X.Uni retient sur toi</label>
-    <textarea id="aiFacts" rows="6" maxlength="1200" placeholder="Rien pour l’instant. Tu peux aussi écrire ici ce qu’il doit savoir : ton niveau, tes matières…"></textarea>
-    <p class="ai-note" id="aiSync"></p>
-    <div class="ai-srow"><button id="aiSave" type="button">Enregistrer</button><button id="aiWipe" type="button">Tout effacer</button><button id="aiShClose" type="button">Fermer</button></div>
+        <p class="ai-note ok" id="aiKeyOk" hidden>✓ Clé Gemini enregistrée sur ce téléphone. Pour la retirer, vide le champ puis touche Enregistrer.</p>
+      </section>
+    </div>
+    <div class="ai-pane" data-pane="mem" hidden>
+      <section class="ai-card">
+        <div class="ai-card-h"><b>Ce que X.Uni retient sur toi</b></div>
+        <textarea id="aiFacts" rows="7" maxlength="1200" placeholder="Rien pour l’instant. Tu peux aussi écrire ici ce qu’il doit savoir : ton niveau, tes matières…" aria-label="Mémoire de X.Uni"></textarea>
+        <p class="ai-note" id="aiSync"></p>
+      </section>
+      <section class="ai-card danger">
+        <div class="ai-card-h"><b>Zone sensible</b></div>
+        <p class="ai-note">Efface la mémoire de X.Uni et la conversation en cours. Tes clés ne sont pas touchées.</p>
+        <button id="aiWipe" type="button">Tout effacer</button>
+      </section>
+    </div>
+    <div class="ai-pane" data-pane="ia" hidden>
+      <section class="ai-card">
+        <div class="ai-card-h"><b>Version de secours (Gemini)</b></div>
+        <select id="aiModel"></select>
+        <p class="ai-note" id="aiModelNote"></p>
+      </section>
+    </div>
+    <div class="ai-srow ai-foot"><button id="aiSave" type="button">Enregistrer</button><button id="aiShClose" type="button">Fermer</button></div>
   </div></div>
 </div>
 <script>
-/* E'cho : à l'ouverture des réglages X.Uni, déplie « clés de secours » si une clé y est déjà enregistrée */
-document.addEventListener('click',function(e){try{var b=e.target.closest&&e.target.closest('#aiCfg');if(!b)return;setTimeout(function(){var d=document.getElementById('aiAdv');if(!d)return;var has=['aiOr','aiHf','aiKey','aiOmniUrl'].some(function(id){var n=document.getElementById(id);return n&&n.value.trim();});d.open=has;},80);}catch(x){}});
+/* X.Uni : onglets des réglages (Clés API / Mémoire / Modèle) + pastilles d'état des clés */
+(function(){
+  function tab(n){var sh=document.getElementById('aiSheet');if(!sh)return;
+    sh.querySelectorAll('.ai-tabs [data-tab]').forEach(function(b){var on=b.dataset.tab===n;b.classList.toggle('on',on);b.setAttribute('aria-selected',on?'true':'false');});
+    sh.querySelectorAll('.ai-pane').forEach(function(p){p.hidden=p.dataset.pane!==n;});}
+  function badges(){document.querySelectorAll('#aiSheet .ai-st').forEach(function(e){var i=document.getElementById(e.dataset.for);var v=!!(i&&i.value.trim());e.textContent=v?'✓ enregistrée':'vide';e.classList.toggle('on',v);});}
+  document.addEventListener('click',function(e){try{
+    var t=e.target.closest&&e.target.closest('#aiSheet .ai-tabs [data-tab]');if(t){tab(t.dataset.tab);return;}
+    if(e.target.closest&&e.target.closest('#aiCfg')){tab('keys');setTimeout(badges,80);}
+  }catch(x){}});
+  document.addEventListener('input',function(e){try{if(e.target.closest&&e.target.closest('#aiSheet'))badges();}catch(x){}});
+})();
 </script>
 <script src="js/script.js?v=586"></script>
 <script src="js/script-2.js?v=586"></script>

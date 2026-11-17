@@ -1,0 +1,69 @@
+/* ===== X.Uni — nouvelle interface (chat + réglages rangés) =====
+   Tout est limité à #aiP et suit le thème de l'app (--accent, --bg, --surface…). */
+#aiP{--x-r:20px;--x-glass:color-mix(in srgb,var(--surface) 82%,transparent);--x-g:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 62%,#7c5cff));background:radial-gradient(120% 60% at 50% -10%,color-mix(in srgb,var(--accent) 14%,transparent),transparent 60%),var(--bg)}
+/* en-tête */
+#aiP .ai-top{gap:4px;border:0;background:transparent;padding-bottom:6px}
+#aiP .ai-top h2{display:flex;align-items:center;gap:10px;font-size:1.05rem;letter-spacing:.2px}
+#aiP .ai-logo{width:34px;height:34px;flex:none;border-radius:11px;background:url(../icon-192.png) center/cover,var(--x-g);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 45%,transparent),0 4px 14px color-mix(in srgb,var(--accent) 35%,transparent)}
+#aiP .ai-tt{display:flex;flex-direction:column;line-height:1.1}
+#aiP .ai-tt small{margin:2px 0 0;font-size:.68rem;color:var(--muted)}
+#aiP .ai-ic{width:38px;height:38px;background:color-mix(in srgb,var(--ink) 7%,transparent);transition:background .15s,transform .1s}
+#aiP .ai-ic:active{transform:scale(.92);background:color-mix(in srgb,var(--accent) 24%,transparent)}
+/* barre Leçon / IA : deux pastilles côte à côte */
+#aiP .ai-bar{display:flex;gap:8px;padding:2px 12px 4px}
+#aiP .ai-bar .ai-ctx{flex:1;min-width:0;padding:0;border:0;background:transparent;gap:6px;position:relative}
+#aiP .ai-bar .ai-ctx label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--accent)}
+#aiP .ai-bar .ai-ctx select{height:36px;border-radius:999px;background:var(--x-glass);font-size:14px;padding:0 12px}
+/* raccourcis */
+#aiP .ai-chips{border:0;padding:6px 12px 8px}
+#aiP .ai-chips button{height:34px;border-radius:999px;background:var(--x-glass);border-color:color-mix(in srgb,var(--accent) 30%,var(--line));color:var(--ink)}
+#aiP .ai-chips button:active{background:var(--x-g);color:var(--accent-ink)}
+/* conversation */
+#aiP #aiLog{padding:10px 14px 16px;gap:12px}
+#aiP .ai-b{max-width:90%;border-radius:var(--x-r);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+#aiP .ai-b.u{background:var(--x-g);color:var(--accent-ink);border-bottom-right-radius:6px;box-shadow:0 4px 14px color-mix(in srgb,var(--accent) 28%,transparent)}
+#aiP .ai-b.a{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:6px var(--x-r) var(--x-r) var(--x-r);padding:11px 15px}
+#aiP .ai-b.e{border-radius:6px var(--x-r) var(--x-r) var(--x-r)}
+#aiP .ai-hi{padding:10vh 24px}
+#aiP .ai-hi h3{font-size:1.25rem}
+/* zone de saisie flottante */
+#aiP #aiForm{border:0;background:transparent;padding:6px 12px calc(10px + env(safe-area-inset-bottom,0px))}
+#aiP #aiIn{border-radius:24px;background:var(--x-glass);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);padding:12px 16px;border-color:color-mix(in srgb,var(--accent) 25%,var(--line));box-shadow:0 6px 22px rgba(0,0,0,.18)}
+#aiP #aiIn:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+#aiP #aiSend{background:var(--x-g);box-shadow:0 4px 14px color-mix(in srgb,var(--accent) 40%,transparent);transition:transform .1s}
+#aiP #aiSend:active{transform:scale(.92)}
+#aiP #aiSend.stop{background:var(--ink)}
+/* feuilles (historique + réglages) */
+#aiP .ai-sheet{background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+#aiP .ai-sheet>div{border-radius:26px 26px 0 0;background:var(--bg);border-top:1px solid var(--line);box-shadow:0 -10px 40px rgba(0,0,0,.35);animation:xuUp .22s ease-out}
+@keyframes xuUp{from{transform:translateY(24px);opacity:.4}to{transform:none;opacity:1}}
+#aiP .ai-sheet>div::before{content:"";display:block;width:40px;height:4px;border-radius:4px;background:var(--line);margin:-6px auto 12px}
+/* réglages : en-tête, onglets, cartes */
+#aiSheet>div{display:flex;flex-direction:column;padding-bottom:0!important}
+#aiSheet .ai-sh-head h3{font-size:1.1rem;margin:0 0 12px}
+#aiSheet .ai-tabs{display:flex;gap:4px;padding:4px;border-radius:999px;background:color-mix(in srgb,var(--ink) 8%,transparent);margin-bottom:12px}
+#aiSheet .ai-tabs button{flex:1;height:38px;border:0;border-radius:999px;background:transparent;color:var(--muted);font-weight:650;font-size:.8rem;cursor:pointer;transition:background .15s,color .15s}
+#aiSheet .ai-tabs button.on{background:var(--x-g);color:var(--accent-ink);box-shadow:0 3px 10px color-mix(in srgb,var(--accent) 35%,transparent)}
+#aiSheet .ai-pane{flex:1;min-height:0}
+#aiSheet .ai-pane[hidden]{display:none}
+#aiSheet .ai-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px 14px 14px;margin:0 0 10px}
+#aiSheet .ai-card-h{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+#aiSheet .ai-card-h b{font-size:.95rem}
+#aiSheet .ai-badge{font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:3px 8px;border-radius:999px;background:color-mix(in srgb,var(--ink) 10%,transparent);color:var(--muted)}
+#aiSheet .ai-badge.main{background:var(--x-g);color:var(--accent-ink)}
+#aiSheet .ai-st{margin-left:auto;font-size:.72rem;font-weight:650;color:var(--muted)}
+#aiSheet .ai-st.on{color:var(--accent)}
+#aiSheet .ai-card input,#aiSheet .ai-card textarea,#aiSheet .ai-card select{margin-top:0;margin-bottom:6px}
+#aiSheet .ai-card input+input{margin-top:6px}
+#aiSheet #aiOmniBox{padding:12px 14px 14px;margin-bottom:10px}
+#aiSheet #aiOmniBox input{margin-top:6px}
+#aiSheet #aiOmniTest{height:38px;padding:0 16px;border:1px solid var(--accent);border-radius:999px;background:transparent;color:var(--accent);font-weight:650;cursor:pointer}
+#aiSheet .ai-card.danger{border-color:color-mix(in srgb,#e5484d 45%,var(--line))}
+#aiSheet #aiWipe{width:100%;height:42px;margin-top:10px;border:1px solid #e5484d;border-radius:999px;background:transparent;color:#e5484d;font-weight:650;cursor:pointer}
+#aiSheet #aiWipe:active{background:#e5484d;color:#fff}
+/* pied collant : Enregistrer / Fermer toujours visibles */
+#aiSheet .ai-foot{position:sticky;bottom:0;margin:6px -16px 0;padding:10px 16px calc(12px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--bg) 78%,transparent)}
+#aiSheet .ai-foot #aiSave{background:var(--x-g);border:0}
+/* mode clair */
+html[data-eff="light"] #aiP .ai-b{box-shadow:0 1px 3px rgba(0,0,0,.08)}
+html[data-eff="light"] #aiP .ai-sheet>div{box-shadow:0 -10px 40px rgba(0,0,0,.15)}
