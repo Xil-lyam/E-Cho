@@ -608,15 +608,6 @@
       var sd = $('settings'); if (sd && sd.open) sd.close();
       var u = me(); if (u) openProfile(u.uid, myUname());
     }, true);
-    /* 2b) bouton « Mon profil » dans l’en-tête (sans passer par les Réglages) */
-    var hb = document.querySelector('.hbtns');
-    if (hb && !$('myProfBtn')) {
-      var mb = mk('button', 'ghost', null); mb.id = 'myProfBtn'; mb.type = 'button'; mb.title = 'Mon profil'; mb.setAttribute('aria-label', 'Mon profil');
-      mb.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>';
-      mb.style.cssText = 'width:38px;height:38px;min-width:38px;padding:0;border-radius:50%;display:grid;place-items:center;flex:none';
-      mb.addEventListener('click', function () { var u = me(); if (u) openProfile(u.uid, myUname()); });
-      hb.insertBefore(mb, hb.firstChild);
-    }
     /* 3) après modification : on rafraîchit */
     document.addEventListener('ui-profile-saved', function () { var u = me(); if (dlg && dlg.open && u && S.uid === u.uid) reload(); });
     /* 4) calcul et publication des badges à l’ouverture de l’appli */
