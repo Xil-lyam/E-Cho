@@ -20,7 +20,7 @@ window.APP_CONFIG = {
   },
   // E-mail de récupération + mot de passe oublié par code : adresse du Worker Cloudflare « ui-recovery »
   recovery: {
-    workerUrl: "https://ui-recovery.lyamsr-14-02.workers.dev"
+    workerUrl: ""
   },
   // Accueil = Shorts YouTube. Clé « YouTube Data API v3 », à restreindre au domaine xil-lyam.github.io.
   shorts: {
