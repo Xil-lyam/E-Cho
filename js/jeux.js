@@ -239,10 +239,38 @@
       msg('Scores remis à zéro. Choisis ton coup !');
     }
 
-    /* ---------- avec un pote (Firestore : collection « rpsRooms ») ---------- */
+    /* ---------- avec un pote (Supabase : table « rps_rooms ») ---------- */
     var N = { code: '', role: '', unsub: null, doc: null, seen: -1, resolving: false, note: '' };
-    function user() { try { return firebase.auth().currentUser; } catch (e) { return null; } }
-    function ref(code) { return firebase.firestore().collection('rpsRooms').doc(code || N.code); }
+    function user() { return window.__xenUser || null; }
+    /* petite couche « comme Firestore » au-dessus de la table Supabase rps_rooms (colonne data = la partie) */
+    function ref(code) {
+      code = code || N.code;
+      var T = function () { return window.__sb.from('rps_rooms'); };
+      var snapOf = function (row) { return { exists: !!row, data: function () { return row ? row.data : null; } }; };
+      return {
+        get: function () { return T().select('data').eq('code', code).maybeSingle().then(function (r) { if (r.error) throw r.error; return snapOf(r.data); }); },
+        set: function (d) { return T().upsert({ code: code, data: d, updated_at: new Date().toISOString() }).then(function (r) { if (r.error) throw r.error; }); },
+        update: function (patch) { return window.__sb.rpc('rps_patch', { p_code: code, p_patch: patch }).then(function (r) { if (r.error) throw r.error; }); },
+        delete: function () { return T().delete().eq('code', code).then(function (r) { if (r.error) throw r.error; }); },
+        onSnapshot: function (ok, err) {
+          var alive = true, ch = null;
+          T().select('data').eq('code', code).maybeSingle().then(function (r) {
+            if (!alive) return; if (r.error) { if (err) err(r.error); return; } ok(snapOf(r.data));
+          }, function (e) { if (alive && err) err(e); });
+          try {
+            ch = window.__sb.channel('rps-' + code + '-' + Math.random().toString(36).slice(2))
+              .on('postgres_changes', { event: '*', schema: 'public', table: 'rps_rooms', filter: 'code=eq.' + code }, function (pl) {
+                if (alive && pl.new && pl.new.data) ok(snapOf(pl.new));
+              })
+              .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'rps_rooms' }, function (pl) {
+                if (alive && pl.old && pl.old.code === code) ok(snapOf(null));
+              })
+              .subscribe();
+          } catch (e) {}
+          return function () { alive = false; if (ch) { try { window.__sb.removeChannel(ch); } catch (e) {} ch = null; } };
+        }
+      };
+    }
     function myName() {
       var n = ($('rpsName').value || '').trim().slice(0, 16);
       if (!n) { var u = user(); n = (u && (u.displayName || String(u.email || '').split('@')[0])) || 'Joueur'; }
@@ -250,7 +278,7 @@
       return n;
     }
     function errMsg(e) {
-      if (e && e.code === 'permission-denied') return 'Permission refusée : ajoute la règle Firestore « rpsRooms » (voir l’explication).';
+      if (e && (e.code === '42501' || e.code === '42P01' || e.code === 'PGRST202')) return 'Table ou fonction Supabase manquante : lance les blocs 7 et 8 (rps_rooms, rps_patch).';
       return 'Erreur : ' + String((e && e.message) || e).slice(0, 90);
     }
     function genCode() { var a = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', s = ''; for (var i = 0; i < 4; i++) s += a[rand(a.length)]; return s; }
