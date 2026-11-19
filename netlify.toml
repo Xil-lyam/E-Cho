@@ -4,3 +4,20 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
+
+# Performance : les fichiers JS/CSS portent un ?v=NNN qui change à chaque mise à jour
+# (voir .github/workflows/version.yml), on peut donc les garder longtemps en cache.
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/css/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=604800, stale-while-revalidate=86400"
