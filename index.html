@@ -10,18 +10,18 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="X&#39;enify">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" type="image/png" href="icon-192.png?v=654">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=654">
+<link rel="icon" type="image/png" href="icon-192.png?v=660">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=660">
 <title>X&#39;enify</title>
 <meta name="description" content="X&#39;enify : écris à qui tu veux, quand tu veux. Une messagerie privée, simple et rapide.">
-<script src="js/config.js?v=654"></script>
+<script src="js/config.js?v=660"></script>
 <!-- Vitesse : on démarre tout de suite le téléchargement du moteur Firebase et du script principal -->
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js">
 <link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js">
 <link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js">
-<link rel="preload" as="script" href="js/script.js?v=654">
-<link rel="preload" as="script" href="js/script-2.js?v=654">
+<link rel="preload" as="script" href="js/script.js?v=660">
+<link rel="preload" as="script" href="js/script-2.js?v=660">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,600;1,9..144,800&family=Roboto:ital,wght@0,400;0,500;0,700;0,900;1,700;1,900&display=swap">
@@ -114,7 +114,7 @@ html.echo-chk #splash>*{visibility:hidden!important;animation:none!important}
 </script>
 
 <!-- Styles : l’ordre des fichiers = l’ordre de la cascade (ne pas changer) -->
-<link rel="stylesheet" href="css/style.css?v=654">
+<link rel="stylesheet" href="css/style.css?v=660">
 <script>
 /* Version : si la page vient du cache et qu'une version plus récente existe, on la recharge AVANT d'afficher quoi que ce soit (plus d'ancien écran qui clignote). 1,5 s max. */
 (function(){try{var d=document.documentElement,l=document.querySelector('link[href*="css/style.css"]'),c=l&&/[?&]v=([\w.-]+)/.exec(l.getAttribute('href'));
@@ -124,13 +124,13 @@ fetch(location.pathname.replace(/[^/]*$/,'')+'index.html?_='+Date.now(),{cache:'
 var m=/css\/style\.css\?v=([\w.-]+)/.exec(x),v=m&&m[1],tr=null;try{tr=sessionStorage.getItem('uandi-maj')}catch(e){}
 if(v&&v!==c&&tr!==v){try{sessionStorage.setItem('uandi-maj',v)}catch(e){}location.reload();return}ok()}).catch(ok)}catch(e){document.documentElement.classList.remove('echo-chk')}})();
 </script>
-<link rel="stylesheet" href="css/echo-v7.css?v=654">
-<link rel="stylesheet" href="css/lark-music.css?v=654">
-<link rel="stylesheet" href="css/xuni.css?v=654">
-<link rel="stylesheet" href="css/messagerie.css?v=654">
-<link rel="stylesheet" href="css/profil.css?v=654">
-<link rel="stylesheet" href="css/statut-x.css?v=654">
-<link rel="stylesheet" href="css/accueil-fluide.css?v=654">
+<link rel="stylesheet" href="css/echo-v7.css?v=660">
+<link rel="stylesheet" href="css/lark-music.css?v=660">
+<link rel="stylesheet" href="css/xuni.css?v=660">
+<link rel="stylesheet" href="css/messagerie.css?v=660">
+<link rel="stylesheet" href="css/profil.css?v=660">
+<link rel="stylesheet" href="css/statut-x.css?v=660">
+<link rel="stylesheet" href="css/accueil-fluide.css?v=660">
 <link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap"></noscript>
 
@@ -711,9 +711,9 @@ if(v&&v!==c&&tr!==v){try{sessionStorage.setItem('uandi-maj',v)}catch(e){}locatio
   <h2 id="ipTitle">Choisis l’icône de ton appli</h2>
   <p class="hint">Elle s’affichera sur ton écran d’accueil.</p>
   <div class="ip-grid" role="radiogroup" aria-label="Icône de l’appli">
-    <button type="button" role="radio" data-i="violet" aria-checked="true"><img src="icon-512.png?v=654" alt="" width="96" height="96"><span>Violet néon</span></button>
-    <button type="button" role="radio" data-i="noir" aria-checked="false"><img src="icon-noir-512.png?v=654" alt="" width="96" height="96"><span>Noir</span></button>
-    <button type="button" role="radio" data-i="blanc" aria-checked="false"><img src="icon-blanc-512.png?v=654" alt="" width="96" height="96"><span>Blanc</span></button>
+    <button type="button" role="radio" data-i="violet" aria-checked="true"><img src="icon-512.png?v=660" alt="" width="96" height="96"><span>Violet néon</span></button>
+    <button type="button" role="radio" data-i="noir" aria-checked="false"><img src="icon-noir-512.png?v=660" alt="" width="96" height="96"><span>Noir</span></button>
+    <button type="button" role="radio" data-i="blanc" aria-checked="false"><img src="icon-blanc-512.png?v=660" alt="" width="96" height="96"><span>Blanc</span></button>
   </div>
   <div class="ip-act"><button type="button" class="primary" id="ipGo">Installer</button><button type="button" class="ghost" id="ipNo">Annuler</button></div>
 </dialog>
@@ -1001,25 +1001,25 @@ if(v&&v!==c&&tr!==v){try{sessionStorage.setItem('uandi-maj',v)}catch(e){}locatio
   document.addEventListener('input',function(e){try{if(e.target.closest&&e.target.closest('#aiSheet'))badges();}catch(x){}});
 })();
 </script>
-<script src="js/script.js?v=654"></script>
-<script src="js/script-2.js?v=654"></script>
-<script src="js/shorts.js?v=654" defer></script>
-<script src="js/halloween.js?v=654" defer></script>
-<script src="js/reglage.js?v=654" defer></script>
-<script src="js/fonctions.js?v=654" defer></script>
-<script src="js/profil.js?v=654" defer></script>
-<script src="js/statut-choix.js?v=654" defer></script>
-<script src="js/profil-edition.js?v=654" defer></script>
-     <script src="js/stories.js?v=654" defer></script>
-<script src="js/echo-dock.js?v=654" defer></script>
-<script src="js/stories-grid.js?v=654" defer></script>
-<script src="js/video-pause.js?v=654" defer></script>
-<script src="js/auth-anim.js?v=654" defer></script>
-<script src="js/maj.js?v=654" defer></script>
-<script src="js/tirer.js?v=654" defer></script>
-<script src="js/swipe-onglets.js?v=654" defer></script>
-<script src="js/perf.js?v=654" defer></script>
-<script src="js/lark-music.js?v=654"></script>
-<script src="js/jeux.js?v=654" defer></script>
+<script src="js/script.js?v=660"></script>
+<script src="js/script-2.js?v=660"></script>
+<script src="js/shorts.js?v=660" defer></script>
+<script src="js/halloween.js?v=660" defer></script>
+<script src="js/reglage.js?v=660" defer></script>
+<script src="js/fonctions.js?v=660" defer></script>
+<script src="js/profil.js?v=660" defer></script>
+<script src="js/statut-choix.js?v=660" defer></script>
+<script src="js/profil-edition.js?v=660" defer></script>
+     <script src="js/stories.js?v=660" defer></script>
+<script src="js/echo-dock.js?v=660" defer></script>
+<script src="js/stories-grid.js?v=660" defer></script>
+<script src="js/video-pause.js?v=660" defer></script>
+<script src="js/auth-anim.js?v=660" defer></script>
+<script src="js/maj.js?v=660" defer></script>
+<script src="js/tirer.js?v=660" defer></script>
+<script src="js/swipe-onglets.js?v=660" defer></script>
+<script src="js/perf.js?v=660" defer></script>
+<script src="js/lark-music.js?v=660"></script>
+<script src="js/jeux.js?v=660" defer></script>
 </body>
 </html>

@@ -8,7 +8,7 @@ try{var _v=navigator.vibrate;if(_v)navigator.vibrate=function(){try{return _v.ap
    Configuration : Supabase, domaine des comptes, push (VAPID + Worker) */
 window.APP_CONFIG = {
   // numéro de version : à augmenter à chaque mise à jour (évite le vieux cache de GitHub Pages)
-  version: '654',
+  version: '660',
   // Supabase : l'URL et la clé « publishable » sont faites pour être publiques (jamais la clé secrète)
   supabaseUrl: 'https://jqcwykwsqdzmnfhimpzp.supabase.co',
   supabaseKey: 'sb_publishable_2OItoG575qZR2LE0TKM7lw_AYRVISQv',
