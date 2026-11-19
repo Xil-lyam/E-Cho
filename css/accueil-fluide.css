@@ -1,0 +1,72 @@
+/* X’enify — Accueil plus attractif + transitions plus fluides (CSS seul, à charger en dernier) */
+
+/* ───────── Base : ressenti « natif » ───────── */
+html{ -webkit-tap-highlight-color:transparent; }
+button,.chatrow,a,select,summary,[role="button"]{ touch-action:manipulation; }
+
+/* ───────── ACCUEIL ───────── */
+
+/* En-tête : halo doux aux couleurs du thème + logo qui respire */
+html body #viewList > header{
+  background:
+    radial-gradient(120% 160% at 0% -20%, color-mix(in srgb,var(--accent) 18%,transparent), transparent 62%),
+    radial-gradient(90% 140% at 100% -30%, color-mix(in srgb,var(--accent) 10%,transparent), transparent 60%),
+    var(--surface);
+}
+html body #viewList h1 svg.xw{
+  filter:drop-shadow(0 0 6px color-mix(in srgb,var(--accent) 55%,transparent));
+}
+
+/* Lignes de discussion : coins doux, retour tactile fluide */
+html body #viewList #chats .chatrow{
+  border-radius:18px;
+  transition:background .25s ease, scale .3s var(--v7-ease,cubic-bezier(.22,1,.36,1));
+}
+html body #viewList #chats .chatrow:active{ scale:.985; }
+@media (hover:hover){
+  html body #viewList #chats .chatrow:hover{ background:color-mix(in srgb,var(--ink) 5%,transparent); }
+}
+
+/* Non lu : barre lumineuse + avatar cerclé + pastille qui bat */
+html body #viewList #chats .chatrow{ position:relative; }
+html body #viewList #chats .chatrow.unread::before{
+  content:"";position:absolute;left:0;top:20%;bottom:20%;width:3px;border-radius:0 4px 4px 0;
+  background:var(--accent);box-shadow:0 0 10px var(--accent);
+}
+html body #viewList #chats .chatrow.unread .avatar:not(.ring){
+  box-shadow:0 0 0 2px var(--bg),0 0 0 3.5px color-mix(in srgb,var(--accent) 60%,transparent);
+}
+html body #viewList #chats .chatrow .pip{ animation:xfPip 2.2s ease-in-out infinite; }
+
+/* Barre d'outils + recherche */
+html body #viewList .tbar .tbtn.mid{ transition:background .25s, color .25s, scale .3s var(--v7-ease,cubic-bezier(.22,1,.36,1)); }
+html body #viewList .field.search,
+html body #viewList #who{ transition:box-shadow .25s ease, background .25s ease; }
+html body #viewList .field.search:focus,
+html body #viewList #who:focus{ box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 28%,transparent); outline:none; }
+
+/* ───────── TRANSITIONS ───────── */
+
+/* Changement d'écran : fondu + léger glissement + zoom, avec ressort doux */
+@media (prefers-reduced-motion:no-preference){
+  html body #app .screen:not([hidden]){ animation:xfScreen .42s var(--v7-ease,cubic-bezier(.22,1,.36,1)) both; }
+
+  /* Fenêtres (dialog) : le fond se floute en fondu */
+  dialog[open]::backdrop{ animation:xfFade .35s ease both; }
+
+  /* Menus et petites feuilles */
+  .kmenu:not([hidden]), .chatmenu:not([hidden]){ transform-origin:top right; animation:xfMenu .28s var(--v7-ease,cubic-bezier(.22,1,.36,1)) both; }
+}
+
+/* Feedback d'appui partout, sans toucher aux règles existantes */
+html body :is(button,.kitem,.tbtn,.tico,.notebtn):active{ scale:.95; }
+html body :is(button,.kitem,.tbtn,.tico,.notebtn){ transition-property:background,color,scale,opacity,box-shadow; transition-duration:.22s; transition-timing-function:var(--v7-ease,cubic-bezier(.22,1,.36,1)); }
+
+@keyframes xfScreen{ from{ opacity:0; transform:translate3d(0,14px,0) scale(.985); } }
+@keyframes xfFade{ from{ opacity:0; } }
+@keyframes xfMenu{ from{ opacity:0; transform:scale(.92) translate3d(0,-6px,0); } }
+@keyframes xfPip{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.25); } }
+
+@media (prefers-reduced-motion:reduce){
+  html body #viewList #chats .chatrow .pip{ animation:none; }
+}
