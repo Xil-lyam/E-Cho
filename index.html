@@ -49,10 +49,22 @@
 :root[data-skin="neant"] #splash{--spa:#FF3B4E;--sp1:#130809;--sp2:#070304;--spi:#F7E9EA;--spm:#A5868A}
 #splash .spmark{position:relative;display:flex;align-items:center;justify-content:center;width:100%;height:150px;animation:spIn .7s cubic-bezier(.2,.8,.2,1) both}
 #splash .springs{position:absolute;left:50%;top:50%;width:0;height:0}
-#splash .springs i{position:absolute;left:-60px;top:-60px;width:120px;height:120px;border-radius:50%;border:2px solid var(--accent,var(--spa));opacity:0;animation:spEcho 2.7s cubic-bezier(.2,.6,.3,1) infinite}
+#splash .springs i{position:absolute;left:-75px;top:-75px;width:150px;height:150px;border-radius:50%;border:2px solid var(--accent,var(--spa));opacity:0;animation:spEcho 2.7s cubic-bezier(.2,.6,.3,1) infinite}
 #splash .springs i:nth-child(2){animation-delay:.9s}#splash .springs i:nth-child(3){animation-delay:1.8s}
 #splash .splogo{position:relative;z-index:1;color:var(--spi)}
 #splash b{display:inline-block;color:var(--accent,var(--spa));text-shadow:0 0 20px var(--accent,var(--spa));animation:spBeat 1.8s ease-in-out infinite}
+#splash .spmark{height:164px}
+#splash .splg{position:relative;z-index:1;overflow:visible;filter:drop-shadow(0 6px 22px color-mix(in srgb,var(--accent,var(--spa)) 45%,transparent))}
+#splash .splgf{transform-origin:50% 55%;animation:spFloat 3.2s ease-in-out 1.6s infinite}
+#splash .splgb{fill:none;stroke:var(--accent,var(--spa));stroke-width:26;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;animation:spDraw 1s cubic-bezier(.4,.1,.2,1) .1s forwards}
+#splash .splb{transform-box:fill-box;transform-origin:0 50%;transform:scaleX(0);animation:spBar .55s cubic-bezier(.3,1.3,.5,1) forwards}
+#splash .splb.b1,#splash .splb.b2{fill:var(--spi)}#splash .splb.b3{fill:var(--accent,var(--spa))}
+#splash .splb.b1{animation-delay:.8s}#splash .splb.b2{animation-delay:1s}#splash .splb.b3{animation-delay:1.2s}
+#splash .splogo{margin-top:-6px;font-size:2.1rem}
+@keyframes spDraw{to{stroke-dashoffset:0}}
+@keyframes spBar{to{transform:scaleX(1)}}
+@keyframes spFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-6px) scale(1.04)}}
+@media (prefers-reduced-motion:reduce){#splash .splgb{stroke-dashoffset:0}#splash .splb{transform:none}}
 #splash .sptag{margin:0;font:500 1rem/1.35 system-ui,sans-serif;letter-spacing:.01em;color:var(--spm);animation:spIn .7s .15s cubic-bezier(.2,.8,.2,1) both}
 #splash .spbar{width:132px;height:3px;border-radius:3px;overflow:hidden;background:rgba(128,136,170,.25);animation:spIn .7s .3s ease both}
 #splash .spbar i{display:block;width:45%;height:100%;border-radius:3px;background:linear-gradient(90deg,transparent,var(--accent,var(--spa)),transparent);animation:spSlide 1.3s ease-in-out infinite}
@@ -91,7 +103,7 @@
 
 </head>
 <body>
-<div id="splash" role="status" aria-live="polite"><div class="spmark"><span class="springs" aria-hidden="true"><i></i><i></i><i></i></span><div class="splogo">E<b>&#39;</b>cho</div></div><p class="sptag">Ici, tes mots résonnent.</p><div class="spbar" aria-hidden="true"><i></i></div><small id="splashMsg">Réveil de l’écho…</small><noscript><small>E&#39;cho a besoin de JavaScript : active-le dans ton navigateur.</small></noscript></div>
+<div id="splash" role="status" aria-live="polite"><div class="spmark"><span class="springs" aria-hidden="true"><i></i><i></i><i></i></span><svg class="splg" viewBox="0 0 512 512" width="124" height="124" aria-hidden="true"><g class="splgf"><path class="splgb" pathLength="1" d="M160 68H350Q445 68 445 160V250Q445 345 350 345H258L122 440L165 347Q70 345 70 250V160Q70 68 160 68Z"/><rect class="splb b1" x="155" y="122" width="200" height="38" rx="19"/><rect class="splb b2" x="155" y="189" width="165" height="38" rx="19"/><rect class="splb b3" x="155" y="256" width="200" height="38" rx="19"/></g></svg></div><div class="splogo">E<b>&#39;</b>cho</div><p class="sptag">Ici, tes mots résonnent.</p><div class="spbar" aria-hidden="true"><i></i></div><small id="splashMsg">Réveil de l’écho…</small><noscript><small>E&#39;cho a besoin de JavaScript : active-le dans ton navigateur.</small></noscript></div>
 <!-- Connexion / inscription -->
 <section class="screen login" id="login" hidden>
   <h1>E<span class="amp">&#39;</span>cho</h1>
