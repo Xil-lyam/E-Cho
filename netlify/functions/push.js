@@ -1,13 +1,20 @@
-/* U&I : envoie une notification push aux destinataires d'un message. */
-const admin = require('firebase-admin');
+/* X'enify : envoie une notification push aux destinataires d'un message (version Supabase).
+   Variables Netlify à définir : SUPABASE_URL, SUPABASE_SERVICE_KEY (clé « service_role », secrète),
+   VAPID_PUBLIC, VAPID_PRIVATE, et facultatif ALLOW_ORIGIN. */
 const webpush = require('web-push');
 
-if (!admin.apps.length) {
-  admin.initializeApp({ credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)) });
-}
+const SB_URL = (process.env.SUPABASE_URL || '').replace(/\/$/, '');
+const SB_KEY = process.env.SUPABASE_SERVICE_KEY || '';
 webpush.setVapidDetails('mailto:contact@u-and-i.app', process.env.VAPID_PUBLIC, process.env.VAPID_PRIVATE);
-const db = admin.firestore();
-const SYS = '\u2063';
+const SYS = '⁣';
+
+async function rest(path, opt) {
+  const r = await fetch(SB_URL + '/rest/v1/' + path, Object.assign({
+    headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }
+  }, opt || {}));
+  if (!r.ok) throw new Error('supabase ' + r.status);
+  return r.status === 204 ? null : r.json();
+}
 
 exports.handler = async (event) => {
   const cors = {
@@ -17,38 +24,50 @@ exports.handler = async (event) => {
   };
   if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers: cors, body: '' };
   if (event.httpMethod !== 'POST') return { statusCode: 405, headers: cors, body: '' };
+  if (!SB_URL || !SB_KEY) return { statusCode: 500, headers: cors, body: 'not configured' };
 
   try {
     const { token, chatId } = JSON.parse(event.body || '{}');
-    if (!token || !chatId) return { statusCode: 400, headers: cors, body: 'bad request' };
-    const uid = (await admin.auth().verifyIdToken(token)).uid;
+    if (!token || !chatId || !/^[0-9a-f-]{36}$/i.test(chatId)) return { statusCode: 400, headers: cors, body: 'bad request' };
 
-    const snap = await db.collection('chats').doc(chatId).get();
-    if (!snap.exists) return { statusCode: 404, headers: cors, body: 'no chat' };
-    const c = snap.data();
-    if (!(c.members || []).includes(uid)) return { statusCode: 403, headers: cors, body: 'forbidden' };
-    if (c.lastUid !== uid || Date.now() - (c.lastTs || 0) > 120000) return { statusCode: 200, headers: cors, body: 'stale' };
-    if (String(c.lastText || '').charAt(0) === SYS) return { statusCode: 200, headers: cors, body: 'system' };
+    /* qui appelle ? on demande à Supabase de vérifier le jeton */
+    const ur = await fetch(SB_URL + '/auth/v1/user', { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + token } });
+    if (!ur.ok) return { statusCode: 401, headers: cors, body: 'error' };
+    const uid = (await ur.json()).id;
 
-    const sender = (c.names && c.names[uid]) || 'X’enify';
-    const title = c.group ? (c.title || 'Groupe') : sender.charAt(0).toUpperCase() + sender.slice(1);
-    const text = String(c.lastText || '').slice(0, 120);
-    const body = c.group ? sender + ' : ' + text : text;
+    const members = (await rest('conversation_members?select=user_id&conversation_id=eq.' + chatId)).map((m) => m.user_id);
+    if (!members.includes(uid)) return { statusCode: 403, headers: cors, body: 'forbidden' };
+
+    /* dernier message : doit être récent et venir de l'appelant */
+    const last = (await rest('messages?select=*&conversation_id=eq.' + chatId + '&order=id.desc&limit=1'))[0];
+    if (!last) return { statusCode: 200, headers: cors, body: 'none' };
+    const from = last.sender_id || last.user_id || last.uid || last.from_uid;
+    const ts = Date.parse(last.created_at || last.ts || '') || 0;
+    if ((from && from !== uid) || (ts && Date.now() - ts > 120000)) return { statusCode: 200, headers: cors, body: 'stale' };
+    const raw = String(last.body || '');
+    if (raw.charAt(0) === SYS) return { statusCode: 200, headers: cors, body: 'system' };
+
+    const conv = (await rest('conversations?select=*&id=eq.' + chatId))[0] || {};
+    const isGroup = conv.kind === 'group';
+    const prof = (await rest('profiles?select=username,name,nick&id=eq.' + uid))[0] || {};
+    const sender = prof.username || prof.name || 'X’enify';
+    const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+    const text = (raw || (last.audio ? '🎤 Message vocal' : last.img ? '📷 Photo' : last.file ? '📎 Fichier' : 'Nouveau message')).slice(0, 120);
+    const title = isGroup ? (conv.title || conv.name || 'Groupe') : cap(sender);
+    const body = isGroup ? sender + ' : ' + text : text;
     const payload = JSON.stringify({ title, body, tag: chatId, url: './' });
 
+    const others = members.filter((m) => m !== uid);
     let sent = 0;
-    for (const to of (c.members || []).filter((m) => m !== uid)) {
-      const ref = db.collection('pushSubs').doc(to);
-      const d = await ref.get();
-      if (!d.exists) continue;
-      const subs = d.data().subs || {};
-      for (const key of Object.keys(subs)) {
+    if (others.length) {
+      const subs = await rest('push_subs?select=uid,token,data&uid=in.(' + others.join(',') + ')');
+      for (const s of subs) {
         try {
-          await webpush.sendNotification(JSON.parse(subs[key]), payload, { TTL: 3600, urgency: 'high' });
+          await webpush.sendNotification(s.data.sub, payload, { TTL: 3600, urgency: 'high' });
           sent++;
         } catch (e) {
           if (e.statusCode === 404 || e.statusCode === 410) {
-            await ref.update({ ['subs.' + key]: admin.firestore.FieldValue.delete() }).catch(() => {});
+            await rest('push_subs?uid=eq.' + s.uid + '&token=eq.' + encodeURIComponent(s.token), { method: 'DELETE' }).catch(() => {});
           }
         }
       }

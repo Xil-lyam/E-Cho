@@ -464,6 +464,7 @@ window.__uandiApp = function () {
     if (!chat.group && r.data && r.data.conversation_id) CUID[chat.id] = r.data.conversation_id;
     state.chatsById[chat.id] = true;
     if (state.chat && state.chat.id === chat.id && state.kick) state.kick();
+    try { var pcid = chat.group ? chat.id : (r.data && r.data.conversation_id); if (pcid && window.__xenPing && String(o.text || '').charAt(0) !== SYS) window.__xenPing(pcid); } catch (e) {}
     return r.data;
   }
   /* nettoyage automatique de mes anciens messages (côté serveur, au plus toutes les 10 min) */
