@@ -1,0 +1,17 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<body style="font:15px monospace;background:#111;color:#eee;padding:12px">
+<pre id="o">test…</pre>
+<script>
+var o = document.getElementById('o'), out = [];
+function t(p, tests) {
+  return fetch(p + '?x=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (s) {
+    out.push(p + ' (' + s.length + ' octets)');
+    tests.forEach(function (x) { out.push('  ' + x[0] + ' : ' + (s.indexOf(x[1]) > -1 ? 'OUI' : 'NON')); });
+  }).catch(function () { out.push(p + ' : introuvable'); });
+}
+t('index.html', [['bibliothèque supabase', 'supabase-js'], ['ancien Firebase', 'firebasejs']])
+.then(function () { return t('js/script-a.js', [['lit supabase.url', 'CFG.supabase.url'], ['ancien Firebase', 'firebase.firestore']]); })
+.then(function () { return t('js/script-b.js', [['ma couche Supabase', 'function rtStart'], ['ancien Firebase', 'onAuthStateChanged(function (user) {\n    AUTH_SEEN']]); })
+.then(function () { return t('js/script-2.js', [['démarrage Supabase', 'migration Supabase']]); })
+.then(function () { o.textContent = out.join('\n'); });
+                   </script>
