@@ -73,7 +73,6 @@ html body :is(button,.kitem,.tbtn,.tico,.notebtn){ transition-property:backgroun
 
 /* ───────── MOBILE : petits écrans ───────── */
 html{ -webkit-text-size-adjust:100%; text-size-adjust:100%; }
-img{ max-width:100%; }
 @media (max-width:360px){
   html body #viewList #chats .chatrow{ gap:8px; padding-left:8px; padding-right:8px; }
   html body #viewList h1{ font-size:clamp(1.05rem,5.2vw,1.3rem); }
