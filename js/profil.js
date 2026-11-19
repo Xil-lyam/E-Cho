@@ -440,6 +440,11 @@
     }, 120);
   }
 
+  /* Stories : module pas encore converti vers Supabase. Un appel qui plante (ex. « firebase is not defined »)
+     ne doit pas empêcher d'afficher le profil : on l'isole et on l'ignore. */
+  function stCall(name, uid) {
+    try { return Promise.resolve(window.UIStories[name](uid)); } catch (e) { return Promise.reject(e); }
+  }
   function render() {
     var P = S.data, body = $('pfBody'); if (!P) return;
     var p = P.pres; body.textContent = '';
@@ -448,11 +453,11 @@
     if (typeof p.photo === 'string' && p.photo) av.style.background = 'center / cover no-repeat url("' + p.photo + '")';
     else { av.style.background = 'hsl(' + hue(P.disp) + ' 38% 42%)'; av.textContent = cap(P.disp).charAt(0); }
     avw.appendChild(av);
-    if (window.UIStories && (P.self || P.isFriend)) UIStories.fetch(P.uid).then(function (l) {
-      if (S.data !== P || !l.length) return;
+    if (window.UIStories && (P.self || P.isFriend)) stCall('fetch', P.uid).then(function (l) {
+      if (S.data !== P || !l || !l.length) return;
       avw.classList.add('st'); if (!P.self && !UIStories.isNew(P.uid, l)) avw.classList.add('seen');
       avw.style.cursor = 'pointer'; avw.addEventListener('click', function () { UIStories.open(P.uid, P.disp); });
-    });
+    }).catch(function () {});
     var online = !P.self ? (p.seen && Date.now() - p.seen < 150000 && p.hideOn !== true) : true;
     if (online) { var pd = mk('i', 'pf-dot'); var heart = P.self ? (function () { try { return localStorage.getItem('xenify-statut-style') === 'heart'; } catch (e) { return false; } })() : p.xst === 'heart'; if (heart) pd.setAttribute('data-xs', 'heart'); avw.appendChild(pd); }
     head.appendChild(avw);
@@ -559,7 +564,8 @@
     /* À la une : albums avec titre (stories gardées depuis l'archive) */
     if (window.UIStories && UIStories.albums && (P.self || P.isFriend)) {
       var hs = mk('div', 'pf-sec'); hs.hidden = true; body.appendChild(hs);
-      UIStories.albums(P.uid).then(function (al) {
+      stCall('albums', P.uid).then(function (al) {
+        al = al || [];
         if (!hs.parentNode || (!al.length && !P.self)) return;
         var hh = mk('div'); hh.style.cssText = 'display:flex;align-items:center;gap:12px';
         var h3 = mk('h3', 'pf-h', 'À la une'); h3.style.flex = '1'; hh.appendChild(h3);
@@ -581,7 +587,7 @@
           row.appendChild(item(a.title, cv, '2px solid var(--accent)', function () { UIStories.openList(P.uid, P.disp, a.list, 0, a.title); }));
         });
         hs.appendChild(row); hs.hidden = false;
-      });
+      }).catch(function () {});
     }
     s1.appendChild(mk('h3', 'pf-h', 'Informations'));
     if (/^\d\d-\d\d$/.test(p.bday || '')) s1.appendChild(infoRow('cake', 'Anniversaire', (+p.bday.slice(3, 5)) + ' ' + MOIS[(+p.bday.slice(0, 2)) - 1], 'Public'));
