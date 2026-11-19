@@ -1,0 +1,69 @@
+/* X’enify : statut « en ligne » = le X du logo, lumineux, avec étincelles */
+:root{
+  --xon-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='80 110 580 442'%3E%3Cpath d='M92 177H205Q234 178 254 198L603 545H458Q430 545 410 526Z'/%3E%3Cpath d='M360 266L518 124Q530 116 548 117H655L437 330Z'/%3E%3Cpath d='M248 372L327 453L264 528Q244 546 216 546H85Z'/%3E%3C/svg%3E");
+  --xon-star:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23eafff4' d='M12 0Q13 11 24 12Q13 13 12 24Q11 13 0 12Q11 11 12 0Z'/%3E%3C/svg%3E");
+  --xon-a:#19c37d;
+  --xon-b:#b8ffe0;
+}
+
+/* conteneur : plus de point, la lueur suit la forme du X */
+.status.on .dot,
+.pf-dot{
+  position:absolute;
+  background:none !important;
+  border:0 !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  overflow:visible;
+  filter:drop-shadow(0 0 2px #b8ffe0) drop-shadow(0 0 6px #19c37d) drop-shadow(0 0 12px rgba(25,195,125,.8));
+  animation:xonGlow 2.2s ease-in-out infinite;
+}
+
+/* le X lui-même : dégradé brillant qui défile */
+.status.on .dot::before,
+.pf-dot::before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(115deg,var(--xon-a) 30%,#fff 48%,var(--xon-b) 52%,var(--xon-a) 70%) 100% 0/300% 100%;
+  -webkit-mask:var(--xon-mask) center/contain no-repeat;
+          mask:var(--xon-mask) center/contain no-repeat;
+  animation:xonShine 2s linear infinite, xonPulse 2.2s ease-in-out infinite;
+}
+
+/* les étincelles ✦ */
+.status.on .dot::after,
+.pf-dot::after{
+  content:"";position:absolute;inset:-70%;pointer-events:none;
+  background:
+    var(--xon-star) 6% 10%/22% auto no-repeat,
+    var(--xon-star) 94% 22%/16% auto no-repeat,
+    var(--xon-star) 80% 96%/24% auto no-repeat,
+    var(--xon-star) 12% 88%/14% auto no-repeat,
+    var(--xon-star) 50% 0%/12% auto no-repeat;
+  animation:xonSpark 1.6s ease-in-out infinite;
+}
+
+/* tailles */
+.status{ position:relative; }
+.status.on .dot{ width:20px; height:16px; margin:0 4px 0 2px; }
+.pf-dot{ width:30px !important; height:23px !important; right:-2px !important; bottom:2px !important; }
+#profDlg .pf-dot{ width:38px !important; height:29px !important; right:-12px !important; bottom:-8px !important; }
+
+@keyframes xonShine{ to{ background-position:0 0; } }
+@keyframes xonPulse{
+  0%,100%{ transform:scale(1) rotate(0); }
+  50%{ transform:scale(1.12) rotate(6deg); }
+}
+@keyframes xonGlow{
+  0%,100%{ filter:drop-shadow(0 0 2px #b8ffe0) drop-shadow(0 0 5px #19c37d) drop-shadow(0 0 9px rgba(25,195,125,.6)); }
+  50%{ filter:drop-shadow(0 0 3px #fff) drop-shadow(0 0 9px #3dffa8) drop-shadow(0 0 18px rgba(25,195,125,.95)); }
+}
+@keyframes xonSpark{
+  0%,100%{ opacity:.15; transform:scale(.7) rotate(0); }
+  35%{ opacity:1; transform:scale(1.05) rotate(45deg); }
+  70%{ opacity:.35; transform:scale(.85) rotate(90deg); }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .status.on .dot,.status.on .dot::before,.status.on .dot::after,
+  .pf-dot,.pf-dot::before,.pf-dot::after{ animation:none; }
+}
