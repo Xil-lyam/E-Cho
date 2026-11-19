@@ -645,7 +645,16 @@
     $('pfBody').textContent = ''; var l = mk('p', 'pf-empty', 'Chargement du profil…'); l.style.paddingTop = '80px'; $('pfBody').appendChild(l);
     if (!dlg.open) dlg.showModal();
     build(uid, name).then(function (d) { if (S.uid === uid) { S.data = d; render(); } })
-      .catch(function () { if (S.uid === uid) { $('pfBody').textContent = ''; $('pfBody').appendChild(mk('p', 'pf-empty', 'Profil indisponible pour le moment.')); } });
+      .catch(function (e) {
+        try { console.error('Profil : échec du chargement', e); } catch (x) {}
+        if (S.uid === uid) {
+          $('pfBody').textContent = '';
+          $('pfBody').appendChild(mk('p', 'pf-empty', 'Profil indisponible pour le moment.'));
+          /* détail technique (aide au dépannage) */
+          var why = String((e && (e.message || e.details || e.code)) || e || '').slice(0, 160);
+          if (why) { var d = mk('p', 'pf-empty', why); d.style.cssText = 'font-size:.7rem;opacity:.6;word-break:break-word'; $('pfBody').appendChild(d); }
+        }
+      });
   }
 
   /* ====== Points d’entrée ====== */
