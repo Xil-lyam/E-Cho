@@ -1,0 +1,118 @@
+/* ===== E'cho — habillage « vraie appli de messagerie » =====
+   Barre du haut plate, liste de discussions classique, barre du bas pleine largeur,
+   conversation avec bulles pleines et zone de saisie arrondie.
+   Chargé en dernier : pour revenir en arrière, supprime sa ligne <link> dans index.html. */
+
+/* ---------- barres du haut (liste + conversation) ---------- */
+html body #viewList > header, html body #viewChat > header.chathead {
+  background: var(--surface); border: 0; border-bottom: 1px solid var(--line); box-shadow: none;
+  border-radius: 0; margin: 0; padding: calc(env(safe-area-inset-top,0px) + 8px) 14px 8px;
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+html body #viewList > header::after, html body #viewChat > header::after, html body #viewChat > header::before { display: none !important; }
+html body #viewList > header h1 { font-size: 1.55rem; letter-spacing: -.01em; }
+html body #viewList > header .me { font-size: .72rem; color: var(--muted); }
+html body header .tico, html body #viewChat .chathead .ghost.dots, html body #viewChat .chathead .back {
+  background: transparent !important; border: 0 !important; box-shadow: none !important; color: var(--ink);
+}
+html body header .tico:active, html body #viewChat .chathead button:active { background: color-mix(in srgb, var(--ink) 10%, transparent) !important; }
+html body #viewChat .chathead .avatar.sm { width: 40px; height: 40px; }
+html body #viewChat .chathead .nmh { font-size: 1.02rem; font-weight: 650; }
+html body #viewChat .chathead .status { font-size: .74rem; }
+
+/* ---------- barre d'outils de la liste (⋮ · Non lus · recherche) ---------- */
+html body #viewList .tbar { padding: 8px 14px 6px; gap: 8px; background: var(--bg); }
+html body #viewList .tbar .tbtn { background: transparent; border: 0; box-shadow: none; }
+html body #viewList .tbar .tbtn.mid { height: 34px; flex: none; padding: 0 16px; border-radius: 999px; background: color-mix(in srgb, var(--ink) 8%, transparent); font-size: .84rem; font-weight: 600; margin-right: auto; }
+html body #viewList .tbar .tbtn.mid[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+
+/* ---------- liste des discussions ---------- */
+html body #chats { padding: 0; margin: 0; }
+html body #chats li { margin: 0; list-style: none; }
+html body #chats .chatrow {
+  position: relative; display: flex; align-items: center; gap: 14px; width: 100%; box-sizing: border-box;
+  padding: 10px 16px; margin: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; transform: none;
+  text-align: left; min-height: 72px;
+}
+html body #chats .chatrow:active { background: color-mix(in srgb, var(--ink) 7%, transparent); }
+html body #chats .chatrow::after { content: ""; position: absolute; left: 82px; right: 0; bottom: 0; height: 1px; background: var(--line); }
+html body #chats li:last-child .chatrow::after { display: none; }
+html body #chats .chatrow .avatar { width: 54px; height: 54px; font-size: 1.2rem; }
+html body #chats .chatrow .avw { flex: none; position: relative; }
+html body #chats .chatrow .ondot { right: 0; bottom: 1px; border: 2px solid var(--bg); }
+html body #chats .chatrow > span:nth-child(2) { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+html body #chats .chatrow .nm { font-size: 1.02rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+html body #chats .chatrow .pv { font-size: .9rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+html body #chats .chatrow .side { flex: none; align-self: stretch; display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 6px; font-size: .74rem; color: var(--muted); }
+/* non lu : fond normal, nom/aperçu en gras, heure et pastille aux couleurs de l'appli */
+html body #chats .chatrow.unread { background: transparent; box-shadow: none; }
+html body #chats .chatrow.unread .nm { font-weight: 750; }
+html body #chats .chatrow.unread .pv { color: var(--ink); font-weight: 600; }
+html body #chats .chatrow.unread .side { color: var(--accent); font-weight: 650; }
+html body #chats .chatrow .pip { width: 12px; height: 12px; min-width: 12px; border-radius: 50%; background: var(--accent); box-shadow: none; border: 0; padding: 0; }
+html body #chats .chatrow.pinned .side::before { content: "📌"; font-size: .7rem; }
+
+/* ---------- barre du bas : classique, pleine largeur, icône + nom ---------- */
+@media (max-width: 899px) {
+  html body #viewList, html body #viewChat { width: calc(100% + 32px); max-width: none; margin-left: -16px; margin-right: -16px; }
+  html body #tabbar.tabbar {
+    left: 0; right: 0; bottom: 0; transform: none; width: auto; max-width: none; box-sizing: border-box;
+    border-radius: 0; margin: 0; gap: 0; padding: 2px 2px calc(2px + env(safe-area-inset-bottom,0px)); align-items: stretch;
+    background: var(--surface); border: 0; border-top: 1px solid var(--line);
+    box-shadow: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+  }
+  html body #tabbar.tabbar .tab, html body #tabbar.tabbar .tab[aria-current="page"] {
+    flex: 1 1 0; min-width: 0; width: auto; height: auto; padding: 7px 0 5px; flex-direction: column; gap: 2px;
+    border-radius: 0; background: transparent !important; box-shadow: none !important; color: var(--muted);
+  }
+  html body #tabbar.tabbar .tab[aria-current="page"] { color: var(--accent); }
+  html body #tabbar.tabbar .tab span, html body #tabbar.tabbar .tab[aria-current="page"] span { max-width: 100%; opacity: 1; margin: 0; font-size: .64rem; font-weight: 600; letter-spacing: 0; }
+  html body #tabbar.tabbar .tab svg { width: 24px; height: 24px; }
+  html body #tabbar.tabbar .tab[aria-current="page"] svg { stroke-width: 2.3; }
+  html body #tabbar.tabbar .tabbadge { top: 2px; left: calc(50% + 6px); right: auto; background: var(--accent); color: var(--accent-ink); }
+  html body.hasnav { padding-bottom: calc(58px + env(safe-area-inset-bottom,0px)); }
+}
+
+/* ---------- bouton « nouveau message » ---------- */
+html body .fxfab { border-radius: 18px; box-shadow: 0 6px 18px rgba(0,0,0,.28); bottom: calc(80px + env(safe-area-inset-bottom,0px)); }
+
+/* ---------- conversation ---------- */
+html body #viewChat { background: color-mix(in srgb, var(--accent) 4%, var(--bg)); }
+html body #log { padding: 10px 10px 14px; }
+html body .day { background: color-mix(in srgb, var(--ink) 9%, var(--bg)); color: var(--muted); font-weight: 600; font-size: .72rem; border: 0; border-radius: 999px; padding: 4px 12px; }
+html body .row .bubble { font-size: 1rem; line-height: 1.38; padding: 8px 12px; border-radius: 16px; box-shadow: 0 1px 1px rgba(0,0,0,.14); max-width: 100%; }
+html body .row.mine .bubble { background: var(--accent) !important; background-image: none !important; color: var(--accent-ink); border: 0; box-shadow: 0 1px 1px rgba(0,0,0,.14) !important; }
+html body .row.theirs .bubble { background: var(--surface) !important; color: var(--ink); border: 0 !important; box-shadow: 0 1px 1px rgba(0,0,0,.12) !important; }
+html body .row.mine.last .bubble { border-bottom-right-radius: 4px; }
+html body .row.theirs.last .bubble { border-bottom-left-radius: 4px; }
+html body .row.mine:not(.last) .bubble { border-bottom-right-radius: 16px; }
+html body .row.theirs:not(.last) .bubble { border-bottom-left-radius: 16px; }
+html body .row.mine:not(.first) .bubble { border-top-right-radius: 6px; }
+html body .row.theirs:not(.first) .bubble { border-top-left-radius: 6px; }
+html body .row .meta { font-size: .68rem; color: var(--muted); padding: 2px 6px 0; }
+html body .row.theirs .gavatar { width: 30px; height: 30px; }
+
+/* ---------- zone de saisie ---------- */
+html body #viewChat .composer {
+  margin: 0; padding: 8px 10px calc(8px + env(safe-area-inset-bottom,0px)); gap: 6px; align-items: flex-end;
+  border: 0; border-top: 1px solid var(--line); border-radius: 0; background: var(--surface); box-shadow: none;
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+html body #viewChat .composer textarea {
+  background: color-mix(in srgb, var(--ink) 7%, var(--surface)); border: 0; border-radius: 22px; padding: 10px 16px; min-height: 42px; box-sizing: border-box; font-size: 1rem;
+}
+html body #viewChat .composer .send { width: 42px; height: 42px; box-shadow: none; }
+html body #viewChat .composer .send.mic { background: transparent; border: 0; color: var(--muted); }
+html body #viewChat .composer #send, html body #viewChat .composer button[type="submit"] { background: var(--accent); color: var(--accent-ink); border-radius: 50%; }
+
+/* ---------- derniers réglages de priorité ---------- */
+html body #chats .chatrow.unread, html body #chats li .chatrow.unread { background: transparent !important; box-shadow: none !important; }
+html body #chats .chatrow .pip { background: var(--accent) !important; box-shadow: none !important; opacity: 1 !important; }
+@media (max-width: 899px) {
+  html body #tabbar.tabbar:not(:has(.tabind.on)) .tab[aria-current="page"],
+  html body #tabbar.tabbar .tab[aria-current="page"] { background: transparent !important; box-shadow: none !important; border-radius: 0 !important; color: var(--accent) !important; }
+  html body #tabbar.tabbar .tab[aria-current="page"] svg { stroke: var(--accent); }
+  html body #tabbar.tabbar .tab[aria-current="page"] span { color: var(--accent); }
+  html body #viewList > header { background: var(--surface) !important; }
+}
+@media (max-width: 899px) { html body #tabbar.tabbar .tabind, html body #tabbar.tabbar .tabind.on { display: none !important; } }
