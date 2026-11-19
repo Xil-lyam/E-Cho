@@ -10,8 +10,7 @@ window.APP_CONFIG = {
   // numéro de version : à augmenter à chaque mise à jour (évite le vieux cache de GitHub Pages)
   version: '682',
   // Supabase : l'URL et la clé « publishable » sont faites pour être publiques (jamais la clé secrète)
-  supabaseUrl: 'https://jqcwykwsqdzmnfhimpzp.supabase.co',
-  supabaseKey: 'sb_publishable_2OItoG575qZR2LE0TKM7lw_AYRVISQv',
+   supabase: { url: 'https://jqcwykwsqdzmnfhimpzp.supabase.co', key: 'sb_publishable_2OItoG575qZR2LE0TKM7lw_AYRVISQv' },
   // Nom d'utilisateur "sophie" => compte interne sophie@u-and-i.app (aucun e-mail n'est envoyé)
   emailDomain: "u-and-i.app",
   // Notifications push : clé VAPID + adresse du Worker Cloudflare « ui-push »
