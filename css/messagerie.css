@@ -121,3 +121,11 @@ html body #chats .chatrow .pip { background: var(--accent) !important; box-shado
 html body #meName { display: flex; align-items: center; min-width: 0; max-width: 100%; overflow: visible; }
 html body #meName .mn { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 html body #meName .ubadge { flex: none; }
+
+/* choix de l'icône (après « Installer l'appli ») */
+#iconPick .ip-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 14px 0; }
+#iconPick .ip-grid button { min-width: 0; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px 6px; border: 2px solid var(--line); border-radius: 20px; background: var(--surface); color: var(--ink); font: inherit; font-size: .82rem; font-weight: 600; cursor: pointer; }
+#iconPick .ip-grid img { width: 100%; max-width: 72px; height: auto; aspect-ratio: 1; border-radius: 22px; display: block; box-shadow: 0 4px 14px rgba(0,0,0,.25); }
+#iconPick .ip-grid button[aria-checked="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--surface)); }
+#iconPick .ip-act { display: flex; flex-direction: column; gap: 8px; }
+#iconPick .ip-act button { min-height: 46px; border-radius: 999px; font: inherit; font-weight: 650; }

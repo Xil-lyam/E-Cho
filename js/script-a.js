@@ -2207,17 +2207,25 @@ window.__uandiApp = function () {
     return c.toDataURL('image/png');
   }
   var iconSkin = null;
-  /* icône de l'appli : X violet néon en thème sombre, version noir & blanc en thème clair */
-  function setIcons(k) {
-    var light = document.documentElement.dataset.eff === 'light', key = light ? 'L' : 'D';
+  /* icône de l'appli : au choix (Violet / Noir / Blanc) via « Installer l'appli » ; sans choix : violet en thème sombre, blanc en thème clair */
+  var ICON_SETS = {
+    violet: { a: ['icon-192', 'icon-512'], m: ['icon-maskable-192', 'icon-maskable-512'], ap: 'apple-touch-icon' },
+    noir: { a: ['icon-noir-192', 'icon-noir-512'], m: ['icon-maskable-noir-192', 'icon-maskable-noir-512'], ap: 'apple-touch-icon-noir' },
+    blanc: { a: ['icon-blanc-192', 'icon-blanc-512'], m: ['icon-maskable-blanc-192', 'icon-maskable-blanc-512'], ap: 'apple-touch-icon-blanc' }
+  };
+  function iconChoice() {
+    var c = null; try { c = localStorage.getItem('uandi-icon'); } catch (e) {}
+    return ICON_SETS[c] ? c : (document.documentElement.dataset.eff === 'light' ? 'blanc' : 'violet');
+  }
+  function setIcons() {
+    var key = iconChoice();
     if (iconSkin === key) return;
     try {
-      var V = '?v=200', abs = function (f) { return new URL(f, location.href).href; };
-      var i192 = abs((light ? 'icon-blanc-192.png' : 'icon-192.png') + V), i512 = abs((light ? 'icon-blanc-512.png' : 'icon-512.png') + V);
-      var m192 = abs('icon-maskable-192.png' + V), m512 = abs('icon-maskable-512.png' + V);
+      var V = '?v=210', abs = function (f) { return new URL(f + '.png' + V, location.href).href; }, S = ICON_SETS[key];
+      var i192 = abs(S.a[0]), i512 = abs(S.a[1]), m192 = abs(S.m[0]), m512 = abs(S.m[1]);
       var fav = document.querySelector('link[rel="icon"]'), ap = document.querySelector('link[rel="apple-touch-icon"]'), mf = document.querySelector('link[rel="manifest"]');
       if (fav) fav.href = i192;
-      if (ap) ap.href = abs((light ? 'apple-touch-icon-blanc.png' : 'apple-touch-icon.png') + V);
+      if (ap) ap.href = abs(S.ap);
       if (mf) {
         var mj = JSON.stringify({
           name: 'X\'enify', short_name: 'X\'enify', start_url: location.pathname + location.search, scope: location.pathname.replace(/[^\/]*$/, ''),
@@ -2229,6 +2237,8 @@ window.__uandiApp = function () {
       iconSkin = key;
     } catch (e) {}
   }
+  window.__echoIconChoice = iconChoice;
+  window.__echoSetIcon = function (c) { try { localStorage.setItem('uandi-icon', c); } catch (e) {} iconSkin = null; setIcons(); };
 
   function applyMode() {
     var m = store('uandi-mode') || 'dark', k = store('uandi-skin');

@@ -3578,17 +3578,34 @@
   });
   var isStandalone = false; try { isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; } catch (e) {}
   if (!isStandalone) $('#installSec').hidden = false;
-  $('#installBtn').addEventListener('click', function () {
+  function doInstall() {
     var ev = installEv;
     if (!ev) {
       var ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
-      alert(ios ? 'Sur iPhone : touche le bouton Partager de Safari, puis « Sur l’écran d’accueil ».' : 'Ouvre le menu ⋮ de ton navigateur puis « Installer l’application » (ou « Ajouter à l’écran d’accueil »).');
+      alert(ios ? 'Sur iPhone : touche le bouton Partager de Safari, puis « Sur l’écran d’accueil ». L’icône choisie sera utilisée.' : 'Ouvre le menu ⋮ de ton navigateur puis « Installer l’application » (ou « Ajouter à l’écran d’accueil »). L’icône choisie sera utilisée.');
       return;
     }
     ev.prompt();
     ev.userChoice.then(function () {}, function () {}).then(function () {
       installEv = null;
     });
+  }
+  /* « Installer » ouvre d'abord le choix de l'icône, puis lance l'installation */
+  var ipDlg = $('#iconPick'), ipSel = 'violet';
+  function ipMark(c) {
+    ipSel = c;
+    ipDlg.querySelectorAll('.ip-grid [data-i]').forEach(function (b) { b.setAttribute('aria-checked', b.dataset.i === c ? 'true' : 'false'); });
+  }
+  $('#installBtn').addEventListener('click', function () {
+    ipMark(window.__echoIconChoice ? window.__echoIconChoice() : 'violet');
+    try { ipDlg.showModal(); } catch (e) { doInstall(); }
+  });
+  ipDlg.querySelectorAll('.ip-grid [data-i]').forEach(function (b) { b.addEventListener('click', function () { ipMark(b.dataset.i); }); });
+  $('#ipNo').addEventListener('click', function () { ipDlg.close(); });
+  $('#ipGo').addEventListener('click', function () {
+    if (window.__echoSetIcon) window.__echoSetIcon(ipSel);
+    ipDlg.close();
+    doInstall();
   });
 
   /* ---------- session ---------- */

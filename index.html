@@ -700,6 +700,17 @@ if(v&&v!==c&&tr!==v){try{sessionStorage.setItem('uandi-maj',v)}catch(e){}locatio
 
 <dialog class="viewer" id="viewer"><img id="viewerImg" alt="Photo"></dialog>
 
+<dialog class="sheet" id="iconPick" aria-labelledby="ipTitle">
+  <h2 id="ipTitle">Choisis l’icône de ton appli</h2>
+  <p class="hint">Elle s’affichera sur ton écran d’accueil.</p>
+  <div class="ip-grid" role="radiogroup" aria-label="Icône de l’appli">
+    <button type="button" role="radio" data-i="violet" aria-checked="true"><img src="icon-512.png?v=210" alt="" width="96" height="96"><span>Violet néon</span></button>
+    <button type="button" role="radio" data-i="noir" aria-checked="false"><img src="icon-noir-512.png?v=210" alt="" width="96" height="96"><span>Noir</span></button>
+    <button type="button" role="radio" data-i="blanc" aria-checked="false"><img src="icon-blanc-512.png?v=210" alt="" width="96" height="96"><span>Blanc</span></button>
+  </div>
+  <div class="ip-act"><button type="button" class="primary" id="ipGo">Installer</button><button type="button" class="ghost" id="ipNo">Annuler</button></div>
+</dialog>
+
 <dialog class="sheet" id="settings" aria-labelledby="setTitle">
   <h2 id="setTitle">Réglages</h2>
   <div class="sec" id="installSec" hidden>
