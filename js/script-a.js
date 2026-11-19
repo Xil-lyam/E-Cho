@@ -446,8 +446,10 @@ window.__uandiApp = function () {
     rlRaf = requestAnimationFrame(function () { rlRaf = 0; renderListNow(); });
   }
   function renderListNow() {
-    $('#meName').textContent = (state.nick ? state.nick + ' · ' : '') + '@' + state.username;
-    withBadge($('#meName'), state.me);
+    var mnEl = $('#meName'), mnTxt = (state.nick ? state.nick + ' · ' : '') + '@' + state.username;
+    mnEl.textContent = '';
+    var mnSp = document.createElement('span'); mnSp.className = 'mn'; mnSp.textContent = mnTxt; mnEl.appendChild(mnSp);
+    withBadge(mnEl, state.me);   /* le badge reste hors du texte : c'est le nom qui est raccourci (…), jamais le badge */
     updateMyNote();
     frBadge();
     onSig = onlineSig();
@@ -2205,26 +2207,26 @@ window.__uandiApp = function () {
     return c.toDataURL('image/png');
   }
   var iconSkin = null;
+  /* icône de l'appli : X violet néon en thème sombre, version noir & blanc en thème clair */
   function setIcons(k) {
-    k = ICON_COL[k] ? k : '';
-    if (iconSkin === k) return;
+    var light = document.documentElement.dataset.eff === 'light', key = light ? 'L' : 'D';
+    if (iconSkin === key) return;
     try {
-      /* une seule icône pour tous les thèmes (E-bulle sombre) */
-      var abs = function (f) { return new URL(f, location.href).href; };
-      var i192 = abs('icon-192.png?v=124'), i512 = abs('icon-512.png?v=124');
-      var m192 = abs('icon-maskable-192.png?v=124'), m512 = abs('icon-maskable-512.png?v=124');
+      var V = '?v=200', abs = function (f) { return new URL(f, location.href).href; };
+      var i192 = abs((light ? 'icon-blanc-192.png' : 'icon-192.png') + V), i512 = abs((light ? 'icon-blanc-512.png' : 'icon-512.png') + V);
+      var m192 = abs('icon-maskable-192.png' + V), m512 = abs('icon-maskable-512.png' + V);
       var fav = document.querySelector('link[rel="icon"]'), ap = document.querySelector('link[rel="apple-touch-icon"]'), mf = document.querySelector('link[rel="manifest"]');
       if (fav) fav.href = i192;
-      if (ap) ap.href = abs('apple-touch-icon.png?v=124');
+      if (ap) ap.href = abs((light ? 'apple-touch-icon-blanc.png' : 'apple-touch-icon.png') + V);
       if (mf) {
         var mj = JSON.stringify({
           name: 'X\'enify', short_name: 'X\'enify', start_url: location.pathname + location.search, scope: location.pathname.replace(/[^\/]*$/, ''),
-          display: 'standalone', background_color: '#1a090d', theme_color: '#1a090d',
+          display: 'standalone', background_color: '#050309', theme_color: '#050309',
           icons: [{ src: i192, sizes: '192x192', type: 'image/png', purpose: 'any' }, { src: i512, sizes: '512x512', type: 'image/png', purpose: 'any' }, { src: m192, sizes: '192x192', type: 'image/png', purpose: 'maskable' }, { src: m512, sizes: '512x512', type: 'image/png', purpose: 'maskable' }]
         });
         mf.href = 'data:application/manifest+json;base64,' + btoa(unescape(encodeURIComponent(mj)));
       }
-      iconSkin = k;
+      iconSkin = key;
     } catch (e) {}
   }
 
@@ -2241,7 +2243,7 @@ window.__uandiApp = function () {
       document.head.appendChild(lk);
     }
     var tc = document.querySelector('meta[name="theme-color"]');
-    if (tc) tc.setAttribute('content', k ? SKIN_BAR[k] : '#1a090d');
+    if (tc) tc.setAttribute('content', k ? SKIN_BAR[k] : '#050309');
     (window.requestIdleCallback || function (fn) { setTimeout(fn, 400); })(function () { setIcons(k); });
     document.querySelectorAll('#modeSeg button').forEach(function (b) {
       b.setAttribute('aria-pressed', b.dataset.m === m ? 'true' : 'false');

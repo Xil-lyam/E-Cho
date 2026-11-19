@@ -116,3 +116,8 @@ html body #chats .chatrow .pip { background: var(--accent) !important; box-shado
   html body #viewList > header { background: var(--surface) !important; }
 }
 @media (max-width: 899px) { html body #tabbar.tabbar .tabind, html body #tabbar.tabbar .tabind.on { display: none !important; } }
+
+/* nom + badge dans l'en-tête : le nom se raccourcit, le badge reste toujours visible */
+html body #meName { display: flex; align-items: center; min-width: 0; max-width: 100%; overflow: visible; }
+html body #meName .mn { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+html body #meName .ubadge { flex: none; }

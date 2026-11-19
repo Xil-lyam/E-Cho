@@ -18,7 +18,7 @@
     var sel = tl.getAttribute('aria-selected') === 'true' ? tl : ts, cs = getComputedStyle(sel);
     look = { bg: cs.backgroundColor, bi: cs.backgroundImage, bw: cs.borderTopWidth, bs: cs.borderTopStyle, bc: cs.borderTopColor, br: cs.borderTopLeftRadius, sh: cs.boxShadow };
     pill = document.createElement('span'); pill.className = 'tabpill'; pill.setAttribute('aria-hidden', 'true');
-    pill.style.cssText = 'background-color:' + look.bg + ';background-image:' + look.bi + ';border:' + look.bw + ' ' + look.bs + ' ' + look.bc + ';border-radius:' + look.br + ';box-shadow:' + look.sh;
+    pill.style.cssText = 'border-radius:' + look.br;   /* couleurs : voir echo-v7.css (suivent le thème) */
     tabs.insertBefore(pill, tabs.firstChild);
     tabs.classList.add('has-pill');
 
