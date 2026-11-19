@@ -15,9 +15,13 @@
 #profDlg .pf-avw.st .pf-av{box-shadow:0 0 0 3px #ff3d77,0 10px 30px rgba(255,61,119,.35)}
 #profDlg .pf-avw.st.seen .pf-av{box-shadow:0 0 0 3px #6b7280}
 #profDlg .pf-dot{right:-4px;bottom:-4px;width:22px;height:22px}
-#profDlg .pf-name{grid-column:2;grid-row:2;align-self:end;justify-content:flex-start;margin:0!important;font-size:1.55rem;line-height:1.1}
+/* badge à droite de l'avatar (ancienne place du nom), nom en dessous de l'avatar sur toute la largeur */
+#profDlg .pf-bdg{grid-column:2;grid-row:2;align-self:end;justify-self:start;display:flex;align-items:center;min-width:0}
+#profDlg .pf-bdg .ubadge{margin-left:0}
+#profDlg .pf-name{grid-column:1 / -1;grid-row:4;align-self:start;justify-content:flex-start;margin:12px 0 0!important;font-size:1.55rem;line-height:1.15;overflow-wrap:anywhere}
 #profDlg .pf-sub{grid-column:2;grid-row:3;align-self:start;margin-top:4px;font-size:.88rem}
 #profDlg .pf-bio,#profDlg .pf-cnt,#profDlg .pf-acts{grid-column:1 / -1}
+#profDlg .pf-name + .pf-bio{margin-top:6px}
 #profDlg .pf-bio{margin:16px 0 0;max-width:none;font-size:.95rem;color:color-mix(in srgb,var(--ink) 88%,transparent)}
 #profDlg .pf-cnt{justify-content:flex-start;gap:10px;margin-top:14px}
 #profDlg .pf-cnt span{display:flex;flex-direction:column;align-items:flex-start;min-width:96px;padding:10px 16px;border-radius:16px;background:var(--surface);border:1px solid var(--line);font-size:.74rem;line-height:1.2}
