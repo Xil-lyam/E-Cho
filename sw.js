@@ -13,6 +13,8 @@ self.addEventListener('push', function (e) {
         body: d.body || '',
         tag: d.tag || 'uandi-msg',
         renotify: true,
+        icon: 'icon-192.png',
+        badge: 'badge-96.png',
         vibrate: [120, 60, 120],
         data: { url: d.url || './' }
       });

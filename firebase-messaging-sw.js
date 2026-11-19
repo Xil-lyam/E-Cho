@@ -56,7 +56,7 @@ self.addEventListener('push', function (event) {
 
     var opt = {
       body: body, tag: tag, renotify: !silent, silent: silent,
-      icon: 'icon-192.png', badge: 'icon-192.png', data: { chat: chat }
+      icon: 'icon-192.png', badge: 'badge-96.png', data: { chat: chat }
     };
     if (!silent && p.vib !== 0 && p.vib !== false) opt.vibrate = [120, 60, 120];
 

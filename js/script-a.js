@@ -1486,7 +1486,7 @@ window.__uandiApp = function () {
   function sysNotify(name, text, chatId, silent) {
     try {
       if (!('Notification' in window) || Notification.permission !== 'granted') return;
-      var opt = { body: (name ? cap(name) + ' : ' : '') + (text || ''), tag: 'uandi-' + (chatId || 'msg'), renotify: !silent && !(PUSH && PUSH.token), icon: 'icon-192.png', badge: 'icon-192.png', data: { chat: chatId || '' } };
+      var opt = { body: (name ? cap(name) + ' : ' : '') + (text || ''), tag: 'uandi-' + (chatId || 'msg'), renotify: !silent && !(PUSH && PUSH.token), icon: 'icon-192.png', badge: 'badge-96.png', data: { chat: chatId || '' } };
       if (silent) opt.silent = true; else if (npOn('vib')) opt.vibrate = [120, 60, 120];
       var plain = function () { try { new Notification(NOTIF_TITLE, opt); } catch (e) {} };
       if ('serviceWorker' in navigator) navigator.serviceWorker.getRegistration().then(function (r) { if (r) r.showNotification(NOTIF_TITLE, opt); else plain(); }).catch(plain); else plain();
