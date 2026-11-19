@@ -1,0 +1,140 @@
+/* X’enify : statut « en ligne » = le X du logo, lumineux, avec étincelles */
+:root{
+  --xon-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='80 110 580 442'%3E%3Cpath d='M92 177H205Q234 178 254 198L603 545H458Q430 545 410 526Z'/%3E%3Cpath d='M360 266L518 124Q530 116 548 117H655L437 330Z'/%3E%3Cpath d='M248 372L327 453L264 528Q244 546 216 546H85Z'/%3E%3C/svg%3E");
+  --xon-star:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23eafff4' d='M12 0Q13 11 24 12Q13 13 12 24Q11 13 0 12Q11 11 12 0Z'/%3E%3C/svg%3E");
+  --xon-heart:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E");
+  --xon-star-x:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23eafff4' d='M12 0Q13 11 24 12Q13 13 12 24Q11 13 0 12Q11 11 12 0Z'/%3E%3C/svg%3E");
+  --xon-star-h:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23ffeaf4' d='M12 0Q13 11 24 12Q13 13 12 24Q11 13 0 12Q11 11 12 0Z'/%3E%3C/svg%3E");
+  --xon-mask-x:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='80 110 580 442'%3E%3Cpath d='M92 177H205Q234 178 254 198L603 545H458Q430 545 410 526Z'/%3E%3Cpath d='M360 266L518 124Q530 116 548 117H655L437 330Z'/%3E%3Cpath d='M248 372L327 453L264 528Q244 546 216 546H85Z'/%3E%3C/svg%3E");
+  --xon-a:#19c37d; --xon-b:#b8ffe0;
+  --xon-h1:rgba(110,255,185,.75); --xon-h2:rgba(25,195,125,.35); --xon-h3:rgba(25,195,125,0);
+}
+
+/* ───── Option : cœur rose (choisi dans Réglages → Confidentialité) ───── */
+html[data-xstatus="heart"], .xon-heart-prev{
+  --xon-mask:var(--xon-heart);
+  --xon-star:var(--xon-star-h);
+  --xon-a:#ff3d8b; --xon-b:#ffc9e1;
+  --xon-h1:rgba(255,120,185,.8); --xon-h2:rgba(255,61,139,.38); --xon-h3:rgba(255,61,139,0);
+}
+.xon-x-prev{
+  --xon-mask:var(--xon-mask-x);
+  --xon-star:var(--xon-star-x);
+  --xon-a:#19c37d; --xon-b:#b8ffe0;
+  --xon-h1:rgba(110,255,185,.75); --xon-h2:rgba(25,195,125,.35); --xon-h3:rgba(25,195,125,0);
+}
+
+/* conteneur (sans filtre : pas de rectangle sombre) */
+.status.on .dot,
+.pf-dot,
+html body .ondot,
+.pf-xon{
+  position:absolute;
+  isolation:isolate;
+  background:none !important;
+  border:0 !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  overflow:visible;
+  filter:none !important;
+  animation:none !important;
+}
+
+/* le X : dégradé brillant qui défile */
+.status.on .dot::before,
+.pf-dot::before,
+html body .ondot::before,
+.pf-xon::before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(115deg,var(--xon-a) 30%,#fff 48%,var(--xon-b) 52%,var(--xon-a) 70%) 100% 0/300% 100%;
+  -webkit-mask:var(--xon-mask) center/contain no-repeat;
+          mask:var(--xon-mask) center/contain no-repeat;
+  animation:xonShine 2s linear infinite, xonPulse 2.2s ease-in-out infinite;
+}
+
+/* lueur douce + étincelles ✦ (derrière le X) */
+.status.on .dot::after,
+.pf-dot::after,
+html body .ondot::after,
+.pf-xon::after{
+  content:"";position:absolute;inset:-70%;z-index:-1;pointer-events:none;
+  background:
+    var(--xon-star) 6% 10%/20% auto no-repeat,
+    var(--xon-star) 94% 22%/15% auto no-repeat,
+    var(--xon-star) 80% 96%/22% auto no-repeat,
+    var(--xon-star) 12% 88%/13% auto no-repeat,
+    var(--xon-star) 50% 0%/11% auto no-repeat,
+    radial-gradient(closest-side,var(--xon-h1) 0,var(--xon-h2) 38%,var(--xon-h3) 100%) center/62% 62% no-repeat;
+  animation:xonSpark 1.8s ease-in-out infinite;
+}
+
+/* tailles / positions */
+.status{ position:relative; }
+.status.on .dot{ position:relative; flex:none; width:20px; height:16px; margin:0 6px 0 2px; }
+.pf-dot{ width:30px !important; height:23px !important; right:-2px !important; bottom:2px !important; }
+#profDlg .pf-dot{ width:38px !important; height:29px !important; right:-12px !important; bottom:-8px !important; }
+html body .ondot, html body #chats .chatrow .ondot{ width:24px !important; height:18px !important; right:-5px !important; bottom:-1px !important; pointer-events:none; }
+.pf-xon{ position:relative !important; display:block; width:28px; height:21px; }
+
+@keyframes xonShine{ to{ background-position:0 0; } }
+@keyframes xonPulse{
+  0%,100%{ transform:scale(1) rotate(0); }
+  50%{ transform:scale(1.12) rotate(6deg); }
+}
+@keyframes xonSpark{
+  0%,100%{ opacity:.35; transform:scale(.8) rotate(0); }
+  40%{ opacity:1; transform:scale(1.08) rotate(45deg); }
+  70%{ opacity:.55; transform:scale(.9) rotate(90deg); }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .status.on .dot::before,.status.on .dot::after,
+  .pf-dot::before,.pf-dot::after,
+  html body .ondot::before,html body .ondot::after,
+  .pf-xon::before,.pf-xon::after{ animation:none !important; }
+}
+
+/* cœur : tailles proches du carré + battement (pas de rotation) */
+html[data-xstatus="heart"] .status.on .dot{ width:17px; height:16px; }
+html[data-xstatus="heart"] .pf-dot{ width:26px !important; height:24px !important; }
+html[data-xstatus="heart"] #profDlg .pf-dot{ width:32px !important; height:30px !important; }
+html[data-xstatus="heart"] body .ondot, html[data-xstatus="heart"] body #chats .chatrow .ondot{ width:20px !important; height:18px !important; }
+html[data-xstatus="heart"] .pf-xon{ width:24px; height:22px; }
+html[data-xstatus="heart"] .status.on .dot::before,
+html[data-xstatus="heart"] .pf-dot::before,
+html[data-xstatus="heart"] body .ondot::before,
+html[data-xstatus="heart"] .pf-xon::before,
+.xon-heart-prev .pf-xon::before{ animation:xonShine 2s linear infinite, xonBeat 1.3s ease-in-out infinite; }
+@keyframes xonBeat{
+  0%,100%{ transform:scale(1); }
+  14%{ transform:scale(1.22); }
+  28%{ transform:scale(1.02); }
+  42%{ transform:scale(1.15); }
+  60%{ transform:scale(1); }
+}
+@media (prefers-reduced-motion:reduce){
+  html[data-xstatus="heart"] .status.on .dot::before,html[data-xstatus="heart"] .pf-dot::before,
+  html[data-xstatus="heart"] body .ondot::before,html[data-xstatus="heart"] .pf-xon::before,
+  .xon-heart-prev .pf-xon::before{ animation:none !important; }
+}
+
+/* ───── Sélecteur dans les Réglages ───── */
+.xon-pick{ display:flex; gap:10px; margin-top:8px; }
+.xon-pick button{ flex:1; display:flex; flex-direction:column; align-items:center; gap:8px; padding:14px 6px 10px; border:2px solid var(--line); border-radius:16px; background:var(--surface); color:var(--ink); font:inherit; font-size:.82rem; font-weight:600; cursor:pointer; }
+.xon-pick button[aria-pressed="true"]{ border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent); }
+.xon-pick .xon-box{ position:relative; width:46px; height:40px; display:grid; place-items:center; }
+.xon-pick .pf-xon{ width:30px !important; height:24px !important; }
+.xon-heart-prev .pf-xon{ width:28px !important; height:26px !important; }
+
+/* ───────── En-tête de discussion ─────────
+   Le nom reste sur UNE ligne et dispose de toute la largeur ;
+   les boutons (appel, vidéo, ⋯) descendent un petit peu. */
+html body #viewChat > header.chathead{ position:relative; padding-bottom:20px; }
+html body #viewChat .chathead .titlebox{ overflow:visible; }
+html body #viewChat .chathead .status{ padding-right:124px; }
+html body #viewChat .chathead #callBtn,
+html body #viewChat .chathead #vcallBtn,
+html body #viewChat .chathead #moreBtn{ position:absolute; bottom:1px; margin:0; }
+html body #viewChat .chathead #moreBtn{ right:8px; }
+html body #viewChat .chathead #vcallBtn{ right:46px; }
+html body #viewChat .chathead #callBtn{ right:84px; }
