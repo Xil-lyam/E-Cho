@@ -1,0 +1,17 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<body style="font:16px monospace;background:#111;color:#eee;padding:12px">
+<pre id="o">test…</pre>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="js/config.js?x=1"></script>
+<script>
+var c = window.APP_CONFIG, t = [];
+t.push('bibliothèque supabase : ' + (window.supabase ? 'OK' : 'ABSENTE'));
+t.push('APP_CONFIG : ' + (c ? 'OK' : 'ABSENT'));
+if (c) {
+  t.push('version : ' + c.version);
+  t.push('supabase groupé : ' + (c.supabase ? 'OUI' : 'NON'));
+  t.push('supabaseUrl à plat : ' + (c.supabaseUrl ? 'OUI' : 'NON'));
+  t.push('clé commence par : ' + String(c.supabaseKey || (c.supabase && c.supabase.key) || '').slice(0, 14));
+}
+document.getElementById('o').textContent = t.join('\n');
+</script>
