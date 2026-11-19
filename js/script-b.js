@@ -133,24 +133,44 @@
     likeState = { uid: uid, n: 0, mine: false };
     $('#nvLikeErr').hidden = true;
     paintLike();
-    likeUnsub = fs.collection('profileLikes').where('to', '==', uid).onSnapshot(function (s) {
-      likeState.n = s.size;
-      likeState.mine = s.docs.some(function (d) { return d.data().from === state.me; });
-      paintLike();
-    }, function () {
+    var alive = true, ch = null;
+    function failed() {
+      if (!alive) return;
       var e = $('#nvLikeErr');
       e.textContent = 'Les likes de profil ne sont pas encore disponibles.';
       e.hidden = false;
-    });
+    }
+    function refresh() {
+      SB.from('profile_likes').select('from_uid').eq('to_uid', uid).then(function (r) {
+        if (!alive) return;
+        if (r.error) { failed(); return; }
+        var rows = r.data || [];
+        likeState.n = rows.length;
+        likeState.mine = rows.some(function (d) { return d.from_uid === state.me; });
+        paintLike();
+      }, failed);
+    }
+    refresh();
+    try {
+      ch = SB.channel('likes-' + uid + '-' + Math.random().toString(36).slice(2))
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'profile_likes', filter: 'to_uid=eq.' + uid }, refresh)
+        .subscribe();
+    } catch (e) {}
+    likeUnsub = function () { alive = false; if (ch) { try { SB.removeChannel(ch); } catch (e) {} ch = null; } };
   }
   $('#nvLike').addEventListener('click', function () {
     var uid = likeState.uid;
     if (!uid || uid === state.me) return;
-    var ref = fs.collection('profileLikes').doc(uid + '_' + state.me);
     var err = $('#nvLikeErr'); err.hidden = true;
-    var p = likeState.mine ? ref.delete() : ref.set({ to: uid, from: state.me, ts: Date.now() });
-    p.catch(function () {
-      err.textContent = 'Le like n’a pas pu être enregistré (connexion ou règles Firestore).';
+    var wasMine = likeState.mine;
+    var p = wasMine
+      ? SB.from('profile_likes').delete().eq('to_uid', uid).eq('from_uid', state.me)
+      : SB.from('profile_likes').insert({ to_uid: uid, from_uid: state.me });
+    /* affichage immédiat, le temps réel confirme ensuite */
+    likeState.mine = !wasMine; likeState.n = Math.max(0, likeState.n + (wasMine ? -1 : 1)); paintLike();
+    Promise.resolve(p).then(function (r) { if (r && r.error) throw r.error; }).catch(function () {
+      likeState.mine = wasMine; likeState.n = Math.max(0, likeState.n + (wasMine ? 1 : -1)); paintLike();
+      err.textContent = 'Le like n’a pas pu être enregistré (connexion ou règles Supabase « profile_likes »).';
       err.hidden = false;
     });
   });

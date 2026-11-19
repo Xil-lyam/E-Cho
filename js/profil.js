@@ -268,7 +268,8 @@
       getPres(uid).catch(function () { return {}; }),
       self ? friendsOf(uid).then(function (l) { return { list: l, state: l ? 'ok' : 'none' }; }) : friendListOf(uid),
       self ? Promise.resolve(null) : friendsOf(u.uid),
-      Promise.resolve(0),   /* « j'aime » de profil : pas encore converti */
+      sb().from('profile_likes').select('from_uid', { count: 'exact', head: true }).eq('to_uid', uid)
+        .then(function (r) { return r && !r.error && typeof r.count === 'number' ? r.count : 0; }).catch(function () { return 0; }),   /* « j'aime » de profil */
       self ? Promise.resolve(null) : frGet(uid),
       self ? evalMine(u) : Promise.resolve(null),
       self ? myVis() : Promise.resolve(null)
