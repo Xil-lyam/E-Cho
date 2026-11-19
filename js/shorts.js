@@ -96,7 +96,7 @@
 
   /* ---------- profil de l'utilisateur ---------- */
   var uid = '', prof = null, seenSet = {}, pool = [], poolIds = {}, inFeed = {}, lastErr = null, loading = null, lastPush = 0;
-  function curUid() { try { var u = firebase.auth().currentUser; return u ? u.uid : 'anon'; } catch (e) { return 'anon'; } }
+  function curUid() { try { var u = window.__xenUser; return u ? u.uid : 'anon'; } catch (e) { return 'anon'; } }
   function emptyProf() { return { seen: [], aff: {}, ban: {}, banN: {}, likes: {} }; }
   function loadProf() {
     var p = null;
@@ -111,13 +111,18 @@
     try { localStorage.setItem('echo-shorts-v1-' + uid, JSON.stringify(prof)); } catch (e) {}
     var now = Date.now(); if (now - lastPush < 30000) return; lastPush = now; pushRemote();
   }
-  function remoteRef() { try { return firebase.firestore().collection('shortsProfiles').doc(uid); } catch (e) { return null; } }
-  function pushRemote() { var r = remoteRef(); if (r && uid !== 'anon') r.set({ p: JSON.stringify(prof), t: Date.now() }).catch(function () {}); }
+  function remoteOk() { return !!(window.__sb && uid && uid !== 'anon'); }
+  function pushRemote() {
+    if (!remoteOk()) return;
+    window.__sb.from('shorts_profiles').upsert({ uid: uid, data: { p: JSON.stringify(prof), t: Date.now() }, updated_at: new Date().toISOString() })
+      .then(function () {}, function () {});
+  }
   function pullRemote() {
-    var r = remoteRef(); if (!r || uid === 'anon') return;
-    r.get().then(function (d) {
+    if (!remoteOk()) return;
+    window.__sb.from('shorts_profiles').select('data').eq('uid', uid).maybeSingle().then(function (q) {
+      var d = { exists: !!(q && q.data) };
       if (!d.exists) return;
-      var rp = JSON.parse(d.data().p || '{}');
+      var rp = JSON.parse((q.data.data && q.data.data.p) || '{}');
       (rp.seen || []).forEach(function (i) { if (!seenSet[i]) { prof.seen.push(i); seenSet[i] = 1; } });
       Object.keys(rp.aff || {}).forEach(function (k) { if (prof.aff[k] == null) prof.aff[k] = rp.aff[k]; });
       Object.keys(rp.ban || {}).forEach(function (k) { prof.ban[k] = 1; if (rp.banN && rp.banN[k] && !prof.banN[k]) prof.banN[k] = rp.banN[k]; });

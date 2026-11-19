@@ -50,6 +50,7 @@ window.__uandiApp = function () {
   var SB = window.supabase.createClient(CFG.supabase.url, CFG.supabase.key, {
     auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
   });
+  window.__sb = SB;   /* partagé avec profil.js, stories, jeux… (un seul client = une seule session) */
   var IS_IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
   var state = {

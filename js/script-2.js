@@ -2440,7 +2440,7 @@ idbOpen().then(function(db){DB=db;return kvGet('meta')}).then(function(m){
   try { var c = JSON.parse(localStorage.getItem(LK) || 'null'); if (c && typeof c === 'object') mem = mk(c); } catch (e) {}
   try { var old = JSON.parse(localStorage.getItem('uandi-ai-chat') || 'null'); if (old && old.length && !mem.msgs.length) mem.msgs = old.filter(valid); } catch (e) {}
   function saveLocal(stamp) { if (stamp !== false) mem.t = Date.now(); try { localStorage.setItem(LK, JSON.stringify(mem)); } catch (e) {} }
-  function uid() { return null; /* sauvegarde en ligne de la mémoire de l'assistant : pas encore convertie à Supabase */ }
+  function uid() { var u = window.__xenUser; return u && window.__sb ? u.uid : null; }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function md(s) {
     var h = esc(s).replace(/```[a-z]*\n?([\s\S]*?)```/g, function (_, c) { return '<pre>' + c.trim() + '</pre>'; });
@@ -2764,17 +2764,19 @@ idbOpen().then(function(db){DB=db;return kvGet('meta')}).then(function(m){
   /* ---------- Mémoire : Cloudinary (fichier JSON) + Firestore (pointeur) ---------- */
   function status() {
     var el = $('#aiSync'); if (!el) return;
-    el.textContent = !uid() ? 'Mémoire gardée sur ce téléphone (sauvegarde en ligne bientôt disponible).'
+    el.textContent = !uid() ? 'Mémoire gardée sur ce téléphone (connecte-toi pour la sauvegarde en ligne).'
       : sync === 'ok' ? 'Mémoire sauvegardée en ligne ✓'
-      : sync === 'err' ? 'Sauvegarde en ligne impossible pour l’instant (règles Firestore ou réseau). Elle reste sur ce téléphone.'
+      : sync === 'err' ? 'Sauvegarde en ligne impossible pour l’instant (table ai_memory ou réseau). Elle reste sur ce téléphone.'
       : 'Mémoire prête.';
   }
   async function cloudLoad() {
     var id = uid(); if (!id) { status(); return; }
     try {
-      var d = await firebase.firestore().collection('aiMemory').doc(id).get();
+      var q = await window.__sb.from('ai_memory').select('data').eq('id', id).maybeSingle();
+      if (q.error) throw q.error;
+      var d = { exists: !!q.data };
       if (d.exists) {
-        var x = d.data();
+        var x = q.data.data;
         if (x && typeof x.url === 'string' && isCld(x.url) && (x.t || 0) > (mem.t || 0)) {
           var r = await fetch(x.url, { cache: 'no-store' }), j = await r.json();
           if (j && typeof j === 'object') {
@@ -2794,7 +2796,8 @@ idbOpen().then(function(db){DB=db;return kvGet('meta')}).then(function(m){
       var mblob = new Blob([JSON.stringify({ facts: mem.facts, msgs: mem.msgs.slice(-30), t: mem.t, id: mem.id, act: mem.act, chats: (mem.chats || []).slice(0, 10).map(function (c) { return { id: c.id, title: c.title, t: c.t, msgs: c.msgs.slice(-20) }; }) })], { type: 'application/json' });
       var murl = window.uiCloudUp ? await window.uiCloudUp(mblob, 'raw', 'memoire.json') : null;
       if (!murl || !isCld(murl)) throw new Error('cloud');
-      await firebase.firestore().collection('aiMemory').doc(id).set({ url: murl, t: mem.t });
+      var w = await window.__sb.from('ai_memory').upsert({ id: id, uid: id, data: { url: murl, t: mem.t }, updated_at: new Date().toISOString() });
+      if (w.error) throw w.error;
       dirty = false; sync = 'ok';
     } catch (e) { sync = 'err'; }
     saving = false; status();
