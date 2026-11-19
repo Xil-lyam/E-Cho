@@ -195,7 +195,7 @@
     applySort(); applyFilter();
 
     if (t && 'mediaSession' in navigator && typeof MediaMetadata !== 'undefined') {
-      try { navigator.mediaSession.metadata = new MediaMetadata({ title: label(t), artist: o.artist || 'E\'cho', artwork: o.cover ? [{ src: o.cover, sizes: '512x512' }] : [] }); } catch (e) {}
+      try { navigator.mediaSession.metadata = new MediaMetadata({ title: label(t), artist: o.artist || 'X\'enify', artwork: o.cover ? [{ src: o.cover, sizes: '512x512' }] : [] }); } catch (e) {}
     }
   }
   /* progression de l'onde en continu (image par image) tant que ça joue, au lieu de sauter toutes les 300 ms */

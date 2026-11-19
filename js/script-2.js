@@ -1402,7 +1402,7 @@ window.__uandiMods['js/ui/bande-notes.js'] = function () {
         document.head.appendChild(s);
       });
       if (typeof window.__uandiApp === 'function') break;
-      say('Réveil de l’écho…');
+      say('Démarrage…');
       await new Promise(function (ok) { setTimeout(ok, 600 * (k + 1)); });
     }
   }
@@ -1452,7 +1452,7 @@ window.__uandiMods['js/ui/bande-notes.js'] = function () {
   }
   async function loadFirebase() {
     if (window.firebase && firebase.auth && firebase.firestore) return true;
-    say('Réveil de l’écho…');
+    say('Démarrage…');
     if (!(await lib(F[0], 9000))) return false;
     say('Connexion au serveur…');
     var r = await Promise.all([lib(F[1], 9000), lib(F[2], 9000)]);
@@ -1487,7 +1487,7 @@ window.__uandiMods['js/ui/bande-notes.js'] = function () {
     if (vis('login') || vis('app') || vis('apWait') || document.getElementById('blank-msg')) return;
     var d = document.createElement('div'); d.id = 'blank-msg';
     d.style.cssText = 'position:fixed;inset:0;z-index:99;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;font:500 16px system-ui,sans-serif;color:#5B1035;background:rgba(255,233,241,.92)';
-    d.innerHTML = '<div style="font-size:2.4rem">E&#39;cho</div><div>Le site n’a pas pu démarrer.<br>Vérifie ta connexion, puis réessaie.</div>';
+    d.innerHTML = '<div style="font-size:2.4rem">X&#39;enify</div><div>Le site n’a pas pu démarrer.<br>Vérifie ta connexion, puis réessaie.</div>';
     var b = document.createElement('button'); b.type = 'button'; b.textContent = 'Réessayer';
     b.style.cssText = 'padding:12px 26px;border:0;border-radius:999px;background:#E0457B;color:#fff;font:600 16px system-ui,sans-serif';
     b.onclick = function () { location.reload(); };
@@ -2698,7 +2698,7 @@ idbOpen().then(function(db){DB=db;return kvGet('meta')}).then(function(m){
       throw { code: ctl.userStop ? 'stop' : ctl.stall ? 'stall' : e && e.name === 'AbortError' ? 'slow' : 'net' };
     } finally { clearTimeout(to); clearInterval(wd); }
   }
-  var BASE = 'Tu es X.Uni, l’assistant d’étude de l’application E\'cho, pour des étudiants. Si on te demande ton nom, tu t’appelles X.Uni. Réponds dans la langue de l’élève (français par défaut), de façon claire, chaleureuse et précise. ' +
+  var BASE = 'Tu es X.Uni, l’assistant d’étude de l’application X\'enify, pour des étudiants. Si on te demande ton nom, tu t’appelles X.Uni. Réponds dans la langue de l’élève (français par défaut), de façon claire, chaleureuse et précise. ' +
     'Explique étape par étape avec des exemples simples. Quand tu fais un quiz, pose UNE question à la fois, attends la réponse, corrige gentiment, puis continue. ' +
     'Pour les devoirs, ne donne la correction que si on te la demande. Tu peux aussi aider sur des questions de la vie de tous les jours. Si tu n’es pas sûr, dis-le. ' +
     'N’invente jamais de faits sur le cours : appuie-toi sur la leçon fournie quand il y en a une. Reste concis : va à l’essentiel, listes courtes, gras pour les mots importants.';
@@ -2933,7 +2933,7 @@ idbOpen().then(function(db){DB=db;return kvGet('meta')}).then(function(m){
     var full = '', st = 0;
     for (var i = 0; i < p.models.length && !full; i++) {
       var hd = { 'Content-Type': 'application/json' }; if (p.key) hd['Authorization'] = 'Bearer ' + p.key;
-      if (p.name === 'openrouter') { hd['HTTP-Referer'] = location.origin; hd['X-Title'] = 'E\'cho'; }
+      if (p.name === 'openrouter') { hd['HTTP-Referer'] = location.origin; hd['X-Title'] = 'X\'enify'; }
       var r;
       try {
         r = await fetch(p.url, { method: 'POST', signal: ctl.signal, headers: hd,

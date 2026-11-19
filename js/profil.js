@@ -342,7 +342,7 @@
     var b = mk('span', 'ubadge st ' + k + (p.bpill === true ? ' pill' : '') + (p.bhide === true ? ' bh' : ''));
     if (cols.indexOf(p.bcol) > -1) b.dataset.bc = p.bcol;
     b.style.setProperty('--sd', '-' + (Date.now() % 6000) + 'ms');
-    b.title = k === 'fnd' ? 'Fondateur de U&I' : k === 'ast' ? 'Assistant de U&I' : 'Compte certifié'; b.setAttribute('aria-label', b.title);
+    b.title = k === 'fnd' ? 'Fondateur de X’enify' : k === 'ast' ? 'Assistant de X’enify' : 'Compte certifié'; b.setAttribute('aria-label', b.title);
     b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><polygon class="sl" stroke-width="1.6" stroke-linejoin="round" points="12.00,1.80 14.25,3.60 17.10,3.17 18.15,5.85 20.83,6.90 20.40,9.75 22.20,12.00 20.40,14.25 20.83,17.10 18.15,18.15 17.10,20.83 14.25,20.40 12.00,22.20 9.75,20.40 6.90,20.83 5.85,18.15 3.17,17.10 3.60,14.25 1.80,12.00 3.60,9.75 3.17,6.90 5.85,5.85 6.90,3.17 9.75,3.60"/><path class="ck" d="M7 12.6l3.3 3.3L17 8.9" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="bt">' + (k === 'fnd' ? 'Fondateur' : k === 'ast' ? 'Assistant' : 'Certifié') + '</span>';
     return b;
   }

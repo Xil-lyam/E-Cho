@@ -30,7 +30,7 @@ exports.handler = async (event) => {
     if (c.lastUid !== uid || Date.now() - (c.lastTs || 0) > 120000) return { statusCode: 200, headers: cors, body: 'stale' };
     if (String(c.lastText || '').charAt(0) === SYS) return { statusCode: 200, headers: cors, body: 'system' };
 
-    const sender = (c.names && c.names[uid]) || 'U&I';
+    const sender = (c.names && c.names[uid]) || 'X’enify';
     const title = c.group ? (c.title || 'Groupe') : sender.charAt(0).toUpperCase() + sender.slice(1);
     const text = String(c.lastText || '').slice(0, 120);
     const body = c.group ? sender + ' : ' + text : text;

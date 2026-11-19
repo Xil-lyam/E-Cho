@@ -993,7 +993,7 @@ window.__uandiApp = function () {
       }
     } catch (x) {}
     try {
-      var cred = await navigator.credentials.create({ publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)), rp: { name: 'E\'cho' }, user: { id: crypto.getRandomValues(new Uint8Array(16)), name: state.username, displayName: state.username }, pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }], authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'preferred', residentKey: 'discouraged' }, attestation: 'none', timeout: 60000 } });
+      var cred = await navigator.credentials.create({ publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)), rp: { name: 'X\'enify' }, user: { id: crypto.getRandomValues(new Uint8Array(16)), name: state.username, displayName: state.username }, pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }], authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'preferred', residentKey: 'discouraged' }, attestation: 'none', timeout: 60000 } });
       localStorage.setItem('uandi-lockbio-' + state.me, b64(new Uint8Array(cred.rawId)));
       lkPaint();
     } catch (e) {
@@ -1362,7 +1362,7 @@ window.__uandiApp = function () {
       o.start(); o.stop(audioCtx.currentTime + 0.25);
     } catch (e) {}
   }
-  var NOTIF_TITLE = 'Vous avez un nouveau message E\'cho \u2764\uFE0F\u200D\uD83E\uDE79';
+  var NOTIF_TITLE = 'Vous avez un nouveau message X\'enify \u2764\uFE0F\u200D\uD83E\uDE79';
   /* ---------- préférences de notifications (propres à cet appareil) ---------- */
   var NP_DEF = { msg: 1, friends: 1, news: 1, sound: 1, vib: 1, quiet: 0, qFrom: '22:00', qTo: '07:00', muteUntil: 0 };
   function npGet() {
@@ -1497,7 +1497,7 @@ window.__uandiApp = function () {
     if (voiceOn()) speakNew(true, voiceFail);
     var go = function () {
       beep(); try { if (navigator.vibrate) navigator.vibrate(120); } catch (e) {}
-      sysNotify('E\'cho', 'Ceci est un test de notification.'); showToast(null, 'E\'cho', 'Ceci est un test de notification.');
+      sysNotify('X\'enify', 'Ceci est un test de notification.'); showToast(null, 'X\'enify', 'Ceci est un test de notification.');
     };
     try {
       if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission().then(function () { go(); pushSetup().then(pushReport); }, go); else { go(); pushSetup().then(pushReport); }
@@ -1513,8 +1513,8 @@ window.__uandiApp = function () {
   function npPaint() {
     var st = $('#nStat'); if (!st) return;
     var perm = ('Notification' in window) ? Notification.permission : 'unsupported', t, sub, k;
-    if (perm === 'unsupported') { k = 'bad'; t = 'Non pris en charge'; sub = 'Ouvre E\'cho dans Chrome ou installe l’appli sur l’écran d’accueil.'; }
-    else if (perm === 'denied') { k = 'bad'; t = 'Bloquées'; sub = 'Autorise-les dans les réglages du téléphone : Applis › E\'cho › Notifications (ou Chrome › Paramètres du site).'; }
+    if (perm === 'unsupported') { k = 'bad'; t = 'Non pris en charge'; sub = 'Ouvre X\'enify dans Chrome ou installe l’appli sur l’écran d’accueil.'; }
+    else if (perm === 'denied') { k = 'bad'; t = 'Bloquées'; sub = 'Autorise-les dans les réglages du téléphone : Applis › X\'enify › Notifications (ou Chrome › Paramètres du site).'; }
     else if (perm === 'default') { k = 'warn'; t = 'Pas encore activées'; sub = 'Appuie sur « Activer » pour recevoir les messages même appli fermée.'; }
     else if (PUSH.token) { k = 'ok'; t = 'Actives, même appli fermée'; sub = npQuiet() ? 'Mode silencieux en ce moment.' : 'Cet appareil est enregistré.'; }
     else { k = 'warn'; t = 'Autorisées, push non enregistré'; sub = PUSH.err ? 'Cause : ' + PUSH.err : 'Enregistrement en cours…'; }
@@ -2218,7 +2218,7 @@ window.__uandiApp = function () {
       if (ap) ap.href = abs('apple-touch-icon.png?v=124');
       if (mf) {
         var mj = JSON.stringify({
-          name: 'E\'cho', short_name: 'E\'cho', start_url: location.pathname + location.search, scope: location.pathname.replace(/[^\/]*$/, ''),
+          name: 'X\'enify', short_name: 'X\'enify', start_url: location.pathname + location.search, scope: location.pathname.replace(/[^\/]*$/, ''),
           display: 'standalone', background_color: '#1a090d', theme_color: '#1a090d',
           icons: [{ src: i192, sizes: '192x192', type: 'image/png', purpose: 'any' }, { src: i512, sizes: '512x512', type: 'image/png', purpose: 'any' }, { src: m192, sizes: '192x192', type: 'image/png', purpose: 'maskable' }, { src: m512, sizes: '512x512', type: 'image/png', purpose: 'maskable' }]
         });
@@ -3437,7 +3437,7 @@ window.__uandiApp = function () {
   var BADGE_TXT = '\u2713 Cr\u00e9ateur', verifs = {}, assists = {}, CERT_TXT = '\u2713 Certifi\u00e9';
   var SEAL = '<svg viewBox="0 0 24 24" aria-hidden="true"><polygon class="sl" stroke-width="1.6" stroke-linejoin="round" points="12.00,1.80 14.25,3.60 17.10,3.17 18.15,5.85 20.83,6.90 20.40,9.75 22.20,12.00 20.40,14.25 20.83,17.10 18.15,18.15 17.10,20.83 14.25,20.40 12.00,22.20 9.75,20.40 6.90,20.83 5.85,18.15 3.17,17.10 3.60,14.25 1.80,12.00 3.60,9.75 3.17,6.90 5.85,5.85 6.90,3.17 9.75,3.60"/><path class="ck" d="M7 12.6l3.3 3.3L17 8.9" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   function badgeKind(uid) { return badges[uid] ? 'fnd' : assists[uid] ? 'ast' : verifs[uid] ? 'cert' : ''; }
-  var BADGE_INFO = { fnd: ['Fondateur', 'Fondateur de E\'cho'], ast: ['Assistant', 'Assistant de E\'cho'], cert: ['Certifi\u00e9', 'Compte certifi\u00e9'] };
+  var BADGE_INFO = { fnd: ['Fondateur', 'Fondateur de X\'enify'], ast: ['Assistant', 'Assistant de X\'enify'], cert: ['Certifi\u00e9', 'Compte certifi\u00e9'] };
   /* badge pilule animé : icône (check qui pop) + mot toujours visible, reflet et halo décalés par badge */
   /* réglages d'affichage de CHAQUE badge : bpill = avec le mot, bhide = masqué. Chacun ne règle que le sien (champs de sa fiche presence). */
   var bprefs = {}, badgeSeen = {};

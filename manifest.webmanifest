@@ -1,7 +1,7 @@
 {
-  "name": "E'cho",
-  "short_name": "E'cho",
-  "description": "Messagerie E'cho",
+  "name": "X'enify",
+  "short_name": "X'enify",
+  "description": "Messagerie X'enify",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

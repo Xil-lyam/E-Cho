@@ -414,7 +414,7 @@
     try {
       if (!('mediaSession' in navigator) || typeof MediaMetadata === 'undefined') return;
       var t = M.tracks[M.cur];
-      navigator.mediaSession.metadata = t ? new MediaMetadata({ title: mLabel(t), artist: 'E\'cho' }) : null;
+      navigator.mediaSession.metadata = t ? new MediaMetadata({ title: mLabel(t), artist: 'X\'enify' }) : null;
     } catch (e) {}
   }
   function mRender() {
@@ -3937,7 +3937,7 @@
     finally { try { npPaint(); } catch (e2) {} }
   }
   function pushReport() {
-    try { showToast(null, 'E\'cho', (PUSH.token ? 'Push OK ✅ jeton enregistré' : 'Push KO ❌ ' + PUSH.err) + (PUSH.lastSend ? ' · dernier envoi : ' + PUSH.lastSend : '')); } catch (e) {}
+    try { showToast(null, 'X\'enify', (PUSH.token ? 'Push OK ✅ jeton enregistré' : 'Push KO ❌ ' + PUSH.err) + (PUSH.lastSend ? ' · dernier envoi : ' + PUSH.lastSend : '')); } catch (e) {}
   }
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('firebase-messaging-sw.js').catch(function () {});
   function pushUnreg() {
@@ -3965,7 +3965,7 @@
         var cert = {}; r.slice(1).forEach(function (sn) { sn.forEach(function (d) { cert[d.id] = 1; }); });
         var to = []; r[0].forEach(function (d) { var v = d.data(); if (v && typeof v.uid === 'string' && v.uid !== state.me && (!!cert[v.uid] === certFeed)) to.push(v.uid); });
         if (!to.length) return;
-        return pushCall('/notify', { to: to, title: 'E\'cho \uD83D\uDCF0', body: 'Nouvelle lettre dans l\u2019actualit\u00e9 : ' + String(text || '').slice(0, 80), chat: 'news' })
+        return pushCall('/notify', { to: to, title: 'X\'enify \uD83D\uDCF0', body: 'Nouvelle lettre dans l\u2019actualit\u00e9 : ' + String(text || '').slice(0, 80), chat: 'news' })
           .then(function (r) { PUSH.lastSend = 'actualit\u00e9 HTTP ' + r.status; });
       }).catch(function (e) { PUSH.lastSend = 'actualit\u00e9 erreur ' + ((e && (e.code || e.message)) || e); });
     } catch (e) {}
@@ -4113,7 +4113,7 @@
       emCall('/email/confirm', { code: code }, true).then(function (j) {
         if (!j._ok) { emErr(emMsg(j)); return; }
         emDlg.close(); emRefresh();
-        try { showToast(null, 'E\'cho', 'E-mail de récupération enregistré ✅'); } catch (e) {}
+        try { showToast(null, 'X\'enify', 'E-mail de récupération enregistré ✅'); } catch (e) {}
       }).catch(function (e) { emErr(emFail(e)); }).then(function () { b.disabled = false; });
     }
   });

@@ -480,7 +480,7 @@
     if (ov) return;
     ov = doc.createElement('section');
     ov.className = 'sh-ov muted'; ov.id = 'shortsOv'; ov.hidden = true; ov.setAttribute('aria-label', 'Shorts');
-    ov.innerHTML = '<div class="sh-top"><h2>E<span class="amp">\'</span>cho <small>Shorts</small></h2><div class="hbtns"></div></div><div class="sh-feed" id="shFeed"></div><div class="sh-status" hidden></div>';
+    ov.innerHTML = '<div class="sh-top"><h2>X<span class="amp">\'</span>enify <small>Shorts</small></h2><div class="hbtns"></div></div><div class="sh-feed" id="shFeed"></div><div class="sh-status" hidden></div>';
     var hb = doc.querySelector('#viewNews .hbtns');
     if (hb) ov.querySelector('.hbtns').innerHTML = hb.innerHTML;
     /* bouton « Chaînes bloquées / Débloquer » en haut (icône) */

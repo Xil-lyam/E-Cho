@@ -1,4 +1,4 @@
-/* U&I : service worker pour les notifications en arrière-plan */
+/* X’enify : service worker pour les notifications en arrière-plan */
 self.addEventListener('install', function () { self.skipWaiting(); });
 self.addEventListener('activate', function (e) { e.waitUntil(self.clients.claim()); });
 
@@ -9,7 +9,7 @@ self.addEventListener('push', function (e) {
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (list) {
       /* l'appli est ouverte et visible : elle gère déjà son alerte (son + bulle) */
       if (list.some(function (c) { return c.visibilityState === 'visible' && c.focused; })) return;
-      return self.registration.showNotification(d.title || 'U&I', {
+      return self.registration.showNotification(d.title || 'X’enify', {
         body: d.body || '',
         tag: d.tag || 'uandi-msg',
         renotify: true,

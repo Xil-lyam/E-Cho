@@ -40,7 +40,7 @@ self.addEventListener('push', function (event) {
     catch (e) { try { payload = { data: { body: event.data.text() } }; } catch (e2) { payload = {}; } }
 
     var n = payload.notification || {}, d = payload.data || {};
-    var title = n.title || d.title || 'U&I';
+    var title = n.title || d.title || 'X’enify';
     var body = n.body || d.body || '';
     var chat = d.chat || '';
 

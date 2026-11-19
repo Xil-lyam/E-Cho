@@ -371,7 +371,7 @@
       leaveLocal(text || 'Crée une partie et envoie le code à ton pote, ou entre son code.');
     }
     async function share() {
-      var t = 'Viens jouer à Pierre · Feuille · Ciseaux avec moi sur E’cho ! Code de la partie : ' + N.code;
+      var t = 'Viens jouer à Pierre · Feuille · Ciseaux avec moi sur X’enify ! Code de la partie : ' + N.code;
       try { if (navigator.share) { await navigator.share({ text: t }); return; } } catch (e) { return; }
       try { await navigator.clipboard.writeText(t); msg('Code copié ! Envoie-le à ton pote.'); } catch (e) { msg('Code : ' + N.code); }
     }

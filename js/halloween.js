@@ -100,7 +100,7 @@
     var bar = document.createElement('div');
     bar.id = 'hwBar';
     var t = document.createElement('span');
-    t.textContent = '🎃 Joyeux Halloween sur U&I !';
+    t.textContent = '🎃 Joyeux Halloween sur X’enify !';
     var x = document.createElement('button');
     x.type = 'button';
     x.setAttribute('aria-label', 'Fermer');
