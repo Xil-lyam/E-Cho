@@ -4223,75 +4223,37 @@
    Notifications push (FCM via le Worker ui-push)
    (fait partie de l’appli : assemblée par js/boot/loader.js dans une seule fermeture) */
   /* ---------- notifications push (FCM via le Worker « ui-push ») ---------- */
-  var PUSH = { url: ((CFG.push || {}).workerUrl || '').replace(/\/+$/, ''), key: (CFG.push || {}).vapidKey || '', token: null };
-  if (PUSH.url.indexOf('COLLE') !== -1) PUSH.url = '';
-  function pushCall(path, body) {
-    return auth.currentUser.getIdToken().then(function (tok) {
-      return fetch(PUSH.url + path, { method: 'POST', headers: { Authorization: 'Bearer ' + tok, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-    });
-  }
-  function pushLoadMsg() {
-    if (window.firebase && firebase.messaging) return Promise.resolve(true);
-    return new Promise(function (ok) {
-      var s = document.createElement('script');
-      s.src = 'https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js';
-      s.onload = function () { ok(true); }; s.onerror = function () { ok(false); };
-      setTimeout(function () { ok(false); }, 10000);
-      document.head.appendChild(s);
-    });
-  }
+  /* Push : géré par js/push.js (abonnements dans Supabase, envoi par la fonction Netlify « push »). Plus de Firebase Messaging ni de Worker. */
+  var PUSH = { url: '', token: null, err: '', lastSend: '' };
   async function pushSetup() {
     PUSH.err = '';
     try {
-      if (!PUSH.url || !PUSH.key) { PUSH.err = 'adresse du Worker ou clé VAPID manquante'; return; }
-      if (!auth.currentUser) { PUSH.err = 'pas connecté'; return; }
       if (!('serviceWorker' in navigator) || !('Notification' in window)) { PUSH.err = 'navigateur sans notifications (ouvre dans Chrome / appli installée)'; return; }
-      if (Notification.permission !== 'granted') { PUSH.err = 'permission notifications = ' + Notification.permission + ' (à autoriser dans les réglages du site)'; return; }
-      if (!(await pushLoadMsg()) || !firebase.messaging.isSupported || !(await firebase.messaging.isSupported())) { PUSH.err = 'Firebase Messaging indisponible'; return; }
-      var reg = await navigator.serviceWorker.register('firebase-messaging-sw.js');
-      await navigator.serviceWorker.ready;
-      var t = await firebase.messaging().getToken({ vapidKey: PUSH.key, serviceWorkerRegistration: reg });
-      if (!t) { PUSH.err = 'jeton FCM vide'; return; }
-      var r = await pushCall('/register', { token: t });
-      if (!r.ok) { PUSH.err = 'le Worker a refusé l’enregistrement (HTTP ' + r.status + ')'; return; }
-      PUSH.token = t;
+      if (typeof window.__xenPushSetup !== 'function') { PUSH.err = 'module push.js non chargé'; return; }
+      var why = await window.__xenPushSetup();
+      if (why) PUSH.err = why; else PUSH.token = 'web';
     } catch (e) { PUSH.err = (e && (e.code || e.message)) || String(e); }
     finally { try { npPaint(); } catch (e2) {} }
   }
   function pushReport() {
-    try { showToast(null, 'X\'enify', (PUSH.token ? 'Push OK ✅ jeton enregistré' : 'Push KO ❌ ' + PUSH.err) + (PUSH.lastSend ? ' · dernier envoi : ' + PUSH.lastSend : '')); } catch (e) {}
+    try { showToast(null, 'X\'enify', PUSH.token ? 'Push OK ✅ appareil enregistré' : 'Push KO ❌ ' + PUSH.err); } catch (e) {}
   }
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('firebase-messaging-sw.js').catch(function () {});
   function pushUnreg() {
-    if (!PUSH.token || !auth.currentUser) return Promise.resolve();
-    var t = PUSH.token; PUSH.token = null;
-    return Promise.race([pushCall('/unregister', { token: t }), new Promise(function (ok) { setTimeout(ok, 2500); })]).catch(function () {});
-  }
-  function pushNotify(chat, text) {
+    PUSH.token = null;
     try {
-      if (!PUSH.url || !chat) return;
-      var c = chatOf(chat.id) || {};
-      var to = (c.members || [state.me, chat.other]).filter(function (u) { return u && u !== state.me; });
-      if (!to.length) return;
-      pushCall('/notify', { to: to, title: NOTIF_TITLE, body: cap(myName()) + ' : ' + text, chat: chat.id }).then(function (r) { PUSH.lastSend = 'message HTTP ' + r.status; }).catch(function (e) { PUSH.lastSend = 'message erreur ' + ((e && (e.code || e.message)) || e); });
-    } catch (e) {}
+      var u = window.__xenUser;
+      if (!u || !window.__sb || !navigator.serviceWorker) return Promise.resolve();
+      return Promise.race([navigator.serviceWorker.ready.then(function (r) { return r.pushManager.getSubscription(); }).then(function (sub) {
+        if (!sub) return;
+        return crypto.subtle.digest('SHA-256', new TextEncoder().encode(sub.endpoint)).then(function (b) {
+          var h = Array.prototype.map.call(new Uint8Array(b), function (x) { return ('0' + x.toString(16)).slice(-2); }).join('');
+          return window.__sb.from('push_subs').delete().eq('token', h);
+        });
+      }), new Promise(function (ok) { setTimeout(ok, 2500); })]).catch(function () {});
+    } catch (e) { return Promise.resolve(); }
   }
-  function pushNews(text) {
-    try {
-      if (!PUSH.url || !auth.currentUser) return;
-      /* fil certifiés : on prévient les comptes certifiés / assistants / créateur ; fil non certifiés : tous les autres */
-      var certFeed = NW.col !== 'lettersN';
-      var cq = ['verified', 'assistant', 'badge'].map(function (f) { return fs.collection('presence').where(f, '==', true).get().catch(function () { return null; }); });
-      Promise.all([fs.collection('usernames').get()].concat(cq)).then(function (r) {
-        if (r.slice(1).some(function (x) { return !x; })) return;
-        var cert = {}; r.slice(1).forEach(function (sn) { sn.forEach(function (d) { cert[d.id] = 1; }); });
-        var to = []; r[0].forEach(function (d) { var v = d.data(); if (v && typeof v.uid === 'string' && v.uid !== state.me && (!!cert[v.uid] === certFeed)) to.push(v.uid); });
-        if (!to.length) return;
-        return pushCall('/notify', { to: to, title: 'X\'enify \uD83D\uDCF0', body: 'Nouvelle lettre dans l\u2019actualit\u00e9 : ' + String(text || '').slice(0, 80), chat: 'news' })
-          .then(function (r) { PUSH.lastSend = 'actualit\u00e9 HTTP ' + r.status; });
-      }).catch(function (e) { PUSH.lastSend = 'actualit\u00e9 erreur ' + ((e && (e.code || e.message)) || e); });
-    } catch (e) {}
-  }
+  function pushNotify() { /* l'envoi se fait dans postMsg via window.__xenPing */ }
+  function pushNews() { /* notifications d'actualité : à refaire côté serveur si besoin */ }
   auth.onAuthStateChanged(function (user) {
     AUTH_SEEN = true;
     if (user) setTimeout(pushSetup, 3000);

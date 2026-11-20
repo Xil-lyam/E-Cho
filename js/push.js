@@ -48,6 +48,27 @@
     Notification.requestPermission().then(function () { subscribe(u); });
   });
 
+  /* utilisé par l'écran « Notifications » : active et enregistre cet appareil, renvoie '' si OK ou la cause de l'échec */
+  window.__xenPushSetup = function () {
+    var u = me(); if (!u) return Promise.resolve('pas connecté');
+    var go = function () {
+      if (Notification.permission !== 'granted') return Promise.resolve('permission notifications = ' + Notification.permission);
+      return reg().then(function (r) {
+        return r.pushManager.getSubscription().then(function (x) { return x || r.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: u8(VAPID_PUBLIC) }); });
+      }).then(function (sub) {
+        return sha(sub.endpoint).then(function (h) {
+          return window.__sb.from('push_subs').upsert({ uid: u.uid, token: h, data: { sub: sub.toJSON() }, updated_at: new Date().toISOString() });
+        });
+      }).then(function (r) { return r && r.error ? 'enregistrement refusé (' + (r.error.message || r.error.code) + ')' : ''; })
+        .catch(function (e) { return (e && (e.message || e.name)) || 'erreur'; });
+    };
+    return Notification.permission === 'default' ? Notification.requestPermission().then(go, go) : go();
+  };
+  /* notification locale de test (vérifie que le téléphone sait afficher les notifications de l'appli) */
+  window.__xenPushTest = function () {
+    return reg().then(function (r) { return r.showNotification("X'enify", { body: 'Test réussi \u2705', icon: 'icon-192.png', badge: 'badge-96.png', tag: 'xen-test' }); });
+  };
+
   /* appelé par l'appli juste après l'envoi d'un message (cid = identifiant de la discussion) */
   window.__xenPing = function (cid) {
     if (!cid || !window.__sb) return;

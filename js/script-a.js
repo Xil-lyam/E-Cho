@@ -1710,22 +1710,9 @@ window.__uandiApp = function () {
   });
   /* test réel : le message part quand tu quittes l'appli, donc la notification arrive appli en arrière-plan ou fermée */
   $('#pushTest').addEventListener('click', function () {
-    if (!PUSH.url || !PUSH.token || !state.me) { npMsg('Active d’abord les notifications.'); return; }
-    SB.auth.getSession().then(function (r) {
-      var tok = r && r.data && r.data.session && r.data.session.access_token;
-      if (!tok) throw new Error('session');
-      npMsg('Prêt. Quitte maintenant l’appli (écran d’accueil) : le test part tout seul et la notification arrive en quelques secondes.');
-      var done = false, fire = function () {
-        if (!document.hidden || done) return;
-        done = true; document.removeEventListener('visibilitychange', fire);
-        try {
-          fetch(PUSH.url + '/notify', { method: 'POST', headers: { Authorization: 'Bearer ' + tok, 'Content-Type': 'application/json' }, body: JSON.stringify({ to: [state.me], title: NOTIF_TITLE, body: 'Test réussi ✅ : les notifications marchent appli fermée.', chat: '' }) })
-            .then(function (r) { PUSH.lastSend = 'test HTTP ' + r.status; }).catch(function () {});
-        } catch (e) {}
-      };
-      document.addEventListener('visibilitychange', fire);
-      setTimeout(function () { document.removeEventListener('visibilitychange', fire); if (!done) { npMsg('Test annulé : tu n’as pas quitté l’appli. Réessaie.'); } }, 60000);
-    }).catch(function (e) { npMsg('Erreur : ' + ((e && (e.code || e.message)) || e)); });
+    if (!PUSH.token || !state.me || !window.__xenPushTest) { npMsg('Active d’abord les notifications.'); return; }
+    window.__xenPushTest().then(function () { npMsg('Notification de test envoyée : regarde le haut de ton écran.'); PUSH.lastSend = 'test local'; npPaint(); })
+      .catch(function (e) { npMsg('Erreur : ' + ((e && (e.code || e.message)) || e)); });
   });
   new MutationObserver(function () { if ($('#settings').open) npPaint(); }).observe($('#settings'), { attributes: true, attributeFilter: ['open'] });
   npSync();
