@@ -8,7 +8,7 @@
 -- ============ Outils communs ============
 create or replace function public.xen_is_creator() returns boolean
 language sql stable security definer set search_path = public as $$
-  select coalesce((select (to_jsonb(p) ->> 'is_creator')::boolean from public.profiles p where p.id = auth.uid()), false)
+  select coalesce((select p.badge from public.profiles p where p.id = auth.uid()), false)   -- le « badge créateur » de l'appli
 $$;
 
 create or replace function public.xen_is_friend(a uuid, b uuid) returns boolean
