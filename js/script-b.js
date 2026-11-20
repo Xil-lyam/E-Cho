@@ -398,10 +398,10 @@
     });
   }
   function rcOpen(uname, code) {
-    return SB.from('recovery').select('salt,iv,ct').eq('username', uname).maybeSingle().then(function (d) {
-      if (d.error) throw d.error;
-      if (!d.data) throw new Error('none');
-      var v = d.data;
+    return SB.rpc('recovery_get', { uname: uname }).then(function (d) {
+  if (d.error) throw d.error;
+  var v = d.data && d.data[0];
+  if (!v) throw new Error('none');
       return rcKey(code, unb64(v.salt)).then(function (k) { return crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(v.iv) }, k, unb64(v.ct)); });
     }).then(function (b) { return TD.decode(b); });
   }
