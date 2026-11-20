@@ -192,13 +192,14 @@
   function rcSave(uname, code, pass) {
     var salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
     return rcKey(code, salt).then(function (k) { return crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, k, TE.encode(pass)); }).then(function (ct) {
-      return fs.collection('recovery').doc(uname).set({ salt: b64(salt), iv: b64(iv), ct: b64(new Uint8Array(ct)), uid: auth.currentUser.uid });
+      return SB.from('recovery').upsert({ username: uname, salt: b64(salt), iv: b64(iv), ct: b64(new Uint8Array(ct)), uid: auth.currentUser.uid }).then(function (r) { if (r.error) throw r.error; });
     });
   }
   function rcOpen(uname, code) {
-    return fs.collection('recovery').doc(uname).get().then(function (d) {
-      if (!d.exists) throw new Error('none');
-      var v = d.data();
+    return SB.from('recovery').select('salt,iv,ct').eq('username', uname).maybeSingle().then(function (d) {
+      if (d.error) throw d.error;
+      if (!d.data) throw new Error('none');
+      var v = d.data;
       return rcKey(code, unb64(v.salt)).then(function (k) { return crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(v.iv) }, k, unb64(v.ct)); });
     }).then(function (b) { return TD.decode(b); });
   }
@@ -219,7 +220,7 @@
     var np = $('#pwNew').value; pwErr(''); $('#pwCode').hidden = true;
     if (np.length < 6) { pwErr('Le nouveau mot de passe doit faire au moins 6 caractères.'); return; }
     pwReauth().then(function () { return SB.auth.updateUser({ password: np }).then(function (r) { if (r.error) throw r.error; }); })
-      .then(function () { return fs.collection('recovery').doc(state.username).delete().catch(function () {}); })
+      .then(function () { return Promise.resolve(SB.from('recovery').delete().eq('username', state.username)).catch(function () {}); })
       .then(function () { $('#pwCur').value = ''; $('#pwNew').value = ''; pwErr('Mot de passe changé. Crée un nouveau code de récupération.'); })
       .catch(function (e) { if (e) pwErr('Changement impossible.'); });
   });
@@ -641,6 +642,34 @@
   }
   /* ---------- musiques partagées : sauvegardées sur Cloudinary, liste dans Firestore (collection « sharedMusic ») ---------- */
   var SH = { pub: {}, mine: {}, unsubs: [] };
+  /* ===== Supabase : musique partagée (table shared_music) et code de récupération (table recovery) ===== */
+  function smDoc(r) { var d = Object.assign({}, r.data || {}); d.uid = r.uid; d.pub = !!r.pub; if (typeof d.ts !== 'number') d.ts = Date.parse(r.created_at) || 0; return d; }
+  function smAdd(data) {
+    return SB.from('shared_music').insert({ uid: data.uid, pub: !!data.pub, data: data }).select('id').single()
+      .then(function (r) { if (r.error) throw r.error; return { id: r.data.id }; });
+  }
+  function smSetPub(id, want) { return SB.from('shared_music').update({ pub: !!want }).eq('id', id).then(function (r) { if (r.error) throw r.error; }); }
+  function smRemove(id) { return SB.from('shared_music').delete().eq('id', id).then(function (r) { if (r.error) throw r.error; }); }
+  /* suit une liste (mes musiques, ou les musiques partagées) et la rafraîchit à chaque changement */
+  function smWatch(mode, cb, onErr) {
+    var alive = true, ch = null;
+    function load() {
+      var b = SB.from('shared_music').select('*');
+      b = mode === 'mine' ? b.eq('uid', state.me) : b.eq('pub', true).order('created_at', { ascending: false }).limit(300);
+      b.then(function (r) {
+        if (!alive) return;
+        if (r.error) { onErr(r.error); return; }
+        cb((r.data || []).map(function (x) { return { id: x.id, data: function () { return smDoc(x); } }; }));
+      }, function (e) { if (alive) onErr(e); });
+    }
+    load();
+    try {
+      ch = SB.channel('sm-' + mode + '-' + Math.random().toString(36).slice(2))
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'shared_music' }, load).subscribe();
+    } catch (e) {}
+    return function () { alive = false; if (ch) { try { SB.removeChannel(ch); } catch (e) {} ch = null; } };
+  }
+
   async function mCloudPush(t, file, title, pub) {
     try {
       if (!state.me || navigator.onLine === false || !file) { mMsg('Connecte-toi à internet pour partager.'); return; }
@@ -654,11 +683,11 @@
       var url = await cloudUp(up, 'video');
       if (!url) { mMsg('Envoi vers le cloud impossible (' + (CLD_ERR || 'erreur') + ').'); return; }
       var data = { uid: state.me, uname: myName() || '', title: String(title || mName(t.name)).slice(0, 100), name: String(t.name || '').slice(0, 120), url: url, size: file.size, ts: Date.now(), pub: !!pub && musicShared() };
-      var ref = await fs.collection('sharedMusic').add(data);
+      var ref = await smAdd(data);
       t.cid = ref.id; SH.mine[ref.id] = data;
       if (typeof t.id === 'number') mTx('readwrite', function (st) { var g = st.get(t.id); g.onsuccess = function () { if (g.result) { g.result.cid = ref.id; st.put(g.result); } }; return g; }).catch(function () {});
       mMsg(data.pub ? 'Musique partagée avec tout le monde ☁' : 'Musique sauvegardée sur ton cloud ☁');
-    } catch (e) { mMsg('Partage impossible (règles Firestore « sharedMusic » ?).'); }
+    } catch (e) { mMsg('Partage impossible (table Supabase « shared_music » : bloc 7 lancé ?).'); }
   }
   /* bouton ☁ de chaque musique : partager / ne plus partager */
   function mCloudBtn(row, t) {
@@ -683,20 +712,20 @@
       t.up = false; mRender(); return;
     }
     try {
-      await fs.collection('sharedMusic').doc(t.cid).update({ pub: want });
+      await smSetPub(t.cid, want);
       if (SH.mine[t.cid]) SH.mine[t.cid].pub = want;
       mMsg(want ? 'Musique partagée avec tout le monde ☁' : 'Musique non partagée (elle reste dans ton cloud).');
-    } catch (e) { mMsg('Changement impossible (règles Firestore « sharedMusic » ?).'); }
+    } catch (e) { mMsg('Changement impossible (table Supabase « shared_music » : bloc 7 lancé ?).'); }
     mRender();
   }
   function mShStop() { SH.unsubs.forEach(function (u) { try { u(); } catch (e) {} }); SH.unsubs = []; SH.pub = {}; SH.mine = {}; }
-  function mShFail() { SH.err = true; try { mShRender(); } catch (e) {} mShMsg('Chargement impossible : les règles Firestore doivent autoriser la lecture de « sharedMusic ».'); }
+  function mShFail() { SH.err = true; try { mShRender(); } catch (e) {} mShMsg('Chargement impossible : table Supabase « shared_music » (lance le bloc 7).'); }
   function mShStart() {
     mShStop(); SH.err = false;
     if (!state.me) { mShRender(); return; }
     try {
-      SH.unsubs.push(fs.collection('sharedMusic').where('uid', '==', state.me).onSnapshot(function (q) { SH.mine = {}; q.forEach(function (d) { SH.mine[d.id] = d.data(); }); mRender(); }, function () { mShFail(); }));
-      if (musicShared()) SH.unsubs.push(fs.collection('sharedMusic').where('pub', '==', true).limit(300).onSnapshot(function (q) { SH.pub = {}; q.forEach(function (d) { SH.pub[d.id] = d.data(); }); mRender(); }, function () { mShFail(); }));
+      SH.unsubs.push(smWatch('mine', function (q) { SH.mine = {}; q.forEach(function (d) { SH.mine[d.id] = d.data(); }); mRender(); }, function () { mShFail(); }));
+      if (musicShared()) SH.unsubs.push(smWatch('pub', function (q) { SH.pub = {}; q.forEach(function (d) { SH.pub[d.id] = d.data(); }); mRender(); }, function () { mShFail(); }));
     } catch (e) {}
     mShRender();
   }
@@ -736,7 +765,7 @@
       row.appendChild(b); row.appendChild(dl);
       if (mine) {
         var rm = el('button', 'mdel', '✕'); rm.type = 'button'; rm.setAttribute('aria-label', 'Retirer du cloud');
-        rm.addEventListener('click', function () { if (!confirm('Retirer cette musique du cloud et du partage ? (elle reste sur ton appareil si tu l’as téléchargée)')) return; fs.collection('sharedMusic').doc(k).delete().catch(function () { mShMsg('Suppression impossible.'); }); });
+        rm.addEventListener('click', function () { if (!confirm('Retirer cette musique du cloud et du partage ? (elle reste sur ton appareil si tu l’as téléchargée)')) return; smRemove(k).catch(function () { mShMsg('Suppression impossible.'); }); });
         row.appendChild(rm);
       }
       li.appendChild(row); ul.appendChild(li);
@@ -4084,7 +4113,7 @@
       /* mot de passe changé : on connecte directement la personne avec le nouveau */
       return SB.auth.signInWithPassword({ email: n + '@' + CFG.emailDomain, password: p1 }).then(function (r) { if (r.error) throw r.error; }).then(function () {
         /* l’ancien code de récupération (qui contenait l’ancien mot de passe) n’est plus valable */
-        fs.collection('recovery').doc(n).delete().catch(function () {});
+        Promise.resolve(SB.from('recovery').delete().eq('username', n)).catch(function () {});
         fmReset();
       }).catch(function () {
         fmReset(); forgotShow(null); setAuthErr('Mot de passe changé. Connecte-toi avec le nouveau.');
