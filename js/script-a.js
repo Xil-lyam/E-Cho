@@ -1398,8 +1398,11 @@ window.__uandiApp = function () {
     renderStatus();
     render();
 
-    var subbed = false, mdead = false, mchs = [], mtimer = null, mbusy = false, mAgain = false;
-    unsubMsgs = function () { mdead = true; clearTimeout(mtimer); mchs.forEach(function (c) { try { SB.removeChannel(c); } catch (e) {} }); mchs = []; };
+    var subbed = false, mdead = false, mchs = [], mtimer = null, mbusy = false, mAgain = false, mfail = 0;
+    /* retour du réseau ou de l'appli au premier plan : on relit les messages (rien ne se perd pendant une coupure) */
+    function mwake() { if (!mdead && !document.hidden) mkick(); }
+    window.addEventListener('online', mwake); document.addEventListener('visibilitychange', mwake);
+    unsubMsgs = function () { mdead = true; clearTimeout(mtimer); window.removeEventListener('online', mwake); document.removeEventListener('visibilitychange', mwake); mchs.forEach(function (c) { try { SB.removeChannel(c); } catch (e) {} }); mchs = []; };
     function mshow(list, size) {
       var before = new Set(state.msgs.map(function (m) { return m.id; }));
       var firstLoad = !state.loaded;
@@ -1444,13 +1447,21 @@ window.__uandiApp = function () {
           (q.data || []).forEach(function (x) { (rx[x.message_id] = rx[x.message_id] || []).push(x); });
         }
         if (mdead) return;
+        mfail = 0;
+        if (state.dead) { state.dead = null; ta.disabled = false; sendBtn.disabled = false; }
         mshow(rows.map(function (x) { return msgFromRow(x, rx[x.id]); }), rows.length);
       } catch (e) {
         if (mdead) return;
-        state.dead = 'La connexion a été interrompue. Recharge la page pour reprendre.';
-        state.loaded = true;
-        ta.disabled = true; sendBtn.disabled = true;
-        render();
+        mfail++;
+        clearTimeout(mtimer);
+        if (mfail <= 3) mtimer = setTimeout(mpull, 1000 * Math.pow(2, mfail));   /* 2 s, 4 s, 8 s */
+        else {
+          state.dead = 'Connexion interrompue. Nouvelle tentative automatique…';
+          state.loaded = true;
+          ta.disabled = true; sendBtn.disabled = true;
+          render();
+          mtimer = setTimeout(mpull, 10000);
+        }
       } finally { mbusy = false; if (mAgain && !mdead) { mAgain = false; mpull(); } }
     }
     function subMsgs() { subbed = true; mpull(); }

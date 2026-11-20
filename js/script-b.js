@@ -1526,22 +1526,7 @@
     }, function () { liveStop('Le direct n’a pas pu démarrer (règles Firestore ?).'); });
   }
   async function liveNotice(chat, text) {
-    try {
-      var chatRef = fs.collection('chats').doc(chat.id), msgRef = chatRef.collection('messages').doc(), ts = Date.now();
-      var exists = !!state.chatsById[chat.id] || !!chat.group;
-      if (!exists) exists = (await chatRef.get()).exists;
-      var batch = fs.batch();
-      batch.set(msgRef, { uid: state.me, sts: SV(), text: text, ts: ts });
-      var last = { lastText: text.slice(0, 120), lastTs: ts, lastUid: state.me };
-      if (exists) { last['seen.' + state.me] = ts; batch.update(chatRef, last); }
-      else {
-        var names = {}; names[state.me] = myName(); names[chat.other] = chat.name;
-        var seen = {}; seen[state.me] = ts;
-        batch.set(chatRef, { members: [state.me, chat.other], names: names, lastText: last.lastText, lastTs: ts, lastUid: state.me, seen: seen });
-      }
-      await batch.commit();
-      state.chatsById[chat.id] = true;
-    } catch (e) {}
+    try { await postMsg(chat, { text: text }); } catch (e) {}
   }
   async function liveStart(chat, i) {
     var t = M.tracks[i];
@@ -1955,7 +1940,7 @@
       if (C.pc !== pc) return;
       var s = pc.connectionState;
       if (s === 'connected') {
-        clearTimeout(C.discT); clearTimeout(C.ringT);
+        clearTimeout(C.discT); clearTimeout(C.ringT); clearTimeout(C.rsT);
         if (C.st !== 'live') {
           C.st = 'live'; C.t0 = Date.now(); ringStop(); callWake(true); callMedia(true);
           if (C.video && C.ui) C.ui.classList.add('vlive');
@@ -1967,12 +1952,33 @@
         if (C.st === 'live') { C.st = 'lost'; callStatus(); }
         clearTimeout(C.discT);
         C.discT = setTimeout(function () { if (C.pc === pc && C.st !== 'live') callFinish('ended', 'Appel coupé : connexion perdue'); }, 60000);
+        clearTimeout(C.rsT);
+        C.rsT = setTimeout(function () { if (C.pc === pc && pc.connectionState !== 'connected') callRestartIce(pc); }, 4000);
       } else if (s === 'failed') {
-        callFinish('ended', callWhy('Connexion échouée'));
+        if ((C.st === 'live' || C.st === 'lost') && (C.role === 'callee' || callRestartIce(pc))) {
+          C.st = 'lost'; callStatus();
+          clearTimeout(C.discT);
+          C.discT = setTimeout(function () { if (C.pc === pc && C.st !== 'live') callFinish('ended', callWhy('Connexion échouée')); }, 30000);
+        } else callFinish('ended', callWhy('Connexion échouée'));
       }
     };
     return pc;
   }
+  /* relance la recherche de chemin réseau (ICE) sans couper l'appel : changement Wi-Fi / 4G, coupure brève.
+     Seul l'appelant relance (3 essais max) ; l'autre côté répond avec le code de réponse existant. */
+  function callRestartIce(pc) {
+    if (C.role !== 'caller' || C.pc !== pc) return false;
+    if (pc.signalingState !== 'stable') return true;   /* une relance est déjà en cours */
+    pc._rs = (pc._rs || 0) + 1;
+    if (pc._rs > 3) return false;
+    pc.createOffer({ iceRestart: true }).then(function (off) {
+      return pc.setLocalDescription(off).then(function () {
+        return callSig('coffer', { data: JSON.stringify({ type: off.type, sdp: off.sdp }) });
+      });
+    }).catch(function () {});
+    return true;
+  }
+  window.addEventListener('online', function () { if (C.role === 'caller' && C.pc && C.st === 'lost') callRestartIce(C.pc); });
   function callSig(kind, extra) {
     if (!C.chat) return Promise.resolve();
     var d = { sid: C.sid, jid: '', from: state.me, kind: kind, ts: Date.now() };
@@ -2016,7 +2022,7 @@
   }
   async function callEnsure(chat) {
     var ref = callRef(chat.id);
-    if (state.chatsById[chat.id]) return ref;
+    /* les discussions vivent maintenant en SQL : le document d'appel (xdocs « chats/… ») doit être créé ici, même si la discussion existe */
     var snap = await ref.get();
     if (snap.exists) return ref;
     var names = {}; names[state.me] = myName(); names[chat.other] = chat.name;
@@ -2098,6 +2104,20 @@
       callClose(C.st === 'ring' ? 'Appel manqué' : 'Appel terminé');
     }
   }
+  /* l'état d'un appel (sonnerie, réponse, refus, fin) vit dans xdocs « chats/… » : on l'écoute ici et on le donne à callWatch */
+  var callSub = null, callSubUid = '';
+  function callListen() {
+    var me = state.me;
+    if (!me || (callSub && callSubUid === me)) return;
+    callUnlisten();
+    callSubUid = me;
+    callSub = fs.collection('chats').where('members', 'array-contains', me).onSnapshot(function (snap) {
+      var list = [];
+      snap.forEach(function (d) { var v = d.data() || {}; v.id = d.id; list.push(v); });
+      callWatch(list);
+    }, function () {});
+  }
+  function callUnlisten() { if (callSub) { try { callSub(); } catch (e) {} } callSub = null; callSubUid = ''; }
   function callWatch(list) {
     if (!state.me) return;
     list.forEach(function (c) {
@@ -4012,6 +4032,7 @@
     state.chatsLoaded = true;
       if (PENDING_CHAT && openChatById(PENDING_CHAT)) { PENDING_CHAT = ''; try { history.replaceState(history.state, '', location.pathname); } catch (e) {} }
       callWatch(state.chats);
+      callListen();
       if (state.chat) {
         var cc = state.chats.filter(function (x) { return x.id === state.chat.id; })[0];
         if (state.chat.group) {
@@ -4039,6 +4060,7 @@
     nwStop();
     liveStop();
     callClose();
+    callUnlisten();
     resetMusic();
     viewGame.hidden = true;
     if (unsubChats) unsubChats(); unsubChats = null;
