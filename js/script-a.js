@@ -585,7 +585,7 @@ window.__uandiApp = function () {
       var o = (c.members || []).filter(function (x) { return x !== state.me; })[0];
       return String(nickOf(c, o) || (c.names && c.names[o]) || '').toLowerCase().indexOf(q) !== -1 || String((c.names && c.names[o]) || '').toLowerCase().indexOf(q) !== -1;
     });
-    if (!state.chatsLoaded) { chatsEl.appendChild(el('li', 'loading', 'Chargement des discussions…')); return; }
+    if (!state.chatsLoaded && !sorted.length) { chatsEl.appendChild(el('li', 'loading', 'Chargement des discussions…')); return; }
     if (!sorted.length && state.onlyUnread) { chatsEl.appendChild(el('li', 'empty', 'Aucun message non lu.')); return; }
     if (!sorted.length) {
       var li = el('li', 'empty');
@@ -1100,7 +1100,7 @@ window.__uandiApp = function () {
   $('#lkForgot').addEventListener('click', function () {
     if (!confirm('Se déconnecter et retirer le verrou ? Tu devras te reconnecter avec ton mot de passe.')) return;
     try { localStorage.removeItem('uandi-lock-' + state.me); localStorage.removeItem('uandi-lockbio-' + state.me); } catch (e) {}
-    lkClose(); SB.auth.signOut();
+    lkClose(); try { Object.keys(localStorage).forEach(function (k) { if (k.indexOf("xen-chats-") === 0) localStorage.removeItem(k); }); } catch (e) {} SB.auth.signOut();
   });
   async function lkBio() {
     var raw = lkBioId(); if (!raw || !lkBioOk()) return;

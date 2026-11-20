@@ -222,7 +222,7 @@
     return api;
   })();
   var auth = { currentUser: null, _ready: false, _cbs: [], _uid: undefined,
-    signOut: function () { return SB.auth.signOut(); },
+    signOut: function () { try { Object.keys(localStorage).forEach(function (k) { if (k.indexOf('xen-chats-') === 0) localStorage.removeItem(k); }); } catch (e) {} return SB.auth.signOut(); },
     onAuthStateChanged: function (cb) { auth._cbs.push(cb); if (auth._ready) setTimeout(function () { cb(auth.currentUser); }, 0); } };
   function mkUser(u) {
     if (!u) return null;
@@ -291,6 +291,7 @@
     var gen = RT.gen, me = state.me, sq = ++RT.sc; if (!me) return;
     pullChats(me).then(function (list) {
       if (gen !== RT.gen || state.me !== me || sq < RT.ac) return; RT.ac = sq;
+      try { localStorage.setItem('xen-chats-' + me, JSON.stringify(list.slice(0, 40))); } catch (e) {}
       applyChats(list);
     }, function () {
       if (gen !== RT.gen || state.me !== me) return;
@@ -3992,6 +3993,11 @@
     state.nick = ''; state.nickAt = 0; state.nickLog = [];
     try { var nk = JSON.parse(store('uandi-nick-' + user.uid) || 'null'); if (nk) { state.nick = String(nk.n || ''); state.nickAt = +nk.t || 0; state.nickLog = Array.isArray(nk.l) ? nk.l.map(Number).filter(Boolean) : (nk.t ? [+nk.t] : []); } } catch (e) {}
     state.chats = []; state.chatsById = {}; state.chatsLoaded = false; knownTs = {};
+    /* affichage instantané : la dernière liste connue est montrée tout de suite, puis remplacée par la vraie */
+    try {
+      var cc0 = JSON.parse(localStorage.getItem('xen-chats-' + user.uid) || 'null');
+      if (Array.isArray(cc0) && cc0.length) { state.chats = cc0; cc0.forEach(function (v) { state.chatsById[v.id] = true; }); }
+    } catch (e) {}
     loginEl.hidden = true;
     appEl.hidden = false;
     state.view = 'list';
