@@ -1,6 +1,5 @@
-// bot/bot.js — publie une lettre anonyme écrite par une IA (Groq) dans Firestore
-// Version « REST » : pas de SDK Firestore, juste un jeton Google + l'API HTTP de Firestore.
-const admin = require("firebase-admin");
+// bot/bot.js — publie une lettre anonyme écrite par une IA (Groq) dans Supabase (table xdocs, collection « letters »).
+// Secrets GitHub nécessaires : SUPABASE_URL, SUPABASE_SERVICE_KEY (clé service_role), GROQ_API_KEY.
 const crypto = require("crypto");
 
 // Collection des vraies lettres anonymes du site (vérifiée dans Firestore).
@@ -35,76 +34,23 @@ const ADJ = ["tranquille", "timide", "calme", "discret", "paisible", "drôle", "
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const masquer = (t) => String(t).replace(/[\w.+-]+@[\w.-]+/g, "<email>").slice(0, 300);
 
-// ---------- Clé Firebase ----------
+// ---------- Supabase (API REST, clé service_role : ignore les règles d'accès) ----------
 
-// Répare la clé privée si elle a été abîmée au copier-coller (retours à la ligne,
-// pied de clé modifié ou texte en trop). Le corps de la clé ne contient jamais de « - ».
-function reparerCle(cle) {
-  const sansEntete = String(cle)
-    .replace(/-----BEGIN PRIVATE KEY-----/, "")
-    .replace(/\\n/g, "")
-    .replace(/\s+/g, "");
-  const corps = (sansEntete.match(/^[A-Za-z0-9+\/]+={0,2}/) || [""])[0];
-  return `-----BEGIN PRIVATE KEY-----\n${corps.match(/.{1,64}/g).join("\n")}\n-----END PRIVATE KEY-----\n`;
-}
+const SB_URL = String(process.env.SUPABASE_URL || "").replace(/\/$/, "");
+const SB_KEY = process.env.SUPABASE_SERVICE_KEY || "";
 
-// L'e-mail du compte et le projet se retrouvent dans l'URL du certificat. Si le copier-coller
-// a abîmé « client_email » ou « project_id », on les reconstruit à partir de là.
-function reparerIdentite(compte) {
-  const fin = String(compte.client_x509_cert_url || "").split("/").pop();
-  let email = "";
-  try { email = decodeURIComponent(fin); } catch (e) { /* on garde l'ancien */ }
-  const m = email.match(/^[\w.+-]+@([\w-]+)\.iam\.gserviceaccount\.com$/);
-  if (!m) return console.log("Identite : impossible de la reconstruire depuis l'URL du certificat.");
-  console.log(`Identite : client_email ${compte.client_email === email ? "deja bon" : "CORRIGE"}, project_id ${compte.project_id === m[1] ? "deja bon" : "CORRIGE"}`);
-  compte.client_email = email;
-  compte.project_id = m[1];
-}
-
-// Compare ta clé privée à la clé publique que Google a enregistrée (affiche seulement OUI/NON).
-async function verifierContreGoogle(compte) {
-  try {
-    const certs = await (await fetch(compte.client_x509_cert_url)).json();
-    const cert = certs[compte.private_key_id];
-    if (!cert) return console.log("VERDICT : Google ne connait PAS cette cle (supprimee/desactivee). Genere une nouvelle cle.");
-    const donnees = Buffer.from("test");
-    const signature = crypto.sign("RSA-SHA256", donnees, crypto.createPrivateKey(compte.private_key));
-    const ok = crypto.verify("RSA-SHA256", donnees, new crypto.X509Certificate(cert).publicKey, signature);
-    console.log(ok ? "VERDICT : la cle privee correspond a Google." : "VERDICT : la cle privee ne correspond PAS a Google (cle abimee).");
-  } catch (e) {
-    console.log("Verification aupres de Google impossible :", masquer(e.message));
-  }
-}
-
-// ---------- Firestore (API REST) ----------
-
-let BASE;      // https://firestore.googleapis.com/v1/projects/<projet>/databases/(default)/documents
-let JETON;
-
-async function appelFirestore(chemin, corps) {
-  const res = await fetch(BASE + chemin, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${JETON}`, "Content-Type": "application/json" },
-    body: JSON.stringify(corps),
-  });
-  const data = await res.json().catch(() => ({}));
-  const err = Array.isArray(data) ? data[0]?.error : data.error;
-  if (!res.ok || err) {
-    throw new Error(`Firestore HTTP ${res.status} - ${err?.status || ""} - ${masquer(err?.message || "")}`);
-  }
-  return data;
+async function sb(chemin, opt) {
+  const res = await fetch(SB_URL + "/rest/v1/" + chemin, Object.assign({
+    headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, "Content-Type": "application/json", Prefer: "return=minimal" },
+  }, opt || {}));
+  if (!res.ok) throw new Error(`Supabase HTTP ${res.status} - ${masquer(await res.text())}`);
+  return res.status === 204 ? null : res.text().then((t) => (t ? JSON.parse(t) : null));
 }
 
 async function derniersMessages() {
   try {
-    const data = await appelFirestore(":runQuery", {
-      structuredQuery: {
-        from: [{ collectionId: COLLECTION }],
-        orderBy: [{ field: { fieldPath: "ts" }, direction: "DESCENDING" }],
-        limit: 15,
-      },
-    });
-    return data.map((r) => r.document?.fields?.text?.stringValue).filter(Boolean);
+    const rows = await sb(`xdocs?select=data&coll=eq.${COLLECTION}&order=ts.desc&limit=15`, { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` } });
+    return (rows || []).map((r) => r.data && r.data.text).filter(Boolean);
   } catch (e) {
     console.log("Impossible de lire les derniers messages :", e.message);
     return [];
@@ -114,48 +60,17 @@ async function derniersMessages() {
 async function publier(text) {
   const [animal, emoji] = pick(ANIMAUX);
   const alias = `${animal} ${pick(ADJ)} ${Math.floor(10 + Math.random() * 90)}`;
+  const id = crypto.randomBytes(10).toString("hex");
   // Mêmes champs que les vraies lettres : alias, emoji, hue, likes, reports, text, ts.
-  const cree = await appelFirestore("/" + COLLECTION, {
-    fields: {
-      alias: { stringValue: alias },
-      emoji: { stringValue: emoji },
-      hue: { integerValue: String(Math.floor(Math.random() * 360)) },
-      likes: { mapValue: { fields: {} } },
-      reports: { mapValue: { fields: {} } },
-      text: { stringValue: text },
-      ts: { integerValue: String(Date.now()) },
-    },
+  await sb("xdocs", {
+    method: "POST",
+    body: JSON.stringify({
+      path: `${COLLECTION}/${id}`, coll: COLLECTION, id,
+      data: { alias, emoji, hue: Math.floor(Math.random() * 360), likes: {}, reports: {}, text, ts: Date.now() },
+    }),
   });
-  console.log("Document créé :", cree.name);
+  console.log("Lettre créée :", id);
   return alias;
-}
-
-// Supprime les anciens documents de TEST du bot (mauvais format) : ils ont « authorName »,
-// « anon », « uid », « createdAt » et pas d'« alias ». Les vraies lettres ne sont jamais touchées.
-async function nettoyerAnciensTests() {
-  try {
-    const data = await appelFirestore(":runQuery", {
-      structuredQuery: {
-        from: [{ collectionId: COLLECTION }],
-        where: { fieldFilter: { field: { fieldPath: "authorName" }, op: "GREATER_THAN_OR_EQUAL", value: { stringValue: "" } } },
-        limit: 20,
-      },
-    });
-    let n = 0;
-    for (const r of data) {
-      const d = r.document;
-      const f = d?.fields || {};
-      if (!d || !f.authorName || !f.anon || !f.uid || !f.createdAt || f.alias) continue;
-      const res = await fetch(`https://firestore.googleapis.com/v1/${d.name}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${JETON}` },
-      });
-      if (res.ok) n++;
-    }
-    console.log(`Nettoyage : ${n} ancien(s) document(s) de test supprimé(s).`);
-  } catch (e) {
-    console.log("Nettoyage impossible :", e.message);
-  }
 }
 
 // ---------- IA ----------
@@ -190,22 +105,7 @@ async function ecrireAvecIA(recents) {
 // ---------- Programme principal ----------
 
 async function main() {
-  const compte = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-  compte.private_key = reparerCle(compte.private_key);
-  reparerIdentite(compte);
-  await verifierContreGoogle(compte);
-
-  // Jeton d'accès Google (pas besoin de SDK Firestore)
-  try {
-    JETON = (await admin.credential.cert(compte).getAccessToken()).access_token;
-    console.log("Jeton Google : obtenu");
-  } catch (e) {
-    console.log("Jeton Google : ECHEC -", masquer(e.message));
-    process.exit(1);
-  }
-  BASE = `https://firestore.googleapis.com/v1/projects/${compte.project_id}/databases/(default)/documents`;
-
-  await nettoyerAnciensTests();
+  if (!SB_URL || !SB_KEY) { console.error("SUPABASE_URL ou SUPABASE_SERVICE_KEY manquant."); process.exit(1); }
 
   // Une fois sur quatre, on ne publie rien (seulement en mode automatique, pas en test manuel).
   if (process.env.GITHUB_EVENT_NAME === "schedule" && Math.random() < 0.25) {

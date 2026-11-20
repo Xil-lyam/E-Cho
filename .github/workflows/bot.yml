@@ -17,8 +17,8 @@ jobs:
       - name: Décalage aléatoire (0 à 20 min, seulement en mode automatique)
         if: github.event_name == 'schedule'
         run: sleep $((RANDOM % 1200))
-      - run: npm install firebase-admin
       - run: node bot/bot.js
         env:
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
