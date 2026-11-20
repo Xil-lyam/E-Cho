@@ -1194,16 +1194,10 @@
     var label = '🎵 ' + title.slice(0, 100), orig = audio;
     var upa = await mediaUp(audio); if (upa) audio = upa;
     async function put(val) {
-      var chatRef = fs.collection('chats').doc(chat.id), msgRef = chatRef.collection('messages').doc(), ts = Date.now();
-      var batch = fs.batch();
-      batch.set(msgRef, { uid: state.me, sts: SV(), text: label, ts: ts, audio: val, dur: Math.round(dur), music: title.slice(0, 100) });
-      var last = { lastText: label, lastTs: ts, lastUid: state.me };
-      last['seen.' + state.me] = ts;
-      batch.update(chatRef, last);
-      await batch.commit();
+      await postMsg(chat, { text: label, audio: val, dur: Math.round(dur), music: title.slice(0, 100) });
     }
     try { await put(audio); }
-    catch (e) { if (e && e.code === 'permission-denied' && audio !== orig) await put(orig); else throw e; }
+    catch (e) { if (audio !== orig) await put(orig); else throw e; }
   }
   async function mShareGo(t, chat, start, end, total) {
     if (M.sharing) return;

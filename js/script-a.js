@@ -1399,6 +1399,7 @@ window.__uandiApp = function () {
     render();
 
     var subbed = false, mdead = false, mchs = [], mtimer = null, mbusy = false, mAgain = false, mfail = 0;
+    var curIds = null;   /* identifiants des messages affichés (pour filtrer les réactions) */
     /* retour du réseau ou de l'appli au premier plan : on relit les messages (rien ne se perd pendant une coupure) */
     function mwake() { if (!mdead && !document.hidden) mkick(); }
     window.addEventListener('online', mwake); document.addEventListener('visibilitychange', mwake);
@@ -1427,7 +1428,12 @@ window.__uandiApp = function () {
       var seenSub = false;
       mchs.push(SB.channel('msg-' + Math.random().toString(36).slice(2))
         .on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: 'conversation_id=eq.' + cu }, mkick)
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'message_reactions' }, mkick)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'message_reactions' }, function (pl) {
+          /* pas de filtre possible côté serveur (la table n'a pas la discussion) : on ignore les réactions d'autres discussions */
+          var rec = (pl && pl.new && pl.new.message_id != null) ? pl.new : (pl && pl.old);
+          if (rec && rec.message_id != null && curIds && !curIds.has(String(rec.message_id))) return;
+          mkick();
+        })
         .subscribe(function (st) { if (st === 'SUBSCRIBED') { if (seenSub) mkick(); seenSub = true; } }));
     }
     async function mpull() {
@@ -1442,6 +1448,7 @@ window.__uandiApp = function () {
         var r = await SB.from('messages').select('*').eq('conversation_id', cu).order('id', { ascending: false }).limit(state.lim);
         if (r.error) throw r.error;
         var rows = r.data || [], ids = rows.map(function (x) { return x.id; }), rx = {};
+        curIds = new Set(ids.map(String));
         if (ids.length) {
           var q = await SB.from('message_reactions').select('message_id,user_id,emoji').in('message_id', ids);
           (q.data || []).forEach(function (x) { (rx[x.message_id] = rx[x.message_id] || []).push(x); });
