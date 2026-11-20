@@ -37,3 +37,30 @@ begin
   return false;
 end $$;
 grant execute on function public.xdoc_ok(text, jsonb, text) to authenticated;
+
+-- ============ Outils createur : validation des comptes et certification ============
+-- Le createur peut aussi creer/ecrire des approbations pour d'autres comptes (migration « approuver les comptes existants »)
+drop policy if exists apr_ins on public.account_approvals;
+create policy apr_ins on public.account_approvals for insert to authenticated
+  with check ((uid = auth.uid() and status = 'pending') or public.xen_is_creator());
+
+-- Certifier un compte (coche bleue) : reserve au createur
+create or replace function public.creator_set_verified(p_uid uuid, p_val boolean) returns void
+language plpgsql security definer set search_path = public as $$
+begin
+  if not public.xen_is_creator() then raise exception 'forbidden'; end if;
+  update public.profiles set verified = p_val where id = p_uid;
+end $$;
+grant execute on function public.creator_set_verified(uuid, boolean) to authenticated;
+
+-- Temps reel pour ces deux tables (sans effet si deja fait)
+do $$
+declare t text;
+begin
+  foreach t in array array['app_settings', 'account_approvals'] loop
+    begin
+      execute format('alter publication supabase_realtime add table public.%I', t);
+    exception when duplicate_object then null; when undefined_object then null;
+    end;
+  end loop;
+end $$;

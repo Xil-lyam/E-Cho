@@ -172,6 +172,7 @@
       return {
         get: function () { return SB.rpc('anon_accepts', { p_uid: uid }).then(chk).then(function (r) { return { exists: r.data === false, data: function () { return r.data === false ? { noAnon: true } : {}; } }; }); },
         set: function (data) {
+          if ('verified' in data) return SB.rpc('creator_set_verified', { p_uid: uid, p_val: data.verified === true }).then(chk).then(function () {});
           if (!('noAnon' in data)) return Promise.reject(new Error('non converti'));
           return SB.from('anon_profiles').upsert({ uid: uid, no_anon: !isFV(data.noAnon) }).then(chk).then(function () {});
         }
@@ -188,11 +189,108 @@
         set: function (data) { return SB.from('anon_profiles').upsert({ uid: uid, name: data && data.name || null, data: clean(data) }).then(chk).then(function () {}); }
       };
     }
+    /* outils créateur : réglages (app_settings) et validation des comptes (account_approvals) */
+    function watchTable(table, load, ms) {
+      var ch = null, tmr = null, poll = null, alive = true;
+      try { ch = SB.channel('wt-' + table + '-' + rid()).on('postgres_changes', { event: '*', schema: 'public', table: table }, function () { clearTimeout(tmr); tmr = setTimeout(load, 120); }).subscribe(); } catch (e) {}
+      poll = setInterval(function () { if (alive && !document.hidden) load(); }, ms || 30000);
+      return function () { alive = false; clearTimeout(tmr); clearInterval(poll); if (ch) { try { SB.removeChannel(ch); } catch (e) {} } };
+    }
+    function settingsDoc(key) {
+      function get() {
+        return SB.from('app_settings').select('data').eq('key', key).maybeSingle().then(chk).then(function (r) {
+          var d = r.data ? (r.data.data || {}) : null;
+          return { id: key, exists: !!r.data, data: function () { return d ? JSON.parse(JSON.stringify(d)) : undefined; } };
+        });
+      }
+      return {
+        get: get,
+        set: function (data, opt) {
+          return (opt && opt.merge ? get() : Promise.resolve({ data: function () { return {}; } })).then(function (sn) {
+            var d = Object.assign({}, sn.data() || {}, clean(data));
+            return SB.from('app_settings').upsert({ key: key, data: d }).then(chk).then(function () {});
+          });
+        },
+        onSnapshot: function (ok, err) {
+          var alive = true;
+          function load() { get().then(function (s) { if (alive) ok(s); }, function (e) { if (alive && err) err(e); }); }
+          load(); var un = watchTable('app_settings', load, 60000);
+          return function () { alive = false; un(); };
+        }
+      };
+    }
+    function rowToApproval(x) { var d = Object.assign({}, x.data || {}, { name: x.name, status: x.status, ts: x.ts }); return mkSnapRaw(x.uid, d); }
+    function mkSnapRaw(id, d) { return { id: id, exists: true, data: function () { return JSON.parse(JSON.stringify(d)); } }; }
+    function approvalRow(id, d) {
+      var o = Object.assign({}, d || {}), row = { uid: id };
+      if ('name' in o) { row.name = o.name; delete o.name; }
+      if ('status' in o) { row.status = o.status; delete o.status; }
+      if ('ts' in o) { row.ts = o.ts; delete o.ts; }
+      row.data = clean(o);
+      return row;
+    }
+    function approvalDoc(id) {
+      return {
+        id: id,
+        get: function () {
+          return SB.from('account_approvals').select('*').eq('uid', id).maybeSingle().then(chk).then(function (r) { return r.data ? rowToApproval(r.data) : { id: id, exists: false, data: function () {} }; });
+        },
+        set: function (d) { return SB.from('account_approvals').upsert(approvalRow(id, d)).then(chk).then(function () {}); },
+        update: function (patch) {
+          return SB.from('account_approvals').select('*').eq('uid', id).maybeSingle().then(chk).then(function (r) {
+            var cur = r.data ? Object.assign({}, r.data.data || {}, { name: r.data.name, status: r.data.status, ts: r.data.ts }) : {};
+            return SB.from('account_approvals').upsert(approvalRow(id, Object.assign(cur, clean(patch)))).then(chk).then(function () {});
+          });
+        }
+      };
+    }
+    function approvalsCol() {
+      var f = [];
+      var q = {
+        doc: approvalDoc,
+        where: function (k, op, v) { f.push([k, op, v]); return q; },
+        get: function () {
+          var b = SB.from('account_approvals').select('*').limit(5000);
+          f.forEach(function (c) { if (c[0] === 'status' && c[1] === '==') b = b.eq('status', c[2]); });
+          return b.then(chk).then(function (r) {
+            var docs = (r.data || []).map(rowToApproval);
+            return { docs: docs, size: docs.length, empty: !docs.length, forEach: function (cb) { docs.forEach(cb); }, docChanges: function () { return docs.map(function (d) { return { type: 'added', doc: d }; }); } };
+          });
+        },
+        onSnapshot: function (ok, err) {
+          var alive = true, prev = null;
+          function load() {
+            q.get().then(function (s) {
+              if (!alive) return;
+              var before = prev; prev = {}; s.docs.forEach(function (d) { prev[d.id] = 1; });
+              s.docChanges = function () { return s.docs.filter(function (d) { return before && !(d.id in before); }).map(function (d) { return { type: 'added', doc: d }; }); };
+              ok(s);
+            }, function (e) { if (alive && err) err(e); });
+          }
+          load(); var un = watchTable('account_approvals', load, 20000);
+          return function () { alive = false; un(); };
+        }
+      };
+      return q;
+    }
+    function usernamesCol() {
+      return {
+        doc: usernameDoc,
+        get: function () {
+          return SB.from('profiles').select('id,username').limit(5000).then(chk).then(function (r) {
+            var docs = (r.data || []).filter(function (x) { return x.username; }).map(function (x) { return mkSnapRaw(x.username, { uid: x.id }); });
+            return { docs: docs, size: docs.length, empty: !docs.length, forEach: function (cb) { docs.forEach(cb); } };
+          });
+        }
+      };
+    }
     var api = {
       collection: function (n) {
         if (n === 'anonProfiles') return { doc: anonProfDoc, get: dead };
         if (XD.indexOf(n) > -1) return colRef(n);
-        if (n === 'usernames') return { doc: usernameDoc, get: dead };
+        if (n === 'usernames') return usernamesCol();
+        if (n === 'settings') return { doc: settingsDoc, get: dead };
+        if (n === 'approvals') return approvalsCol();
         if (n === 'presence') return { doc: presenceDoc, where: function () { return { get: dead }; }, get: dead };
         return node().collection(n);
       },
@@ -4103,7 +4201,7 @@
     if (on && !confirm('Activer le mode strict ? Tout compte SANS approbation enregistrée sera bloqué. Lance d’abord « Approuver les comptes existants ».')) return;
     b.disabled = true;
     fs.collection('settings').doc('approval').set({ strict: on, strictBy: state.me, strictAt: Date.now() }, { merge: true })
-      .catch(function () { showToast(null, 'Mode strict', 'Impossible : règles Firestore (écriture de « settings/approval »).'); })
+      .catch(function () { showToast(null, 'Mode strict', 'Impossible : réservé au créateur (lance le bloc 10 SQL).'); })
       .then(function () { b.disabled = false; });
   });
   $('#apMig').addEventListener('click', async function () {
@@ -4127,7 +4225,7 @@
       }
       b.textContent = todo.length + ' compte(s) approuvé(s) ✓';
     } catch (e) {
-      b.textContent = 'Échec : publie d’abord les nouvelles règles Firestore';
+      b.textContent = 'Échec : lance d’abord le bloc 10 SQL';
     }
     setTimeout(function () { b.textContent = lbl; b.disabled = false; }, 4000);
   });
@@ -4141,7 +4239,7 @@
     if (!creatorOn()) return;
     var on = !AP.auto, b = this; b.disabled = true;
     fs.collection('settings').doc('approval').set({ auto: on, since: Date.now(), by: state.me }, { merge: true })
-      .catch(function () { showToast(null, 'Approbation auto', 'Impossible : règles Firestore (écriture de « settings/approval »).'); })
+      .catch(function () { showToast(null, 'Approbation auto', 'Impossible : réservé au créateur (lance le bloc 10 SQL).'); })
       .then(function () { b.disabled = false; });
   });
   function apCheck() {
