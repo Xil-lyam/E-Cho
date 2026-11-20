@@ -2389,7 +2389,7 @@ window.__uandiApp = function () {
     } catch (e) {
       var code = (e && e.code) || '';
       err.textContent = code === 'not-found' ? 'La discussion n’existe pas encore : envoie d’abord un message, puis reviens mettre le surnom.'
-        : code === 'permission-denied' ? 'Refusé par les règles Firestore (permission-denied) : les règles publiées ne sont pas à jour.'
+        : code === 'permission-denied' ? 'Accès refusé (permission-denied) : vérifie que les blocs SQL Supabase ont bien été lancés.'
         : 'Le surnom n’a pas pu être enregistré (' + (code || (e && e.message) || 'erreur inconnue') + ').';
       err.hidden = false;
     } finally { btn.disabled = false; }
@@ -2730,7 +2730,7 @@ window.__uandiApp = function () {
     var w = e && e.why;
     if (w === 'bloque') return 'Le stockage (Cloudinary) refuse de livrer ce fichier : les PDF et ZIP y sont bloqués par défaut. Active « PDF and ZIP files delivery » dans Cloudinary > Settings > Security (ou renvoie le fichier : les nouveaux envois n’utilisent plus ce chemin).';
     if (w === 'invalide' || w === 'incomplet') return 'Ce fichier est incomplet ou abîmé : demande à l’expéditeur de le renvoyer.';
-    if (e && e.code === 'permission-denied') return 'Lecture refusée par les règles Firestore (collection fchunks). À corriger dans Firebase > Firestore > Règles.';
+    if (e && e.code === 'permission-denied') return 'Lecture refusée : vérifie les blocs SQL Supabase.';
     return 'Impossible de récupérer le fichier : vérifie ta connexion et réessaie.';
   }
   function fileBlob(m, cid) {

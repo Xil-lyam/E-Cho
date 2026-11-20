@@ -575,7 +575,7 @@
     if (!(window.crypto && crypto.subtle)) { pwErr('Ouvre le site en https.'); return; }
     pwReauth().then(function () { return rcSave(state.username, c, p); })
       .then(function () { var h = $('#pwCode'); h.textContent = 'Ton code (note-le, il ne sera plus affiché) : ' + c; h.hidden = false; $('#pwCur').value = ''; })
-      .catch(function (e) { if (e) pwErr('Code impossible : vérifie les règles Firestore (recovery).'); });
+      .catch(function (e) { if (e) pwErr('Code impossible : vérifie le bloc SQL de récupération.'); });
   });
   function forgotErr(t) { var e = $('#forgotErr'); e.textContent = t || ''; e.hidden = !t; }
   function forgotShow(mode) {   /* mode : 'mail', 'code' ou null (retour à la connexion) */
@@ -1092,7 +1092,7 @@
     box.hidden = !state.me || (!can && !Object.keys(SH.mine).length);
     $('#mShTitle').textContent = can ? '☁ Musiques partagées' : '☁ Mon cloud';
     ul.replaceChildren();
-    if (!ids.length) { var e0 = el('li', 'empty'); e0.appendChild(document.createTextNode(SH.err ? 'Impossible de charger les musiques partagées (règles Firestore « sharedMusic » : autorise la lecture).' : online ? 'Aucune musique partagée pour le moment.' : 'Hors connexion : seules les musiques téléchargées sont disponibles.')); ul.appendChild(e0); return; }
+    if (!ids.length) { var e0 = el('li', 'empty'); e0.appendChild(document.createTextNode(SH.err ? 'Impossible de charger les musiques partagées (connexion ou droits d’accès).' : online ? 'Aucune musique partagée pour le moment.' : 'Hors connexion : seules les musiques téléchargées sont disponibles.')); ul.appendChild(e0); return; }
     ids.forEach(function (k) {
       var it = all[k], mine = it.uid === state.me, li = el('li'), row = el('div', 'mrow');
       var b = el('button', 'mname', (mine ? (it.pub === true ? '☁ ' : '🔒 ') : '') + (it.title || it.name || 'Musique') + (mine ? '' : ' · ' + cap(it.uname || '?')));
@@ -1332,7 +1332,7 @@
         : em === 'unsupported' ? 'Ton navigateur ne permet pas ce partage.'
         : em.indexOf('play:') === 0 ? 'Lecture bloquée par le navigateur (' + em.slice(5) + '). Touche d’abord ▶ sur un morceau puis réessaie.'
         : em.indexOf('media:') === 0 ? 'Ce fichier audio ne peut pas être lu pour le partage (code ' + em.slice(6) + ').'
-        : 'Partage impossible. Vérifie ta connexion (ou les règles Firestore) et réessaie.';
+        : 'Partage impossible. Vérifie ta connexion (connexion ou droits d’accès) et réessaie.';
     }
     M.sharing = false; M.shareAbort = false; M.shareStop = null; M.cancelBtn = null; mRender();
     if (failMsg) mMsg(failMsg);
@@ -1620,7 +1620,7 @@
         var d = ch.doc.data();
         if (d && d.from !== state.me) liveSignal(d);
       });
-    }, function () { liveStop('Le direct n’a pas pu démarrer (règles Firestore ?).'); });
+    }, function () { liveStop('Le direct n’a pas pu démarrer (connexion ou droits d’accès).'); });
   }
   async function liveNotice(chat, text) {
     try { await postMsg(chat, { text: text }); } catch (e) {}
@@ -1641,7 +1641,7 @@
       await liveRef(chat.id).set({ host: state.me, sid: L.sid, title: mLabel(t), beat: Date.now(), ts: Date.now() });
     } catch (e) {
       liveStop();
-      showErr('Direct impossible (connexion ou règles Firestore).');
+      showErr('Direct impossible (connexion ou droits d’accès).');
       return;
     }
     L.beatT = setInterval(liveBeat, 15000);
@@ -2115,7 +2115,7 @@
         var d = ch.doc.data();
         if (d && d.from !== state.me && /^c/.test(d.kind || '')) callSignal(d);
       });
-    }, function () { showErr('Appel impossible (règles Firestore : autorise « liveSig »).'); callFinish('ended'); });
+    }, function () { showErr('Appel impossible (connexion ou droits d’accès).'); callFinish('ended'); });
   }
   async function callEnsure(chat) {
     var ref = callRef(chat.id);
@@ -2152,7 +2152,7 @@
       await liveCol(chat.id).add({ sid: sid, jid: '', from: state.me, kind: 'coffer', ts: Date.now(), data: JSON.stringify({ type: off.type, sdp: off.sdp }) });
       await ref.update({ call: { sid: sid, from: state.me, to: chat.other, ts: Date.now(), st: 'ring', video: !!video } });
     } catch (e) {
-      if (C.sid === sid) { showErr('Appel impossible (' + ((e && (e.code || e.message)) || 'erreur') + ') : vérifie les règles Firestore de « chats ».'); callClose(); }
+      if (C.sid === sid) { showErr('Appel impossible (' + ((e && (e.code || e.message)) || 'erreur') + ') : vérifie le bloc 10 SQL de « chats ».'); callClose(); }
       return;
     }
     C.ringT = setTimeout(function () { if (C.sid === sid && C.role === 'caller' && C.st === 'ring') callFinish('missed'); }, 45000);
@@ -2337,7 +2337,7 @@
         td.rooms = []; snap.forEach(function (d) { var x=d.data(); if (x && (x.status === 'waiting' || x.status === 'playing') && (x.players || []).length > 0 && Date.now() - (x.createdAt || 0) < 86400000) td.rooms.push(Object.assign({id:d.id},x)); });
         tdRenderRooms(); tdRenderPosts();
         if (td.roomId && !td.roomUnsub) { var found=td.rooms.filter(function(r){return r.id===td.roomId;})[0]; if(found) tdRenderRoom(found); }
-      }, function (e) { tdMsg('Impossible de charger les parties. Vérifie les règles Firestore de truthDareRooms.'); });
+      }, function (e) { tdMsg('Impossible de charger les parties. Vérifie que le bloc 9 SQL est lancé.'); });
     }
     function tdAgo(ts) {
       var m = Math.max(0, Math.floor((Date.now() - (ts || 0)) / 60000));
@@ -2396,7 +2396,7 @@
       var player={uid:state.me,name:tdMyName(),joinedAt:Date.now()};
       fs.collection('truthDareRooms').add({title:'Action ou vérité',creator:state.me,createdAt:Date.now(),startAt:startAt,status:'waiting',players:[player],turn:null,history:[],certOnly:!!($td('tdCertOnly')&&$td('tdCertOnly').checked&&tdCanCert())})
       .then(function(ref){tdMsg('Partie créée ! Les autres peuvent la rejoindre.');return tdJoin(ref.id);})
-      .catch(function(e){tdMsg('Création impossible : '+(e.message||'vérifie les règles Firestore.'));});
+      .catch(function(e){tdMsg('Création impossible : '+(e.message||'vérifie que le bloc 9 SQL est lancé.'));});
     }
     function tdJoin(id) {
       if (!state.me) { tdMsg('Connecte-toi pour rejoindre une partie.'); return; }
@@ -3103,7 +3103,7 @@
     var cur = nwRxOf(o)[state.me] || '', p = {};
     p['reacts.' + state.me] = cur === e ? firebase.firestore.FieldValue.delete() : e;
     if (o.likes && o.likes[state.me]) p['likes.' + state.me] = false;
-    ref.update(p).catch(function () { nwErr('Réaction impossible (connexion ou règles Firestore).'); });
+    ref.update(p).catch(function () { nwErr('Réaction impossible (connexion ou droits d’accès).'); });
   }
   /* bulles d'emojis flottantes : montent au-dessus du bouton, directement sur la vidéo.
      Aucun nwRender() : la vidéo n'est pas touchée pendant le choix. */
@@ -3225,7 +3225,7 @@
     var nwResume = [];
     nwFeed.textContent = '';
     if (!NW.loaded) { nwFeed.appendChild(el('p', 'hint', 'Chargement…')); return; }
-    if (NW.failed) { nwFeed.appendChild(el('p', 'hint', 'Impossible de charger les lettres (règles Firestore : autorise la collection « letters »).')); return; }
+    if (NW.failed) { nwFeed.appendChild(el('p', 'hint', 'Impossible de charger les lettres (connexion ou droits d’accès).')); return; }
     var creator = creatorOn();
     var list = NW.items.filter(function (it) { return creator || NW.mine[it.id] || nwCount(it.reports) < 3; });
     list = list.slice().sort(function (a, b) { return (b.pin === true) - (a.pin === true); });
@@ -3282,7 +3282,7 @@
         var pb = el('button', 'vact', it.pin === true ? 'Désépingler' : 'Épingler'); pb.type = 'button';
         pb.addEventListener('click', function () {
           LC().doc(it.id).update({ pin: it.pin === true ? firebase.firestore.FieldValue.delete() : true })
-            .catch(function () { nwErr('Épinglage impossible (règles Firestore : le créateur doit pouvoir modifier « letters »).'); });
+            .catch(function () { nwErr('Épinglage impossible (connexion ou droits d’accès).'); });
         });
         sec.appendChild(pb);
       }
@@ -3361,18 +3361,18 @@
   document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('#openNews, .tab[data-t="news"]')) setTimeout(nwPubPaint, 200); });
   function nwLike(it) {
     var p = {}; p['likes.' + state.me] = !(it.likes && it.likes[state.me]);
-    LC().doc(it.id).update(p).catch(function () { nwErr('Action impossible (connexion ou règles Firestore).'); });
+    LC().doc(it.id).update(p).catch(function () { nwErr('Action impossible (connexion ou droits d’accès).'); });
   }
   function nwReport(it) {
     if (!confirm('Signaler cette lettre ? Elle sera masquée après plusieurs signalements.')) return;
     var p = {}; p['reports.' + state.me] = true;
-    LC().doc(it.id).update(p).catch(function () { nwErr('Signalement impossible (connexion ou règles Firestore).'); });
+    LC().doc(it.id).update(p).catch(function () { nwErr('Signalement impossible (connexion ou droits d’accès).'); });
   }
   function nwDelete(it) {
     if (!confirm('Supprimer cette lettre ?')) return;
     LC().doc(it.id).delete()
       .then(function () { fs.collection('letterOwners').doc(it.id).delete().catch(function () {}); })
-      .catch(function () { nwErr('Suppression impossible (connexion ou règles Firestore).'); });
+      .catch(function () { nwErr('Suppression impossible (connexion ou droits d’accès).'); });
   }
   /* photo anonyme : redimensionnée et ré-encodée dans un canvas (supprime les métadonnées EXIF : position GPS, appareil…) */
   function nwPhotoClear() {
@@ -3457,7 +3457,7 @@
       b.set(fs.collection('letterOwners').doc(ref.id), { uid: state.me, ts: ts });
       await b.commit();
       ta.value = ''; $('#nwCount').textContent = '0 / 600'; NW.last = ts; nwPhotoClear(); pushNews(text || (vidUrl ? '🎬 Vidéo' : '📷 Photo'));
-    } catch (e) { nwErr('Publication impossible (règles Firestore : voir « letters » et « letterOwners »).'); }
+    } catch (e) { nwErr('Publication impossible (connexion ou droits d’accès).'); }
     NW.busy = false; btn.disabled = false; btn.textContent = label0;
   }
 
@@ -3482,7 +3482,7 @@
   function nwCmBox(it) {
     var c = NW.cm[it.id], creator = creatorOn(), box = el('div', 'nwcm');
     if (!c.loaded) box.appendChild(el('small', 'hint', 'Chargement…'));
-    else if (c.failed) box.appendChild(el('small', 'hint', 'Commentaires indisponibles (règles Firestore : sous-collection « comments »).'));
+    else if (c.failed) box.appendChild(el('small', 'hint', 'Commentaires indisponibles (connexion ou droits d’accès).'));
     else if (!c.items.length) box.appendChild(el('small', 'hint', 'Aucun commentaire. Sois le premier !'));
     c.items.forEach(function (cm) {
       var real = cm.kind === 'real', mine = real ? cm.uid === state.me : !!NW.mine[cm.id];
@@ -3641,7 +3641,7 @@
       await b.commit();
       if (!voice) NW.draft[it.id] = ''; delete NW.replyTo[it.id]; NW.cmLast = ts;
       LC().doc(it.id).update({ cc: firebase.firestore.FieldValue.increment(1) }).catch(function () {});
-    } catch (e) { nwErr('Commentaire impossible (règles Firestore : voir « comments » dans les règles).'); }
+    } catch (e) { nwErr('Commentaire impossible (connexion ou droits d’accès).'); }
     NW.busy = false; nwRender();
   }
   function nwCmDelete(it, cm) {
@@ -3650,7 +3650,7 @@
       .then(function () {
         if (cm.kind !== 'real') fs.collection('letterOwners').doc(cm.id).delete().catch(function () {});
         LC().doc(it.id).update({ cc: firebase.firestore.FieldValue.increment(-1) }).catch(function () {});
-      }).catch(function () { nwErr('Suppression impossible (connexion ou règles Firestore).'); });
+      }).catch(function () { nwErr('Suppression impossible (connexion ou droits d’accès).'); });
   }
 
 
@@ -3725,7 +3725,7 @@
     var list = $('#atList');
     if (!list) return;
     list.textContent = '';
-    if (AT.failed) { list.appendChild(el('p', 'hint', 'Discussions indisponibles (règles Firestore : « anonThreads » et « anonRequests »).')); return; }
+    if (AT.failed) { list.appendChild(el('p', 'hint', 'Discussions indisponibles (connexion ou droits d’accès).')); return; }
     atOptPaint();
     if (!AT.items.length) { list.appendChild(el('p', 'hint', 'Aucune discussion. Touche « 🎭 Discuter » sur une lettre anonyme, ou « 🎭 Taquiner » sur le commentaire d’un profil (ou tape son identifiant ci-dessus).')); return; }
     AT.items.forEach(function (t) {
@@ -3768,7 +3768,7 @@
       }
       box.scrollTop = box.scrollHeight;
       atMark(tid, Math.max(last, Date.now()));
-    }, function () { var e = $('#atErr'); e.textContent = 'Messages indisponibles (règles Firestore).'; e.hidden = false; });
+    }, function () { var e = $('#atErr'); e.textContent = 'Messages indisponibles (connexion ou droits d’accès).'; e.hidden = false; });
   }
   async function atStart(addr, alias, realUid) {
     nwErr(''); atTErr('');
@@ -3793,7 +3793,7 @@
       b.set(fs.collection('anonRequests').doc(ref.id), { addr: addr, ts: ts });
       await b.commit();
       atListen(); atOpen(ref.id);
-    } catch (e) { var m2 = 'Discussion impossible (règles Firestore : « anonThreads » et « anonRequests »).'; nwErr(m2); atTErr(m2); }
+    } catch (e) { var m2 = 'Discussion impossible (connexion ou droits d’accès).'; nwErr(m2); atTErr(m2); }
   }
   /* taquiner un profil réel depuis son identifiant */
   $('#atTeaseForm').addEventListener('submit', async function (ev) {
@@ -3809,7 +3809,7 @@
       inp.value = '';
       var uid = snap.data().uid;
       await atStart('u:' + uid, { name: name, emoji: atInitial(name), hue: atHue(name) }, uid);
-    } catch (e) { atTErr('Recherche impossible. Vérifie ta connexion et les règles Firestore.'); }
+    } catch (e) { atTErr('Recherche impossible. Vérifie ta connexion.'); }
   });
   $('#atOptBtn').addEventListener('click', function () {
     var on = !atOptIn();
@@ -3825,7 +3825,7 @@
     b.set(ref.collection('messages').doc(), { uid: state.me, text: text.slice(0, 600), ts: ts });
     b.update(ref, { lastText: text.slice(0, 60), lastTs: ts, lastUid: state.me });
     try { await b.commit(); }
-    catch (e) { inp.value = text; var er = $('#atErr'); er.textContent = 'Envoi impossible (connexion ou règles Firestore).'; er.hidden = false; }
+    catch (e) { inp.value = text; var er = $('#atErr'); er.textContent = 'Envoi impossible (connexion ou droits d’accès).'; er.hidden = false; }
   }
   document.addEventListener('click', function (e) {
     var tb = e.target.closest && e.target.closest('.nwtab');
@@ -3905,7 +3905,7 @@
       if (AT.msgU) { AT.msgU(); AT.msgU = null; }
       if (AT.pane === 'thread') nwPane('threads');
       await atWipe();
-    } catch (e) { nwErr('Certains messages n’ont pas pu être effacés (règles Firestore : autorise la suppression dans « anonThreads »).'); }
+    } catch (e) { nwErr('Certains messages n’ont pas pu être effacés (connexion ou droits d’accès).'); }
     atRetire(); NW.id = nwMake(); nwSaveId(); nwPaintId(); atWatch();
     btn.disabled = false;
   });
@@ -4274,7 +4274,7 @@
     }, function () {});
   }
   function apDecide(id, st) {
-    fs.collection('approvals').doc(id).update({ status: st, by: state.me, ats: Date.now() }).catch(function () { crErr('Action impossible (règles Firestore).'); });
+    fs.collection('approvals').doc(id).update({ status: st, by: state.me, ats: Date.now() }).catch(function () { crErr('Action impossible (connexion ou droits d’accès).'); });
   }
   function apRender() {
     var box = $('#crBody'); box.replaceChildren();
@@ -4288,7 +4288,7 @@
       okc.addEventListener('click', function () {
         fs.collection('presence').doc(it.id).set({ verified: true }, { merge: true })
           .then(function () { apDecide(it.id, 'approved'); })
-          .catch(function () { crErr('Certification impossible (règles Firestore).'); });
+          .catch(function () { crErr('Certification impossible (connexion ou droits d’accès).'); });
       });
       no.addEventListener('click', function () { apDecide(it.id, 'rejected'); });
       bx.appendChild(ok); bx.appendChild(okc); bx.appendChild(no); r.appendChild(mid); r.appendChild(bx); box.appendChild(r);
