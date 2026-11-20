@@ -54,8 +54,119 @@
   }
   /* setIc(el, 'music', 'Titre') : icône + texte (le texte reste du texte brut) */
   function setIc(el, n, t, sz) { el.innerHTML = ic(n, sz || 15, t ? 6 : 0); if (t) el.appendChild(document.createTextNode(t)); return el; }
-  function db() { return firebase.firestore(); }
-  function me() { try { return firebase.auth().currentUser; } catch (e) { return null; } }
+  /* ====== Couche « comme Firestore » au-dessus de Supabase ======
+     stories      -> table stories (colonne data = tout le contenu de la story)
+     presence     -> table profiles (photo, note…)
+     sharedMusic  -> table shared_music
+     Les modifications passent par la fonction SQL story_update (bloc 8) : le propriétaire peut tout changer,
+     un ami peut seulement s'ajouter aux vues, réagir ou signaler. */
+  var FV = {
+    del: { __fv: 'del' },
+    union: function (x) { return { __fv: 'union', v: x }; }
+  };
+  function sbc() { return window.__sb || null; }
+  function rowToDoc(r) {
+    var d = Object.assign({}, r.data || {});
+    d.uid = r.uid;
+    if (typeof d.ts !== 'number') d.ts = Date.parse(r.created_at) || 0;
+    if (!Array.isArray(d.viewers)) d.viewers = [];
+    if (!d.reactions || typeof d.reactions !== 'object') d.reactions = {};
+    return d;
+  }
+  function mkSnap(id, data) { return { id: id, exists: !!data, data: function () { return data; } }; }
+  function mkList(docs) { return { docs: docs, size: docs.length, forEach: function (f) { docs.forEach(f); } }; }
+  function presRow(r) {
+    var m = { name: r.name || r.username, nick: r.nick, photo: r.photo, xst: r.xst, seen: r.seen, bio: r.bio, note: r.note, noteTs: r.note_ts, noteTo: r.note_to, username: r.username };
+    var o = {}; Object.keys(m).forEach(function (k) { if (m[k] !== null && m[k] !== undefined) o[k] = m[k]; });
+    if (typeof o.noteTs === 'string') o.noteTs = Date.parse(o.noteTs) || 0;
+    return o;
+  }
+  function opsOf(patch) {
+    var ops = [];
+    Object.keys(patch).forEach(function (k) {
+      var v = patch[k], path = k.split('.');
+      if (v && v.__fv === 'del') ops.push({ o: 'del', p: path });
+      else if (v && v.__fv === 'union') ops.push({ o: 'union', p: path, v: v.v });
+      else ops.push({ o: 'set', p: path, v: v === undefined ? null : v });
+    });
+    return ops;
+  }
+  function chk(r) { if (r && r.error) throw r.error; return r; }
+  function storyRef(id) {
+    return {
+      id: id,
+      get: function () { return sbc().from('stories').select('*').eq('id', id).maybeSingle().then(function (r) { chk(r); return mkSnap(id, r.data ? rowToDoc(r.data) : null); }); },
+      update: function (patch) { return sbc().rpc('story_update', { p_id: id, p_ops: opsOf(patch) }).then(chk); },
+      delete: function () { return sbc().from('stories').delete().eq('id', id).then(chk); }
+    };
+  }
+  function storiesCol() {
+    var f = { uid: null, uids: null, hl: null, lim: 0 };
+    var q = {
+      where: function (k, op, v) {
+        if (k === 'uid' && op === '==') f.uid = v;
+        else if (k === 'uid' && op === 'in') f.uids = v;
+        else if (k === 'hl' && op === '==') f.hl = v;
+        return q;
+      },
+      limit: function (n) { f.lim = n; return q; },
+      get: function () {
+        var b = sbc().from('stories').select('*');
+        if (f.uid) b = b.eq('uid', f.uid); else if (f.uids) b = b.in('uid', f.uids);
+        if (f.lim) b = b.limit(f.lim);
+        return b.then(function (r) {
+          chk(r);
+          var docs = (r.data || []).map(function (x) { return mkSnap(x.id, rowToDoc(x)); });
+          if (f.hl !== null) docs = docs.filter(function (d) { return !!d.data().hl === f.hl; });
+          return mkList(docs);
+        });
+      },
+      doc: storyRef,
+      add: function (data) {
+        var row = { uid: data.uid, data: data, created_at: new Date(data.ts || Date.now()).toISOString() };
+        return sbc().from('stories').insert(row).select('id').single().then(function (r) { chk(r); return { id: r.data.id }; });
+      }
+    };
+    return q;
+  }
+  function presenceCol() {
+    return { doc: function (uid) { return { get: function () {
+      return sbc().from('profiles').select('*').eq('id', uid).maybeSingle().then(function (r) { chk(r); return mkSnap(uid, r.data ? presRow(r.data) : null); });
+    } }; } };
+  }
+  function musicCol() {
+    var f = { lim: 0 };
+    var q = {
+      where: function () { return q; },
+      limit: function (n) { f.lim = n; return q; },
+      get: function () {
+        var b = sbc().from('shared_music').select('*').eq('pub', true).order('created_at', { ascending: false });
+        if (f.lim) b = b.limit(f.lim);
+        return b.then(function (r) {
+          chk(r);
+          return mkList((r.data || []).map(function (x) {
+            var d = Object.assign({}, x.data || {}); d.uid = x.uid; d.pub = x.pub; if (typeof d.ts !== 'number') d.ts = Date.parse(x.created_at) || 0;
+            return mkSnap(x.id, d);
+          }));
+        });
+      }
+    };
+    return q;
+  }
+  function db() {
+    return {
+      collection: function (n) { return n === 'stories' ? storiesCol() : n === 'presence' ? presenceCol() : musicCol(); },
+      batch: function () {
+        var jobs = [];
+        return {
+          update: function (ref, patch) { jobs.push(function () { return ref.update(patch); }); },
+          delete: function (ref) { jobs.push(function () { return ref.delete(); }); },
+          commit: function () { return Promise.all(jobs.map(function (j) { return j(); })).then(function () {}); }
+        };
+      }
+    };
+  }
+  function me() { return window.__xenUser || null; }
   function uname() { var u = me(); return u ? String(u.email || '').split('@')[0] : ''; }
   function cap(s) { s = String(s || ''); return s ? s.charAt(0).toUpperCase() + s.slice(1) : '?'; }
   function hue(name) { var h = 0, s = String(name || ''); for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360; return h; }
@@ -438,7 +549,7 @@
   function sendReaction(key) {
     var c = curStory(); if (!c || !c.s || !me()) return Promise.resolve(false);
     var uid = me().uid, s = c.s, cur = s.reactions && s.reactions[uid], on = cur !== key, p = {};
-    p['reactions.' + uid] = on ? key : firebase.firestore.FieldValue.delete();
+    p['reactions.' + uid] = on ? key : FV.del;
     return db().collection('stories').doc(s.id).update(p).then(function () {
       if (!s.reactions || typeof s.reactions !== 'object') s.reactions = {};
       if (on) s.reactions[uid] = key; else delete s.reactions[uid];
@@ -571,7 +682,7 @@
     }
     if (!mineS) {
       if (!(Array.isArray(s.viewers) && s.viewers.indexOf(me().uid) >= 0)) {
-        db().collection('stories').doc(s.id).update({ viewers: firebase.firestore.FieldValue.arrayUnion(me().uid) }).catch(function () {});
+        db().collection('stories').doc(s.id).update({ viewers: FV.union(me().uid) }).catch(function () {});
         s.viewers = (s.viewers || []).concat([me().uid]);
       }
     }
@@ -783,7 +894,7 @@
       refresh(true);
       document.dispatchEvent(new CustomEvent('ui-profile-saved'));
     } catch (e) {
-      cErr('Publication impossible (' + ((e && e.message) || 'connexion') + '). Vérifie aussi les règles Firestore « stories ».');
+      cErr('Publication impossible (' + ((e && e.message) || 'connexion') + '). Vérifie aussi la table Supabase « stories » (blocs 7 et 8).');
     }
     C.busy = false; $('stGo').disabled = false; $('stGo').textContent = 'Publier';
   }
@@ -879,7 +990,7 @@
       if (!tr.length) l1.appendChild(mk('p', 'hint', 'Aucune musique dans ta section Musique.'));
     }).catch(function () { l1.textContent = ''; l1.appendChild(mk('p', 'hint', 'Ta musique est indisponible.')); });
 
-    /* musiques partagées (collection sharedMusic) */
+    /* musiques partagées (table shared_music) */
     var h2 = mk('p', 'st-mh', 'Musiques partagées'), l2 = mk('div'); box.appendChild(h2); box.appendChild(l2);
     l2.appendChild(mk('p', 'hint', 'Chargement…'));
     db().collection('sharedMusic').where('pub', '==', true).limit(60).get().then(function (sn) {
@@ -926,7 +1037,7 @@
     });
   }
   function unalbum(list) {
-    var D = firebase.firestore.FieldValue.delete(), b = db().batch();
+    var D = FV.del, b = db().batch();
     list.forEach(function (sv) { b.update(stCol().doc(sv.id), { hl: false, alb: D, albT: D, albTs: D, albC: D }); });
     return b.commit().then(function () {
       list.forEach(function (sv) { sv.hl = false; delete sv.alb; delete sv.albT; delete sv.albTs; delete sv.albC; });
@@ -971,7 +1082,7 @@
     b.commit().then(function () {
       AL.st.forEach(function (sv) { sv.hl = true; sv.alb = id; sv.albT = title; sv.albTs = ts; sv.albC = !!coverId && sv.id === coverId; });
       $('stAlbOk').disabled = false; alb.close(); bumpAll(); if (done) done();
-    }).catch(function () { $('stAlbOk').disabled = false; albErr('Impossible pour le moment. Vérifie les règles Firestore « stories ».'); });
+    }).catch(function () { $('stAlbOk').disabled = false; albErr('Impossible pour le moment. Vérifie la table Supabase « stories » (blocs 7 et 8).'); });
   }
   function addToAlbum(stories, done) {
     if (!me() || !stories || !stories.length) return;
@@ -1194,7 +1305,10 @@
   /* ====== Démarrage ====== */
   function start() {
     css();
-    firebase.auth().onAuthStateChanged(function (u) {
+    var last = null;
+    sbc().auth.onAuthStateChange(function (ev, session) {
+      var u = session && session.user ? session.user.id : null;
+      if (u === last) return; last = u;
       if (!u) { items = []; FR = null; renderBar(); return; }
       setTimeout(function () { refresh(true); }, 2500);
     });
@@ -1202,7 +1316,7 @@
     document.addEventListener('visibilitychange', function () { if (!document.hidden && me() && Date.now() - lastRef > 60000) refresh(false); });
   }
   (function wait(n) {
-    if (window.firebase && firebase.apps && firebase.apps.length && window.UIProfile) { try { start(); } catch (e) { console.warn('Stories :', e); } return; }
+    if (window.__sb && window.UIProfile) { try { start(); } catch (e) { console.warn('Stories :', e); } return; }
     if (n < 400) setTimeout(function () { wait(n + 1); }, 300);
   })(0);
 
