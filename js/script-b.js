@@ -1,9 +1,18 @@
 
 /* ===== X'enify : couche Supabase (démarrage, discussions, amis en temps réel) ===== */
-  var firebase = { firestore: { FieldValue: { delete: function () { return null; }, arrayUnion: function () { return null; }, arrayRemove: function () { return null; }, increment: function () { return null; } } },
+  /* ===== Couche « comme Firestore » au-dessus de Supabase (table xdocs, bloc 9) =====
+     Gère : lettres (letters, lettersN, letterOwners), anonymes (anonThreads, anonRequests, anonProfiles),
+     Action ou vérité (truthDareRooms), appels et direct (chats/…).
+     Les autres collections (usernames, presence, approvals…) restent « non converties » et échouent proprement. */
+  var FV_DEL = { __fv: 'del' };
+  var firebase = { firestore: { FieldValue: {
+      delete: function () { return FV_DEL; },
+      arrayUnion: function () { return { __fv: 'union', v: Array.prototype.slice.call(arguments) }; },
+      arrayRemove: function () { return { __fv: 'remove', v: Array.prototype.slice.call(arguments) }; },
+      increment: function (n) { return { __fv: 'inc', v: n }; } } },
     auth: { EmailAuthProvider: { credential: function () { return null; } } } };
-  /* Modules pas encore convertis (lettres, anonymes, jeux, musique partagée, direct, appels) : ils échouent proprement au lieu de planter */
   var fs = (function () {
+    var XD = ['letters', 'lettersN', 'letterOwners', 'anonThreads', 'anonRequests', 'truthDareRooms', 'chats'];
     var dead = function () { return Promise.reject(new Error('non converti')); };
     function node() {
       return new Proxy(function () {}, {
@@ -16,7 +25,200 @@
         apply: function () { return node(); }
       });
     }
-    return node();
+    function T() { return SB.from('xdocs'); }
+    function chk(r) { if (r && r.error) { var e = new Error(r.error.message || 'erreur'); e.code = r.error.code; throw e; } return r; }
+    function rid() { var a = new Uint8Array(15); crypto.getRandomValues(a); return Array.prototype.map.call(a, function (x) { return ('0' + x.toString(16)).slice(-2); }).join(''); }
+    function clean(o) { return JSON.parse(JSON.stringify(o, function (k, v) { return v === undefined ? null : v; })); }
+    function isFV(v) { return v && typeof v === 'object' && typeof v.__fv === 'string'; }
+    function opsOf(patch) {
+      var ops = [];
+      Object.keys(patch).forEach(function (k) {
+        var v = patch[k], p = k.split('.');
+        if (isFV(v)) ops.push(v.__fv === 'del' ? { o: 'del', p: p } : { o: v.__fv, p: p, v: v.v });
+        else ops.push({ o: 'set', p: p, v: v === undefined ? null : clean({ x: v }).x });
+      });
+      return ops;
+    }
+    function stripFV(o) { var r = {}; Object.keys(o).forEach(function (k) { if (!isFV(o[k])) r[k] = o[k]; }); return r; }
+    function mkSnap(path, data) {
+      var segs = path.split('/');
+      return { id: segs[segs.length - 1], exists: !!data, ref: docRef(path), data: function () { return data ? JSON.parse(JSON.stringify(data)) : undefined; } };
+    }
+    function cmp(a, b) { if (a === b) return 0; if (a === undefined || a === null) return -1; if (b === undefined || b === null) return 1; return a < b ? -1 : 1; }
+    function sameDoc(a, b) { return JSON.stringify(a) === JSON.stringify(b); }
+
+    function docRef(path) {
+      var segs = path.split('/');
+      var ref = {
+        id: segs[segs.length - 1], path: path,
+        parent: { path: segs.slice(0, -1).join('/') },
+        collection: function (n) { return colRef(path + '/' + n); },
+        get: function () {
+          return T().select('data').eq('path', path).maybeSingle().then(function (r) { chk(r); return mkSnap(path, r.data ? r.data.data : null); });
+        },
+        set: function (data, opt) {
+          if (opt && opt.merge) {
+            return SB.rpc('xdoc_apply', { p_path: path, p_ops: opsOf(data), p_upsert: true }).then(chk).then(function () {});
+          }
+          var coll = segs.slice(0, -1).join('/');
+          return T().upsert({ path: path, coll: coll, id: ref.id, data: clean(stripFV(data)) }).then(chk).then(function () {});
+        },
+        update: function (patch) {
+          var keys = Object.keys(patch);
+          if (/^anonThreads\/[^/]+$/.test(path) && keys.length === 2 && keys.indexOf('b') > -1 && keys.indexOf('members') > -1) {
+            return SB.rpc('anon_join', { p_tid: ref.id }).then(chk).then(function () {});     /* rejoindre une discussion anonyme */
+          }
+          return SB.rpc('xdoc_apply', { p_path: path, p_ops: opsOf(patch), p_upsert: false }).then(chk).then(function () {});
+        },
+        delete: function () { return T().delete().eq('path', path).then(chk).then(function () {}); },
+        onSnapshot: function (ok, err) {
+          var alive = true, ch = null, tmr = null;
+          function load() {
+            ref.get().then(function (s) { if (alive) ok(s); }, function (e) { if (alive && err) err(e); });
+          }
+          load();
+          try {
+            ch = SB.channel('xd-' + rid())
+              .on('postgres_changes', { event: '*', schema: 'public', table: 'xdocs', filter: 'path=eq.' + path }, function () { clearTimeout(tmr); tmr = setTimeout(load, 60); })
+              .subscribe();
+          } catch (e) {}
+          return function () { alive = false; clearTimeout(tmr); if (ch) { try { SB.removeChannel(ch); } catch (e) {} ch = null; } };
+        }
+      };
+      return ref;
+    }
+
+    function colRef(path) {
+      var f = [], ord = [], lim = 0;
+      var q = {
+        path: path,
+        doc: function (id) { return docRef(path + '/' + (id === undefined ? rid() : String(id))); },
+        add: function (data) { var d = q.doc(); return d.set(data).then(function () { return d; }); },
+        where: function (k, op, v) { f.push([k, op, v]); return q; },
+        orderBy: function (k, dir) { ord.push([k, dir === 'desc' ? -1 : 1]); return q; },
+        limit: function (n) { lim = n; return q; },
+        get: function () { return run(); },
+        onSnapshot: function (ok, err) {
+          var alive = true, ch = null, tmr = null, prev = null;
+          function load() {
+            run().then(function (s) {
+              if (!alive) return;
+              var before = prev; prev = {};
+              s.docs.forEach(function (d) { prev[d.id] = d.data(); });
+              s.docChanges = function () {
+                var out = [];
+                s.docs.forEach(function (d) {
+                  if (!before || !(d.id in before)) out.push({ type: 'added', doc: d });
+                  else if (!sameDoc(before[d.id], d.data())) out.push({ type: 'modified', doc: d });
+                });
+                if (before) Object.keys(before).forEach(function (id) { if (!(id in prev)) out.push({ type: 'removed', doc: mkSnap(path + '/' + id, before[id]) }); });
+                return out;
+              };
+              ok(s);
+            }, function (e) { if (alive && err) err(e); });
+          }
+          load();
+          try {
+            ch = SB.channel('xc-' + rid())
+              .on('postgres_changes', { event: '*', schema: 'public', table: 'xdocs', filter: 'coll=eq.' + path }, function () { clearTimeout(tmr); tmr = setTimeout(load, 60); })
+              .subscribe();
+          } catch (e) {}
+          return function () { alive = false; clearTimeout(tmr); if (ch) { try { SB.removeChannel(ch); } catch (e) {} ch = null; } };
+        }
+      };
+      function run() {
+        var b = T().select('path,data').eq('coll', path);
+        f.forEach(function (c) {
+          var k = c[0], op = c[1], v = c[2];
+          if (op === '==' && (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean')) b = b.eq('data->>' + k, String(v));
+          else if (op === 'in' && Array.isArray(v) && v.length && v.every(function (x) { return typeof x === 'string'; })) b = b.in('data->>' + k, v);
+        });
+        return b.limit(1000).then(function (r) {
+          chk(r);
+          var docs = (r.data || []).map(function (x) { return mkSnap(x.path, x.data); });
+          docs = docs.filter(function (d) {
+            var v0 = d.data();
+            return f.every(function (c) {
+              var x = v0[c[0]], op = c[1], v = c[2];
+              if (op === '==') return x === v;
+              if (op === 'in') return Array.isArray(v) && v.indexOf(x) > -1;
+              if (op === 'array-contains') return Array.isArray(x) && x.indexOf(v) > -1;
+              if (op === '!=') return x !== v;
+              if (op === '>') return x > v; if (op === '>=') return x >= v;
+              if (op === '<') return x < v; if (op === '<=') return x <= v;
+              return true;
+            });
+          });
+          if (ord.length) docs.sort(function (a, b) {
+            var da = a.data(), db = b.data();
+            for (var i = 0; i < ord.length; i++) { var c = cmp(da[ord[i][0]], db[ord[i][0]]) * ord[i][1]; if (c) return c; }
+            return 0;
+          });
+          if (lim) docs = docs.slice(0, lim);
+          return { docs: docs, size: docs.length, empty: !docs.length, forEach: function (cb) { docs.forEach(cb); }, docChanges: function () { return docs.map(function (d) { return { type: 'added', doc: d }; }); } };
+        });
+      }
+      return q;
+    }
+
+    /* cas particuliers : annuaire des identifiants et option « accepte les messages anonymes » */
+    function usernameDoc(name) {
+      return { get: function () {
+        return SB.rpc('uid_of_username', { p_name: name }).then(chk).then(function (r) { return { exists: !!r.data, data: function () { return { uid: r.data }; } }; });
+      } };
+    }
+    function presenceDoc(uid) {
+      return {
+        get: function () { return SB.rpc('anon_accepts', { p_uid: uid }).then(chk).then(function (r) { return { exists: r.data === false, data: function () { return r.data === false ? { noAnon: true } : {}; } }; }); },
+        set: function (data) {
+          if (!('noAnon' in data)) return Promise.reject(new Error('non converti'));
+          return SB.from('anon_profiles').upsert({ uid: uid, no_anon: !isFV(data.noAnon) }).then(chk).then(function () {});
+        }
+      };
+    }
+    function anonProfDoc(uid) {
+      return {
+        get: function () {
+          return SB.from('anon_profiles').select('data').eq('uid', uid).maybeSingle().then(chk).then(function (r) {
+            var d = r.data && r.data.data && Object.keys(r.data.data).length ? r.data.data : null;
+            return { exists: !!d, data: function () { return d; } };
+          });
+        },
+        set: function (data) { return SB.from('anon_profiles').upsert({ uid: uid, name: data && data.name || null, data: clean(data) }).then(chk).then(function () {}); }
+      };
+    }
+    var api = {
+      collection: function (n) {
+        if (n === 'anonProfiles') return { doc: anonProfDoc, get: dead };
+        if (XD.indexOf(n) > -1) return colRef(n);
+        if (n === 'usernames') return { doc: usernameDoc, get: dead };
+        if (n === 'presence') return { doc: presenceDoc, where: function () { return { get: dead }; }, get: dead };
+        return node().collection(n);
+      },
+      batch: function () {
+        var jobs = [];
+        var b = {
+          set: function (ref, d, o) { jobs.push(function () { return ref.set(d, o); }); return b; },
+          update: function (ref, d) { jobs.push(function () { return ref.update(d); }); return b; },
+          delete: function (ref) { jobs.push(function () { return ref.delete(); }); return b; },
+          commit: function () { return jobs.reduce(function (p, j) { return p.then(j); }, Promise.resolve()); }
+        };
+        return b;
+      },
+      runTransaction: function (fn) {
+        var jobs = [];
+        var tx = {
+          get: function (ref) { return ref.get(); },
+          set: function (ref, d, o) { jobs.push(function () { return ref.set(d, o); }); return tx; },
+          update: function (ref, d) { jobs.push(function () { return ref.update(d); }); return tx; },
+          delete: function (ref) { jobs.push(function () { return ref.delete(); }); return tx; }
+        };
+        return Promise.resolve(fn(tx)).then(function (res) {
+          return jobs.reduce(function (p, j) { return p.then(j); }, Promise.resolve()).then(function () { return res; });
+        });
+      }
+    };
+    return api;
   })();
   var auth = { currentUser: null, _ready: false, _cbs: [], _uid: undefined,
     signOut: function () { return SB.auth.signOut(); },
