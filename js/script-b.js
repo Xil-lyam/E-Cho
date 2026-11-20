@@ -131,6 +131,7 @@
         f.forEach(function (c) {
           var k = c[0], op = c[1], v = c[2];
           if (op === '==' && (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean')) b = b.eq('data->>' + k, String(v));
+          else if (op === 'array-contains' && k === 'members' && typeof v === 'string') b = b.filter('data->members', 'cs', JSON.stringify([v]));
           else if (op === 'in' && Array.isArray(v) && v.length && v.every(function (x) { return typeof x === 'string'; })) b = b.in('data->>' + k, v);
         });
         return b.limit(1000).then(function (r) {
@@ -1244,23 +1245,26 @@
    Écouter ensemble en direct (WebRTC)
    (fait partie de l’appli : assemblée par js/boot/loader.js dans une seule fermeture) */
   /* ---------- écouter ensemble en direct (WebRTC, signalisation via Firestore) ---------- */
-  /* Serveurs relais (TURN) : nécessaires quand les deux téléphones sont en 4G/5G ou derrière un réseau strict.
-     Les identifiants « openrelayproject » sont un service public gratuit (limité). Pour un direct fiable,
-     crée un compte gratuit sur metered.ca (Open Relay) puis colle tes propres serveurs dans LIVE_TURN_EXTRA, par ex. :
-     { urls: 'turn:global.relay.metered.ca:443?transport=tcp', username: 'TON_USER', credential: 'TON_MOT_DE_PASSE' } */
-  var LIVE_TURN_EXTRA = [
-    { urls: 'stun:stun.relay.metered.ca:80' },
-    { urls: ['turn:global.relay.metered.ca:80', 'turn:global.relay.metered.ca:80?transport=tcp', 'turn:global.relay.metered.ca:443', 'turns:global.relay.metered.ca:443?transport=tcp'],
-      username: '945203f5cdfa5f8655fe4730', credential: 'xvoDPMhJQP9TnTML' }
+  /* Serveurs relais (TURN) : nécessaires quand les deux téléphones sont en 4G/5G ou derrière un réseau strict. */
+  /* Les identifiants TURN ne sont plus dans le code : la fonction Netlify « turn » les donne aux personnes connectées. */
+  var ICE_BASE = [
+    { urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302', 'stun:stun.cloudflare.com:3478'] },
+    { urls: ['turn:openrelay.metered.ca:80', 'turn:openrelay.metered.ca:443', 'turn:openrelay.metered.ca:443?transport=tcp', 'turns:openrelay.metered.ca:443?transport=tcp'],
+      username: 'openrelayproject', credential: 'openrelayproject' }
   ];
-  var ICE = {
-    iceServers: LIVE_TURN_EXTRA.concat([
-      { urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302', 'stun:stun.cloudflare.com:3478'] },
-      { urls: ['turn:openrelay.metered.ca:80', 'turn:openrelay.metered.ca:443', 'turn:openrelay.metered.ca:443?transport=tcp', 'turns:openrelay.metered.ca:443?transport=tcp'],
-        username: 'openrelayproject', credential: 'openrelayproject' }
-    ]),
-    iceCandidatePoolSize: 2
-  };
+  var ICE = { iceServers: ICE_BASE.slice(), iceCandidatePoolSize: 2 };
+  async function iceLoad() {
+    try {
+      var s = window.__sb && (await window.__sb.auth.getSession());
+      var tk = s && s.data && s.data.session && s.data.session.access_token;
+      if (!tk) return;
+      var r = await fetch('/.netlify/functions/turn', { headers: { Authorization: 'Bearer ' + tk } });
+      if (!r.ok) return;
+      var j = await r.json();
+      if (j && j.iceServers && j.iceServers.length) ICE.iceServers = j.iceServers.concat(ICE_BASE);
+    } catch (e) {}
+  }
+  [4000, 20000, 60000].forEach(function (t) { setTimeout(iceLoad, t); }); setInterval(iceLoad, 30 * 60 * 1000);
   var L = { role: null, chat: null, sid: '', jid: '', pc: null, rem: null, g: null, sigUnsub: null, beatT: null, gUnsub: null, gT: null, joinT: null,
             watch: null, watchT: null, sess: null, pend: [], title: '', state: 'wait', needTap: false, gAt: 0, peers: {}, n: 0, hname: '' };
   var LIVE_MAX = 8; /* auditeurs simultanés max par écoute de groupe (le téléphone de l’hôte envoie le son à chacun) */
