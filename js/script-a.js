@@ -464,7 +464,7 @@ window.__uandiApp = function () {
     if (r.error) throw sbErr(r.error);
     if (!chat.group && r.data && r.data.conversation_id) CUID[chat.id] = r.data.conversation_id;
     state.chatsById[chat.id] = true;
-    if (state.chat && state.chat.id === chat.id && state.kick) state.kick();
+    if (state.chat && state.chat.id === chat.id && state.kick) state.kick(800);
     try { var pcid = chat.group ? chat.id : (r.data && r.data.conversation_id); if (pcid && window.__xenPing && String(o.text || '').charAt(0) !== SYS) window.__xenPing(pcid); } catch (e) {}
     return r.data;
   }
@@ -1408,7 +1408,7 @@ window.__uandiApp = function () {
       var before = new Set(state.msgs.map(function (m) { return m.id; }));
       var firstLoad = !state.loaded;
       var paging = state.paging; state.paging = false;
-      list.sort(function (a, b) { return a.ts - b.ts || (+a.id) - (+b.id); });
+      list.sort(function (a, b) { return a.ts - b.ts || ((+a.id) || 0) - ((+b.id) || 0); });
       cleanMine();
       state.more = size >= state.lim;
       var fresh = (firstLoad || paging) ? [] : list.filter(function (m) { return !before.has(m.id) && m.uid !== state.me; });
@@ -1423,11 +1423,36 @@ window.__uandiApp = function () {
       if (fresh.length) notifyIncoming(fresh[fresh.length - 1]);
       if (firstLoad || fresh.length) markSeen();
     }
-    function mkick() { clearTimeout(mtimer); mtimer = setTimeout(mpull, 120); }
+    function mkick(ms) { clearTimeout(mtimer); mtimer = setTimeout(mpull, typeof ms === 'number' ? ms : 120); }
+    /* message reçu / modifié / supprimé : on l'applique tout de suite (sans relire le serveur), puis on vérifie un peu plus tard */
+    function mpatch(pl) {
+      try {
+        if (!state.loaded || !pl || mdead) { mkick(); return; }
+        var list;
+        if (pl.eventType === 'DELETE') {
+          var oid = pl.old && pl.old.id;
+          if (oid == null) { mkick(); return; }
+          list = state.msgs.filter(function (x) { return x.id !== String(oid); });
+        } else {
+          var row = pl.new;
+          if (!row || row.id == null || (!row.body && !row.img && !row.audio && !row.file)) { mkick(); return; }
+          var nm = msgFromRow(row, null);
+          var old = state.msgs.find(function (x) { return x.id === nm.id; });
+          if (old) { nm.likes = old.likes; nm.reacts = old.reacts; }
+          list = state.msgs.filter(function (x) {
+            return x.id !== nm.id && !(String(x.id).indexOf('tmp') === 0 && x.uid === nm.uid && x.text === nm.text);
+          });
+          list.push(nm);
+          if (curIds) curIds.add(nm.id);
+        }
+        mshow(list, state.more ? state.lim : Math.min(list.length, state.lim - 1));
+        mkick(1500);
+      } catch (e) { mkick(); }
+    }
     function mlisten(cu) {
       var seenSub = false;
       mchs.push(SB.channel('msg-' + Math.random().toString(36).slice(2))
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: 'conversation_id=eq.' + cu }, mkick)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: 'conversation_id=eq.' + cu }, mpatch)
         .on('postgres_changes', { event: '*', schema: 'public', table: 'message_reactions' }, function (pl) {
           /* pas de filtre possible côté serveur (la table n'a pas la discussion) : on ignore les réactions d'autres discussions */
           var rec = (pl && pl.new && pl.new.message_id != null) ? pl.new : (pl && pl.old);
@@ -1473,7 +1498,7 @@ window.__uandiApp = function () {
     }
     function subMsgs() { subbed = true; mpull(); }
     subMsgs();
-    state.kick = function () { if (!subbed) subMsgs(); else mkick(); };
+    state.kick = function (ms) { if (!subbed) subMsgs(); else mkick(ms); };
     state.loadOlder = function () {
       if (!state.more || state.paging) return;
       state.paging = true; state.lim += 20;
@@ -1928,10 +1953,21 @@ window.__uandiApp = function () {
     setTyping(false);
     showErr('');
     state.stick = true;
+    var o = withReply({ text: text });
+    var tmp = { id: 'tmp' + Date.now(), uid: state.me, text: text, ts: Date.now(), likes: {}, reacts: {}, edited: false, delAt: 0,
+      audio: null, dur: 0, music: '', img: null, file: null, reply: (o.reply && typeof o.reply.t === 'string') ? o.reply : null };
+    var shown = state.loaded && state.chat === chat;
+    if (shown) { state.msgs.push(tmp); render(); }
+    var dropTmp = function () {
+      var i = state.msgs.indexOf(tmp);
+      if (i > -1) { state.msgs.splice(i, 1); if (state.chat === chat) render(); }
+    };
     try {
-      await postMsg(chat, withReply({ text: text }));
+      await postMsg(chat, o);
+      setTimeout(dropTmp, 4000);
       pushNotify(chat, text);
     } catch (e) {
+      dropTmp();
       ta.value = text;
       autosize();
       showErr(e && e.inv ? e.inv : 'Message non envoyé. Vérifie ta connexion et réessaie.');
@@ -1969,15 +2005,22 @@ window.__uandiApp = function () {
   };
 
   async function toggleLike(id) {
-    if (!state.chat || busy.has(id)) return;
+    if (!state.chat || busy.has(id) || String(id).indexOf('tmp') === 0) return;
     var m = state.msgs.find(function (x) { return x.id === id; });
     var now = !(m && m.likes && m.likes[state.me] === true);
+    var oldL = m && m.likes, oldR = m && m.reacts;
+    if (m) {   /* affichage immédiat du cœur */
+      m.likes = Object.assign({}, m.likes); m.reacts = Object.assign({}, m.reacts); delete m.reacts[state.me];
+      if (now) m.likes[state.me] = true; else delete m.likes[state.me];
+      render();
+    }
     busy.add(id);
     try {
       var rl = await SB.rpc('react_message', { p_id: +id, p_emoji: now ? RX[0] : null });
       if (rl.error) throw rl.error;
-      if (state.kick) state.kick();
     } catch (e) {
+      if (m) { m.likes = oldL; m.reacts = oldR; render(); }
+      if (state.kick) state.kick();
       showErr('Le cœur n’a pas pu être enregistré.');
     } finally { busy.delete(id); }
   }
@@ -2013,7 +2056,7 @@ window.__uandiApp = function () {
   }
   async function eraseForAll(id) {
     var chat = state.chat, m = state.msgs.find(function (x) { return x.id === id; });
-    if (!chat || !m || m.uid !== state.me) return;
+    if (!chat || !m || m.uid !== state.me || String(id).indexOf('tmp') === 0) return;
     try {
       var re = await SB.rpc('erase_message', { p_id: +id });
       if (re.error) throw re.error;
@@ -2569,15 +2612,22 @@ window.__uandiApp = function () {
     if (!state.chat || busy.has(id)) return;
     var m = state.msgs.find(function (x) { return x.id === id; });
     if (!m) return;
+    if (String(id).indexOf('tmp') === 0) return;
     var next = (reactionsOf(m)[state.me] === emoji) ? '' : emoji;
+    var oldL = m.likes, oldR = m.reacts;
+    /* affichage immédiat : la réaction apparaît tout de suite, le serveur confirme ensuite */
+    m.likes = Object.assign({}, m.likes); delete m.likes[state.me];
+    m.reacts = Object.assign({}, m.reacts); delete m.reacts[state.me];
+    if (next) { if (next === '\u2764\uFE0F') m.likes[state.me] = true; else m.reacts[state.me] = next; }
     state.picker = null;
     closePickerAnim(id, next, render);
     busy.add(id);
     try {
       var rr = await SB.rpc('react_message', { p_id: +id, p_emoji: next || null });
       if (rr.error) throw rr.error;
-      if (state.kick) state.kick();
     } catch (e) {
+      m.likes = oldL; m.reacts = oldR; render();
+      if (state.kick) state.kick();
       showErr('La réaction n’a pas pu être enregistrée (connexion à vérifier).');
     } finally { busy.delete(id); }
   }
