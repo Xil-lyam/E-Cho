@@ -3,7 +3,7 @@
    - Quand JE envoie un message, l'appli prévient la fonction Supabase « push » (supabase/functions/push) qui notifie les autres membres.
    À configurer : VAPID_PUBLIC ci-dessous + déployer la fonction (voir sql/LISEZMOI-FONCTIONS.md). */
 (function () {
-  var VAPID_PUBLIC = 'BKN_ouxQ0NgRLHCT3PkK2xAnaWPBArcnxMskx8Zlj2K1UYkn_1NA3p6EeQCIWwaffuHmyECzz1JrPxQV828ddgE';
+  var VAPID_PUBLIC = 'BBv4r2KLPOrJc_yBwXTuE738T9YHDVDSZQzrE1uoDfYigyHExsuJDTobUskU3HN_y-In5hd1gi4KUHul486vwTw';
   function fnUrl() { return String(window.__sb.supabaseUrl).replace(/\/$/, '') + '/functions/v1/push'; }
 
   if (VAPID_PUBLIC.indexOf('COLLE') === 0) return;
@@ -26,12 +26,25 @@
   }
   function me() { return window.__xenUser || null; }
 
+  /* abonnement existant seulement s'il utilise la clé actuelle (sinon on le remplace : la clé a changé) */
+  function getSub(r) {
+    var key = u8(VAPID_PUBLIC);
+    return r.pushManager.getSubscription().then(function (s) {
+      var same = false;
+      try {
+        var k = s && s.options && s.options.applicationServerKey;
+        if (k) { var a = new Uint8Array(k); same = a.length === key.length && a.every(function (v, i) { return v === key[i]; }); }
+        else same = !!s;
+      } catch (e) { same = !!s; }
+      if (s && !same) return s.unsubscribe().then(function () { return null; });
+      return s;
+    }).then(function (s) { return s || r.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key }); });
+  }
+
   function subscribe(user) {
     if (!window.__sb || Notification.permission !== 'granted') return Promise.resolve();
     return reg().then(function (r) {
-      return r.pushManager.getSubscription().then(function (s) {
-        return s || r.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: u8(VAPID_PUBLIC) });
-      });
+      return getSub(r);
     }).then(function (sub) {
       return sha(sub.endpoint).then(function (h) {
         return window.__sb.from('push_subs').upsert({ uid: user.uid, token: h, data: { sub: sub.toJSON() }, updated_at: new Date().toISOString() });
@@ -52,7 +65,7 @@
     var go = function () {
       if (Notification.permission !== 'granted') return Promise.resolve('permission notifications = ' + Notification.permission);
       return reg().then(function (r) {
-        return r.pushManager.getSubscription().then(function (x) { return x || r.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: u8(VAPID_PUBLIC) }); });
+        return getSub(r);
       }).then(function (sub) {
         return sha(sub.endpoint).then(function (h) {
           return window.__sb.from('push_subs').upsert({ uid: u.uid, token: h, data: { sub: sub.toJSON() }, updated_at: new Date().toISOString() });
