@@ -77,6 +77,30 @@ window.__uandiApp = function () {
     return n;
   }
   function chatOf(id) { return state.chats.filter(function (x) { return x.id === id; })[0] || null; }
+  /* petite porte d'entrée pour la page de recherche (js/recherche.js) */
+  window.__xenSearch = {
+    me: function () { return state.me; },
+    hasChat: function (uid) { return state.chats.some(function (c) { return !c.group && (c.members || []).indexOf(uid) > -1; }); },
+    chats: function (q) {
+      q = String(q || '').trim().toLowerCase(); if (!q) return [];
+      var out = [];
+      state.chats.forEach(function (c) {
+        if (inviteIn(c) || isBlockedChat(c)) return;
+        var o = (c.members || []).filter(function (x) { return x !== state.me; })[0];
+        var name = c.group ? (c.title || 'Groupe') : (nickOf(c, o) || (c.names && c.names[o]) || 'Inconnu');
+        var last = String(c.lastText || '');
+        var inName = name.toLowerCase().indexOf(q) > -1, inLast = last.toLowerCase().indexOf(q) > -1;
+        if (inName || inLast) out.push({ id: c.id, group: !!c.group, uid: o || '', name: name, last: last, ts: c.lastTs || 0, byName: inName });
+      });
+      out.sort(function (a, b) { return (b.byName - a.byName) || (b.ts - a.ts); });
+      return out.slice(0, 30);
+    },
+    openChat: function (r) { if (r.group) { var g = chatOf(r.id); if (g) openChat('', g.title || 'Groupe', g); } else openChat(r.uid, r.name); },
+    openUser: function (uid, name) {
+      if (state.chats.some(function (c) { return !c.group && (c.members || []).indexOf(uid) > -1; })) openChat(uid, name);
+      else openUserCard(uid, name);
+    }
+  };
   function nickOf(c, uid) { return (c && c.nicks && typeof c.nicks[uid] === 'string' && c.nicks[uid]) || ''; }
   function myName() { return state.nick || state.username; }
   /* ---------- Cloudinary : vocaux, musiques et photos sont envoy\u00e9s l\u00e0-bas, Firestore ne garde que le lien ---------- */

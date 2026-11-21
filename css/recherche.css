@@ -1,0 +1,64 @@
+/* X'enify — page de recherche plein écran (comme TikTok). Suit les couleurs du thème. */
+.xsr { position: fixed; inset: 0; z-index: 70; display: flex; flex-direction: column; background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); padding-top: env(safe-area-inset-top, 0px); transform: translateX(100%); transition: transform .22s cubic-bezier(.2,.8,.2,1); }
+.xsr[hidden] { display: none; }
+.xsr.in { transform: none; }
+.xsr.out { transform: translateX(100%); }
+html.xsr-open body { overflow: hidden; }
+.xsr-top { display: flex; align-items: center; gap: 6px; padding: 8px 12px 8px 4px; }
+.xsr-back { flex: none; width: 44px; height: 44px; display: grid; place-items: center; border: 0; background: none; color: var(--ink); border-radius: 50%; }
+.xsr-back:active { background: var(--raise, rgba(128,128,128,.18)); }
+.xsr-field { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 6px 0 14px; border-radius: 22px;
+  background: var(--raise, rgba(128,128,128,.16)); color: var(--muted); border: 1.5px solid transparent; }
+.xsr-field:focus-within { border-color: color-mix(in srgb, var(--accent) 60%, transparent); color: var(--ink); }
+.xsr-field input { flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: transparent; color: var(--ink); font: inherit; font-size: 1rem; padding: 0; -webkit-appearance: none; appearance: none; }
+.xsr-field input::-webkit-search-cancel-button { display: none; }
+.xsr-field input::placeholder { color: var(--muted); }
+.xsr-clear { flex: none; width: 28px; height: 28px; display: grid; place-items: center; border: 0; border-radius: 50%; background: var(--muted); color: var(--bg); opacity: .8; }
+.xsr-clear[hidden], .xsr-go[hidden] { display: none; }
+.xsr-go { flex: none; border: 0; background: none; color: var(--accent); font: inherit; font-weight: 700; font-size: .98rem; padding: 10px 6px; }
+.xsr-tabs { display: flex; border-bottom: 1px solid var(--line); padding: 0 8px; }
+.xsr-tab { flex: 1; border: 0; background: none; color: var(--muted); font: inherit; font-size: .95rem; font-weight: 600; padding: 12px 4px 11px; position: relative; }
+.xsr-tab[aria-selected="true"] { color: var(--ink); }
+.xsr-tab[aria-selected="true"]::after { content: ""; position: absolute; left: 22%; right: 22%; bottom: -1px; height: 3px; border-radius: 3px; background: var(--ink); }
+.xsr-body { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 4px 0 calc(24px + env(safe-area-inset-bottom, 0px)); -webkit-overflow-scrolling: touch; }
+.xsr-sec { padding-top: 10px; }
+.xsr-h { display: flex; align-items: baseline; justify-content: space-between; padding: 6px 16px 4px; }
+.xsr-h h2 { margin: 0; font-family: "Sora", var(--font-display); font-size: 1rem; font-weight: 700; letter-spacing: -.01em; }
+.xsr-more { border: 0; background: none; color: var(--muted); font: inherit; font-size: .85rem; font-weight: 600; padding: 6px 0 6px 12px; }
+.xsr-list { list-style: none; margin: 0; padding: 0; }
+.xsr-row { display: flex; align-items: center; gap: 4px; padding: 0 8px 0 4px; min-height: 68px; }
+.xsr-row.slim { min-height: 52px; }
+.xsr-main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; padding: 8px 8px; border: 0; background: none; color: inherit; font: inherit; text-align: left; border-radius: 14px; }
+.xsr-main:active { background: var(--raise, rgba(128,128,128,.16)); }
+.xsr-av { flex: none; width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; overflow: hidden; color: #fff; font-weight: 700; font-size: 1.15rem; background: var(--raise); }
+.xsr-av img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.xsr-info { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.xsr-nm { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.xsr-nm.plain { font-weight: 500; }
+.xsr-un { color: var(--muted); font-size: .88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.xsr mark { background: none; color: var(--accent); font-weight: 700; }
+.xsr-cert { flex: none; width: 16px; height: 16px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--accent-ink); }
+.xsr-ic { flex: none; width: 40px; height: 40px; display: grid; place-items: center; color: var(--muted); }
+.xsr-x { flex: none; width: 40px; height: 40px; display: grid; place-items: center; border: 0; background: none; color: var(--muted); border-radius: 50%; }
+/* like : le cœur et son compteur, comme sur TikTok */
+.xsr-like { flex: none; display: flex; flex-direction: column; align-items: center; gap: 1px; min-width: 46px; padding: 6px 4px; border: 0; background: none; color: var(--muted); font: inherit; font-size: .72rem; font-weight: 600; border-radius: 12px; }
+.xsr-like svg { transition: transform .15s; }
+.xsr-like.on { color: var(--like, #ff3b5c); }
+.xsr-like.on svg { fill: currentColor; }
+.xsr-like.pop svg { animation: xsrPop .32s cubic-bezier(.3,1.6,.5,1); }
+@keyframes xsrPop { 0% { transform: scale(.6); } 60% { transform: scale(1.35); } 100% { transform: scale(1); } }
+.xsr-write { flex: none; width: 40px; height: 40px; display: grid; place-items: center; border: 0; border-radius: 50%; background: var(--raise, rgba(128,128,128,.16)); color: var(--ink); }
+.xsr-write:active, .xsr-like:active { background: var(--raise2, rgba(128,128,128,.28)); }
+.xsr-empty { padding: 64px 28px; text-align: center; color: var(--muted); }
+.xsr-empty strong { display: block; color: var(--ink); font-family: "Sora", var(--font-display); font-size: 1.05rem; margin-bottom: 6px; }
+.xsr-empty p { margin: 0; font-size: .92rem; line-height: 1.5; }
+.xsr-skel .xsr-av, .xsr-skel .xsr-bar { background: var(--raise); animation: xsrSh 1.3s ease-in-out infinite; }
+.xsr-bar { display: block; height: 12px; width: 140px; border-radius: 6px; } .xsr-bar.s { width: 90px; height: 10px; margin-top: 6px; }
+@keyframes xsrSh { 50% { opacity: .45; } }
+.xsr-toast { position: absolute; left: 16px; right: 16px; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); padding: 12px 16px; border-radius: 14px; background: var(--ink); color: var(--bg); font-size: .9rem; opacity: 0; transform: translateY(8px); pointer-events: none; transition: .2s; }
+.xsr-toast.on { opacity: 1; transform: none; }
+@media (min-width: 700px) { .xsr { max-width: 44rem; margin: 0 auto; border-left: 1px solid var(--line); border-right: 1px solid var(--line); } }
+@media (prefers-reduced-motion: reduce) { .xsr, .xsr-toast { transition: none; } .xsr-like.pop svg, .xsr-skel .xsr-av, .xsr-skel .xsr-bar { animation: none; } }
+html body .xsr .xsr-field input, html body .xsr .xsr-field input:focus, html body .xsr .xsr-field input:focus-visible { outline: 0; box-shadow: none; border: 0; background: transparent; border-radius: 0; }
+html body .xsr button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
