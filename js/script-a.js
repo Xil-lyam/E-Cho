@@ -97,7 +97,9 @@ window.__uandiApp = function () {
     },
     openChat: function (r) { if (r.group) { var g = chatOf(r.id); if (g) openChat('', g.title || 'Groupe', g); } else openChat(r.uid, r.name); },
     openUser: function (uid, name) {
-      if (state.chats.some(function (c) { return !c.group && (c.members || []).indexOf(uid) > -1; })) openChat(uid, name);
+      var f = frWith(uid);
+      /* discussion existante ou ami : directement les messages ; sinon la fiche (invitation par message) */
+      if ((f && f.status === 'accepted') || state.chats.some(function (c) { return !c.group && (c.members || []).indexOf(uid) > -1; })) openChat(uid, name);
       else openUserCard(uid, name);
     }
   };

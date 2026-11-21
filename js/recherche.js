@@ -126,10 +126,13 @@
     info.appendChild(nm);
     var un = el('span', 'xsr-un'); un.appendChild(document.createTextNode('@')); un.appendChild(mark(r.username || '', query)); info.appendChild(un);
     main.appendChild(info);
-    main.addEventListener('click', function () {
-      if (window.UIProfile && UIProfile.open) UIProfile.open(r.id, r.name || r.username);
+    function toProfile() {
       pushRecent(query || r.username || '');
-    });
+      if (window.UIProfile && UIProfile.open) UIProfile.open(r.id, r.name || r.username);
+      else if (api()) api().openUser(r.id, r.name || r.username);
+    }
+    main.addEventListener('click', toProfile);
+    li.addEventListener('click', function (e) { if (e.target === li) toProfile(); });   /* toute la ligne ouvre le profil, sauf le cœur et le bouton message */
     li.appendChild(main);
     var like = el('button', 'xsr-like'); like.type = 'button'; like.setAttribute('aria-label', 'Aimer ce profil');
     like.appendChild(svg(I.heart, 20)); like.appendChild(el('span', 'n', '0'));
