@@ -2009,6 +2009,7 @@ window.__uandiApp = function () {
     var m = state.msgs.find(function (x) { return x.id === id; });
     var now = !(m && m.likes && m.likes[state.me] === true);
     var oldL = m && m.likes, oldR = m && m.reacts;
+    state.open.delete(id); if (state.picker === id) state.picker = null;
     if (m) {   /* affichage immédiat du cœur */
       m.likes = Object.assign({}, m.likes); m.reacts = Object.assign({}, m.reacts); delete m.reacts[state.me];
       if (now) m.likes[state.me] = true; else delete m.likes[state.me];
@@ -2619,7 +2620,7 @@ window.__uandiApp = function () {
     m.likes = Object.assign({}, m.likes); delete m.likes[state.me];
     m.reacts = Object.assign({}, m.reacts); delete m.reacts[state.me];
     if (next) { if (next === '\u2764\uFE0F') m.likes[state.me] = true; else m.reacts[state.me] = next; }
-    state.picker = null;
+    state.picker = null; state.open.delete(id);   /* le menu d'actions se ferme en même temps que les réactions */
     closePickerAnim(id, next, render);
     busy.add(id);
     try {
