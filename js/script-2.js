@@ -247,7 +247,7 @@ window.__uandiMods['js/ui/onglets.js'] = function () {
     }
     new MutationObserver(paintMusic).observe(om, { attributes: true, attributeFilter: ['class'] });
     var mti = $('mTitle'); if (mti) new MutationObserver(paintMusic).observe(mti, { childList: true, characterData: true, subtree: true });
-    setInterval(function () { paintMusic(); }, 700);
+    setInterval(function () { if (!document.hidden && om.classList.contains('playing')) paintMusic(); }, 700);
     window.__echoPaintMusic = paintMusic; paintMusic();
   })();
   /* la pilule se réduit quand on fait défiler vers le bas, et revient en remontant */

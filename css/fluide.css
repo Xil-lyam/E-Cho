@@ -1,0 +1,8 @@
+/* X'enify : fluidité — moins d'animations permanentes (batterie + saccades), réponse tactile immédiate */
+button, a, [role="button"], .chatrow, .tab, .rxb, label { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+#log { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+/* pas d'animation en boucle sur chaque ligne des listes (une par message / par discussion) */
+html body #viewList #chats .chatrow .pip { animation: none; }
+#log .ubadge, #log .ubadge::after, #chats .ubadge, #chats .ubadge::after { animation: none !important; }
+/* les écrans cachés ne travaillent pas */
+[hidden] { animation: none !important; }
