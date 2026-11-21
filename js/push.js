@@ -1,12 +1,10 @@
 /* X'enify : notifications push (client) — version Supabase.
    - Abonne cet appareil : l'abonnement est rangé dans la table push_subs.
-   - Quand JE envoie un message, l'appli prévient la fonction Netlify (push.js) qui notifie les autres membres.
-   À configurer : VAPID_PUBLIC et FN_URL ci-dessous (voir LISEZMOI-PUSH.md). */
+   - Quand JE envoie un message, l'appli prévient la fonction Supabase « push » (supabase/functions/push) qui notifie les autres membres.
+   À configurer : VAPID_PUBLIC ci-dessous + déployer la fonction (voir sql/LISEZMOI-FONCTIONS.md). */
 (function () {
   var VAPID_PUBLIC = 'BKN_ouxQ0NgRLHCT3PkK2xAnaWPBArcnxMskx8Zlj2K1UYkn_1NA3p6EeQCIWwaffuHmyECzz1JrPxQV828ddgE';
-  /* Si le site est sur Netlify : laisse tel quel.
-     Si le site est sur GitHub Pages : mets l'adresse complète, ex. 'https://ma-fonction.netlify.app/.netlify/functions/push' */
-  var FN_URL = 'https://dazzling-horse-f6d13a.netlify.app/.netlify/functions/push';
+  function fnUrl() { return String(window.__sb.supabaseUrl).replace(/\/$/, '') + '/functions/v1/push'; }
 
   if (VAPID_PUBLIC.indexOf('COLLE') === 0) return;
   if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) return;
@@ -75,7 +73,7 @@
     var now = Date.now(); if (lastPing[cid] && now - lastPing[cid] < 800) return; lastPing[cid] = now;
     window.__sb.auth.getSession().then(function (r) {
       var s = r && r.data && r.data.session; if (!s) return;
-      return fetch(FN_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: s.access_token, chatId: cid }) });
+      return fetch(fnUrl(), { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + s.access_token }, body: JSON.stringify({ token: s.access_token, chatId: cid }) });
     }).catch(function () {});
   };
 

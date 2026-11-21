@@ -1357,7 +1357,7 @@
       var s = window.__sb && (await window.__sb.auth.getSession());
       var tk = s && s.data && s.data.session && s.data.session.access_token;
       if (!tk) return;
-      var r = await fetch('/.netlify/functions/turn', { headers: { Authorization: 'Bearer ' + tk } });
+      var r = await fetch(String(window.__sb.supabaseUrl).replace(/\/$/, '') + '/functions/v1/turn', { headers: { Authorization: 'Bearer ' + tk } });
       if (!r.ok) return;
       var j = await r.json();
       if (j && j.iceServers && j.iceServers.length) ICE.iceServers = j.iceServers.concat(ICE_BASE);
@@ -4179,7 +4179,7 @@
 
   /* ---------- approbation des nouveaux comptes par le créateur ---------- */
   var apNew = false, AP = { items: [], unsub: null, first: true, auto: false, since: 0, setU: null, done: {} }, AG = { unsub: null };
-  var AP_FN = 'https://dazzling-horse-f6d13a.netlify.app/.netlify/functions/push';
+  var AP_FN = '';
   function apPaint() {
     var b = $('#apBtn'); if (!b) return;
     b.textContent = 'Comptes à approuver' + (AP.items.length ? ' (' + AP.items.length + ')' : '');

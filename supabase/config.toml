@@ -1,0 +1,5 @@
+[functions.push]
+verify_jwt = false
+
+[functions.turn]
+verify_jwt = false
