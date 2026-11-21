@@ -3880,6 +3880,7 @@ window.__uandiApp = function () {
   function noteCount() { $('#noteCount').textContent = $('#noteInput').value.length + ' / 60'; }
   function noteErr(t) { var e = $('#noteErr'); e.textContent = t || ''; e.hidden = !t; }
   function openNoteEditor() {
+    try { if (window.__shortsClose) window.__shortsClose(); } catch (e) {} 
     var a = activeNote(state.me);
     $('#noteInput').value = a ? a.text : '';
     $('#noteDel').hidden = !a;

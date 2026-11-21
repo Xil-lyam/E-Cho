@@ -555,6 +555,7 @@
     doc.dispatchEvent(new Event('shortschange'));
   }
 
+  window.__shortsClose = close;   /* appelé quand une story / une note s'ouvre : plus de son qui continue derrière */
   doc.addEventListener('visibilitychange', function () { try { if (isOpen && player) { if (doc.hidden) player.pauseVideo(); else player.playVideo(); } } catch (e) {} });
   /* se ferme si l'app change d'écran (déconnexion, discussion, musique, jeux, lettres) */
   function watchHidden(id, closeWhenShown) {

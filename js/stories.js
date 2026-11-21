@@ -612,6 +612,7 @@
     view.addEventListener('close', function () { clearTimeout(V.timer); V.tok++; V.paused = false; V.run = false; V.held = false; var vw = $('stVw'); if (vw) vw.hidden = true; var mw = $('stMenuW'); if (mw) mw.hidden = true; var rxe = $('stRx'); if (rxe) rxe.hidden = true; var rin = $('stRIn'); if (rin) { rin.value = ''; rin.blur(); } var rsd = $('stRSend'); if (rsd) rsd.hidden = true; view.style.transition = ''; view.style.transform = ''; view.style.opacity = ''; stopMedia(); renderBar(); });
   }
   function openQueue(q, start) {
+    try { if (window.__shortsClose) window.__shortsClose(); } catch (e) {} 
     if (!q.length || !me()) return;
     ensureView();
     V.q = q; V.qi = start || 0; V.si = 0;
@@ -867,6 +868,7 @@
     $('stAudH').textContent = C.aud === 'close' ? (n ? n + (n > 1 ? ' amis proches verront' : ' ami proche verra') + ' cette story.' : 'Ta liste d’amis proches est vide : ajoute-en depuis la fiche d’un ami.') : '';
   }
   function compose() {
+    try { if (window.__shortsClose) window.__shortsClose(); } catch (e) {} 
     if (!me()) return;
     ensureComp();
     clearMedia(); C.mus = null; C.bg = Math.floor(Math.random() * BGS.length); C.busy = false;
